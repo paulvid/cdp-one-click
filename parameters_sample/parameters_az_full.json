@@ -1,0 +1,27 @@
+{
+    "required": {
+        "prefix":         "pvi",
+        "credential":     "pvidal-az-se-credential",
+        "region":         "Central US",
+        "key":            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4YhcNwxMvZLyLECWfJyqf5rdk+R+DM2gzt0cEFYu9/SVV3GWAGvESevGCMEZaqapMDWgY+9n5uFgQRKo8UeVH1cJuRqQUZOY44ZiZokiMZ+kkY5rPOj44ArKXvqQDz0DB1EVyMYB8LATjloDtcghl51Z/y2hXMjaxpewYokTh8YTeMPvyBYvvIuRIW0EOMMDLXfR3EXaLwQAtlDjWkQYezFnkNM4lQsYJ50ohb/DA68ZCBhvTYqPYPbFmeNHubt/ymucecDaAJFbwmdHf6j+8xbT/HH/4GbCUXgU9RNCKgJfBlOcgEEBCy0cbg/hFz2sawMA+epuX4OhY2s9atugV",
+        "workload_pwd":   "cdpw0rksh0p",
+        "datahub_list": [
+            {
+                "definition": "data-mart.json",
+                "custom_script": ""
+            }],
+        "ml_workspace_list": []
+    },
+    "optional": {
+        "cloud_provider": "az", 
+        "cloud_profile":  "default",
+        "cdp_profile":    "default",
+        "generate_credential": "yes",
+        "generate_minimal_cross_account": "no",
+        "create_network": "no",
+        "tags": {
+            "end_date":       "04102020",
+            "project":        "pvi_test"
+        }
+    }
+}

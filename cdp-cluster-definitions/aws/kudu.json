@@ -1,0 +1,152 @@
+{
+  "environmentName": "pvi-cdp-env",
+  "instanceGroups": [
+    {
+      "nodeCount": 1,
+      "name": "coordinator",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "i3.4xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 1900,
+            "count": 2,
+            "type": "ephemeral"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "master2",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "master3",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "master1",
+      "type": "GATEWAY",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 3,
+      "name": "executor",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "i3.4xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 1900,
+            "count": 2,
+            "type": "ephemeral"
+          }
+        ]
+      },
+      "recipeNames": []
+    }
+  ],
+  "image": {
+    "catalog": "cdp-default",
+    "id": "dad279ba-5845-4803-664b-a17aae10953c"
+  },
+  "network": {
+    "aws": {
+      "subnetId": "subnet-0ef5b6bc20eff0b20"
+    }
+  },
+  "cluster": {
+    "databases": [],
+    "cloudStorage": {
+      "aws": {
+        "s3Guard": {
+          "dynamoTableName": "pvi-cdp-table"
+        }
+      },
+      "locations": [
+        {
+          "type": "YARN_LOG",
+          "value": "s3a://pvi-cdp-bucket/pvi-dl/oplogs/yarn-app-logs"
+        }
+      ],
+      "identities": [
+        {
+          "s3": {
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvi-idbroker-role"
+          },
+          "type": "LOG"
+        }
+      ]
+    },
+    "exposedServices": [
+      "ALL"
+    ],
+    "blueprintName": "7.1.0 - Real-time Data Mart: Apache Impala, Hue, Apache Kudu, Apache Spark",
+    "validateBlueprint": false
+  },
+  "sdx": {
+    "name": "pvi-cdp-dl"
+  },
+  "tags": {
+    "application": null,
+    "userDefined": {},
+    "defaults": null
+  },
+  "inputs": {}
+}

@@ -1,0 +1,119 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Effect": "Allow",
+          "Action": [
+              "autoscaling:CreateAutoScalingGroup",
+              "autoscaling:DeleteAutoScalingGroup",
+              "autoscaling:DescribeAutoScalingGroups",
+              "autoscaling:CreateLaunchConfiguration",
+              "autoscaling:DeleteLaunchConfiguration"
+          ],
+          "Resource": "*"
+      },
+      {
+          "Effect": "Allow",
+          "Action": [
+              "cloudformation:CreateStack",
+              "cloudformation:DeleteStack",
+              "cloudformation:DescribeStackEvents",
+              "cloudformation:DescribeStacks",
+              "cloudformation:CreateChangeSet",
+              "cloudformation:DeleteChangeSet",
+              "cloudformation:DescribeChangeSet",
+              "cloudformation:ExecuteChangeSet"
+          ],
+          "Resource": "*"
+      },
+      {
+          "Effect": "Allow",
+          "Action": [
+              "ec2:CreateNetworkInterface",
+              "ec2:DeleteNetworkInterface",
+              "ec2:DescribeNetworkInterfaces",
+              "ec2:DescribeImages",
+              "ec2:DescribeInstances",
+              "ec2:DeleteKeyPair",
+              "ec2:ImportKeyPair",
+              "ec2:DescribeRouteTables",
+              "ec2:CreateSecurityGroup",
+              "ec2:DeleteSecurityGroup",
+              "ec2:AuthorizeSecurityGroupIngress",
+              "ec2:RevokeSecurityGroupIngress",
+              "ec2:AuthorizeSecurityGroupEgress",
+              "ec2:RevokeSecurityGroupEgress",
+              "ec2:CreatePlacementGroup",
+              "ec2:DeletePlacementGroup",
+              "ec2:DescribePlacementGroups",
+              "ec2:DescribeSubnets",
+              "ec2:DescribeVpcs"
+          ],
+          "Resource": "*"
+      },
+      {
+          "Effect": "Allow",
+          "Action": [
+              "elasticfilesystem:CreateFileSystem",
+              "elasticfilesystem:DeleteFileSystem",
+              "elasticfilesystem:DescribeFileSystems",
+              "elasticfilesystem:CreateMountTarget",
+              "elasticfilesystem:DeleteMountTarget",
+              "elasticfilesystem:DescribeMountTargets"
+          ],
+          "Resource": "*"
+      },
+      {
+          "Effect": "Allow",
+          "Action": [
+              "elasticloadbalancing:DescribeLoadBalancers"
+          ],
+          "Resource": "*"
+      },
+      {
+          "Effect": "Allow",
+          "Action": [
+              "eks:CreateCluster",
+              "eks:DeleteCluster",
+              "eks:DescribeCluster",
+              "eks:DescribeUpdate",
+              "eks:UpdateClusterConfig",
+              "eks:UpdateClusterVersion",
+              "eks:TagResource"
+          ],
+          "Resource": "*"
+      },
+      {
+          "Effect": "Allow",
+          "Action": [
+              "iam:GetRole",
+              "iam:CreateRole",
+              "iam:DeleteRole",
+              "iam:TagRole",
+              "iam:UntagRole",
+              "iam:ListRoleTags",
+              "iam:GetRolePolicy",
+              "iam:AttachRolePolicy",
+              "iam:DetachRolePolicy",
+              "iam:PutRolePolicy",
+              "iam:DeleteRolePolicy",
+              "iam:CreateInstanceProfile",
+              "iam:DeleteInstanceProfile",
+              "iam:AddRoleToInstanceProfile",
+              "iam:RemoveRoleFromInstanceProfile",
+              "iam:CreateServiceLinkedRole"
+          ],
+          "Resource": "*"
+      },
+      {
+          "Effect": "Allow",
+          "Action": [
+              "iam:PassRole"
+          ],
+          "Resource": [
+              "arn:aws:iam::${local.account_id}:role/liftie-*-eks-service-role",
+              "arn:aws:iam::${local.account_id}:role/liftie-*-eks-worker-nodes"
+          ]
+      }
+  ]
+}

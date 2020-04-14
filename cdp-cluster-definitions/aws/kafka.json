@@ -1,0 +1,112 @@
+{
+  "environmentName": "pvi-cdp-env",
+  "instanceGroups": [
+    {
+      "nodeCount": 2,
+      "name": "executor",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5d.4xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 300,
+            "count": 2,
+            "type": "ephemeral"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "coordinator",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5d.4xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 300,
+            "count": 2,
+            "type": "ephemeral"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "master",
+      "type": "GATEWAY",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5.4xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    }
+  ],
+  "image": {
+    "catalog": "cdp-default",
+    "id": "dad279ba-5845-4803-664b-a17aae10953c"
+  },
+  "network": {
+    "aws": {
+      "subnetId": "subnet-0ef5b6bc20eff0b20"
+    }
+  },
+  "cluster": {
+    "databases": [],
+    "cloudStorage": {
+      "aws": {
+        "s3Guard": {
+          "dynamoTableName": "pvi-cdp-table"
+        }
+      },
+      "locations": [
+        {
+          "type": "DEFAULT_FS",
+          "value": "s3a://pvi-cdp-bucket/pvi-dl/data-mart"
+        }
+      ],
+      "identities": [
+        {
+          "s3": {
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvi-idbroker-role"
+          },
+          "type": "LOG"
+        }
+      ]
+    },
+    "exposedServices": [
+      "ALL"
+    ],
+    "blueprintName": "7.1.0 - Data Mart: Apache Impala, Hue",
+    "validateBlueprint": false
+  },
+  "sdx": {
+    "name": "pvi-cdp-dl"
+  },
+  "tags": {
+    "application": null,
+    "userDefined": {},
+    "defaults": null
+  },
+  "inputs": {}
+}

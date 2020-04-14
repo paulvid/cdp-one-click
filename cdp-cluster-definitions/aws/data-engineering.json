@@ -1,0 +1,136 @@
+{
+  "environmentName": "pvi-cdp-env",
+  "instanceGroups": [
+    {
+      "nodeCount": 3,
+      "name": "worker",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 0,
+      "name": "gateway",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 0,
+      "name": "compute",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "master",
+      "type": "GATEWAY",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    }
+  ],
+  "image": {
+    "catalog": "cdp-default",
+    "id": "dad279ba-5845-4803-664b-a17aae10953c"
+  },
+  "network": {
+    "aws": {
+      "subnetId": "subnet-0ef5b6bc20eff0b20"
+    }
+  },
+  "cluster": {
+    "databases": [],
+    "cloudStorage": {
+      "aws": {
+        "s3Guard": {
+          "dynamoTableName": "pvi-cdp-table"
+        }
+      },
+      "locations": [
+        {
+          "type": "YARN_LOG",
+          "value": "s3a://pvi-cdp-bucket/pvi-dl/oplogs/yarn-app-logs"
+        },
+        {
+          "type": "ZEPPELIN_NOTEBOOK",
+          "value": "s3a://pvi-cdp-bucket/pvi-dl/data-engineering/zeppelin/notebook"
+        }
+      ],
+      "identities": [
+        {
+          "s3": {
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvi-idbroker-role"
+          },
+          "type": "LOG"
+        }
+      ]
+    },
+    "exposedServices": [
+      "ALL"
+    ],
+    "blueprintName": "7.1.0 - Data Engineering: Apache Spark, Apache Hive, Apache Oozie",
+    "validateBlueprint": false
+  },
+  "sdx": {
+    "name": "pvi-cdp-dl"
+  },
+  "tags": {
+    "application": null,
+    "userDefined": {},
+    "defaults": null
+  },
+  "inputs": {}
+}

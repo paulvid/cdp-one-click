@@ -1,0 +1,25 @@
+{
+    "required": {
+
+        "prefix":         "pvi",
+        "credential":     "pvidal-aws-se-credential",
+        "region":         "us-east-1",
+        "key":            "field",
+        "workload_pwd":   "cdpw0rksh0p",
+        "datahub_list": [
+            {
+                "definition": "cdp-mod-workshop.json",
+                "custom_script": "cdp_mod_workshop.sh"
+            }],
+        "ml_workspace_list": []
+    },
+    "optional": {
+        "cloud_provider": "aws", 
+        "cloud_profile":  "workshop",
+        "cdp_profile":    "workshop",
+        "generate_credential": "yes",
+        "external_id": "e803d401-3ce4-434c-a4cb-d49e8736976f",
+        "generate_minimal_cross_account": "no",
+        "create_network": "yes"
+    }
+}

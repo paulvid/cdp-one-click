@@ -1,0 +1,112 @@
+{
+  "environmentName": "pvc-cdp-env",
+  "instanceGroups": [
+    {
+      "nodeCount": 1,
+      "name": "coordinator",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5d.4xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 300,
+            "count": 2,
+            "type": "ephemeral"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "master",
+      "type": "GATEWAY",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5.4xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 2,
+      "name": "executor",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5d.4xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 300,
+            "count": 2,
+            "type": "ephemeral"
+          }
+        ]
+      },
+      "recipeNames": []
+    }
+  ],
+  "image": {
+    "catalog": "cdp-default",
+    "id": "dad279ba-5845-4803-664b-a17aae10953c"
+  },
+  "network": {
+    "aws": {
+      "subnetId": "subnet-0bd06c9931da8c52a"
+    }
+  },
+  "cluster": {
+    "databases": [],
+    "cloudStorage": {
+      "aws": {
+        "s3Guard": {
+          "dynamoTableName": "pvc-cdp-table"
+        }
+      },
+      "locations": [
+        {
+          "type": "DEFAULT_FS",
+          "value": "s3a://pvc-cdp-bucket/wertew"
+        }
+      ],
+      "identities": [
+        {
+          "s3": {
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvc-log-role"
+          },
+          "type": "LOG"
+        }
+      ]
+    },
+    "exposedServices": [
+      "ALL"
+    ],
+    "blueprintName": "7.1.0 - Data Mart: Apache Impala, Hue",
+    "validateBlueprint": false
+  },
+  "sdx": {
+    "name": "pvc-cdp-dl"
+  },
+  "tags": {
+    "application": null,
+    "userDefined": {},
+    "defaults": null
+  },
+  "inputs": {}
+}
