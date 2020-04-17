@@ -1,1 +1,10 @@
 *.DS_Store*
+copy_from_infra.sh
+cdp-recipes/*
+parameters
+cdp-dh-custom-scripts/*
+cdp-cluster-definitions/aws/cdp-mod-workshop.json
+cdp-cluster-definitions/aws/cdp-main-workshop.json
+cdp-cluster-definitions/aws/cdp-emr-workshop.json
+cdp-cluster-definitions/aws/cdf-workshop.json
+cdp-cluster-templates/*

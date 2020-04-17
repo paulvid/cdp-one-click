@@ -79,9 +79,12 @@ for row in $(echo ${all_clusters} | jq -r '.clusters[] | @base64'); do
     }
     cluster_name=$(_jq '.clusterName')
 
-
-    cdp datahub  stop-cluster --cluster-name $cluster_name > /dev/null 2>&1
-
+    dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
+    if [ "$dh_status" != "STOPPED" ]
+    then
+        result=$(cdp datahub stop-cluster --cluster-name $cluster_name 2>&1 > /dev/null)
+        handle_exception $? $prefix "datahub stop" "$result"
+    fi
 
     dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
 
@@ -94,11 +97,10 @@ for row in $(echo ${all_clusters} | jq -r '.clusters[] | @base64'); do
         dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
     done
 
-        printf "\r${CHECK_MARK}  $prefix: $cluster_name datahub cluster status: $dh_status                            "
-        echo ""
+    printf "\r${CHECK_MARK}  $prefix: $cluster_name datahub cluster status: $dh_status                            "
+
 done
 
-echo ""
 # 2. Stopping SDX
 echo ""
 echo "⏱  $(date +%H%Mhrs)"
@@ -110,10 +112,50 @@ do
     underline=${underline}"▔"
 done
 echo ${underline}
-echo "🚫  $prefix: SDX stop is not yet supported by CLI"
-echo ""
-echo ""
 
+# 2.1 Datalake
+
+dl_status=$($base_dir/cdp_describe_dl.sh  $prefix | jq -r .datalake.status)
+if [ "$dl_status" != "STOPPED" ]
+then
+    result=$(cdp datalake stop-datalake --datalake-name $prefix-cdp-dl 2>&1 > /dev/null)
+    handle_exception $? $prefix "datalake stop" "$result"
+fi
+dl_status=$($base_dir/cdp_describe_dl.sh  $prefix | jq -r .datalake.status)
+
+spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+while [ "$dl_status" != "STOPPED" ]
+do 
+    i=$(( (i+1) %8 ))
+    printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
+    sleep 2
+    dl_status=$($base_dir/cdp_describe_dl.sh  $prefix | jq -r .datalake.status)
+done
+
+printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                                 "
+
+# 2.2 Environment
+
+env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
+if [ "$env_status" != "STOPPED" ]
+then
+    result=$(cdp environments stop-environment --environment-name $prefix-cdp-env 2>&1 > /dev/null)
+    handle_exception $? $prefix "environment stop" "$result"
+fi
+env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
+
+spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+while [ "$env_status" != "STOPPED" ]
+do 
+    i=$(( (i+1) %8 ))
+    printf "\r${spin:$i:1}  $prefix: environment status: $env_status                              "
+    sleep 2
+    env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
+done
+
+printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                                   "
+
+echo ""
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"

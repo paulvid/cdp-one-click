@@ -58,7 +58,63 @@ run_pre_checks
 echo "${CHECK_MARK}  pre-checks done"
 echo ""
 
-# 1. Starting datahub clusters
+
+# 1. Starting SDX
+echo ""
+echo "⏱  $(date +%H%Mhrs)"
+echo ""
+echo "Starting SDX (environment & datalake) for $prefix:"
+underline="▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔"
+for ((i=1;i<=$prefix_length;i++))
+do
+    underline=${underline}"▔"
+done
+echo ${underline}
+
+# 1.1 Environment
+
+env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
+if [ "$env_status" != "AVAILABLE" ]
+then
+    result=$(cdp environments start-environment --environment-name $prefix-cdp-env 2>&1 > /dev/null)
+    handle_exception $? $prefix "environment start" "$result"
+fi
+env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
+
+spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+while [ "$env_status" != "AVAILABLE" ]
+do 
+    i=$(( (i+1) %8 ))
+    printf "\r${spin:$i:1}  $prefix: environment status: $env_status                              "
+    sleep 2
+    env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
+done
+
+printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                                   "
+
+# 1.1 Datalake
+
+dl_status=$($base_dir/cdp_describe_dl.sh  $prefix | jq -r .datalake.status)
+if [ "$dl_status" != "RUNNING" ]
+then
+    result=$(cdp datalake start-datalake --datalake-name $prefix-cdp-dl 2>&1 > /dev/null)
+    handle_exception $? $prefix "datalake start" "$result"
+fi
+dl_status=$($base_dir/cdp_describe_dl.sh  $prefix | jq -r .datalake.status)
+
+spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+while [ "$dl_status" != "RUNNING" ]
+do 
+    i=$(( (i+1) %8 ))
+    printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
+    sleep 2
+    dl_status=$($base_dir/cdp_describe_dl.sh  $prefix | jq -r .datalake.status)
+done
+
+printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                                 "
+
+
+# 2. Starting datahub clusters
 echo ""
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
@@ -79,10 +135,13 @@ for row in $(echo ${all_clusters} | jq -r '.clusters[] | @base64'); do
     }
     cluster_name=$(_jq '.clusterName')
 
-
-    cdp datahub  start-cluster --cluster-name $cluster_name > /dev/null 2>&1
-
-
+    dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
+    if [ "$dh_status" != "AVAILABLE" ]
+    then
+        result=$(cdp datahub start-cluster --cluster-name $cluster_name 2>&1 > /dev/null)
+        handle_exception $? $prefix "datahub start" "$result"
+    fi
+    
     dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
 
     spin='🌑🌒🌓🌔🌕🌖🌗🌘'
@@ -99,20 +158,7 @@ for row in $(echo ${all_clusters} | jq -r '.clusters[] | @base64'); do
 done
 
 echo ""
-# 2. Stopping SDX
-echo ""
-echo "⏱  $(date +%H%Mhrs)"
-echo ""
-echo "Starting SDX (environment & datalake) for $prefix:"
-underline="▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔"
-for ((i=1;i<=$prefix_length;i++))
-do
-    underline=${underline}"▔"
-done
-echo ${underline}
-echo "🚫  $prefix: SDX start is not yet supported by CLI"
-echo ""
-echo ""
+
 
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
