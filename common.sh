@@ -97,7 +97,13 @@ parse_parameters()
     cdp_profile=$(handle_null_param "$cdp_profile" "no" "default")
 
     end_date=$(cat ${param_file} | jq -r .optional.tags.end_date)
-    default_date=$(date -v+3d "+%m%d%Y")
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        date -d "$dt +3 day" "+%m%d%Y"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        default_date=$(date -v+3d "+%m%d%Y")
+    fi
+
+    
     end_date=$(handle_null_param "$end_date" "no" "$default_date")
 
     default_project=$prefix"_one_click_project"

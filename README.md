@@ -187,7 +187,7 @@ cdp_create_datahub_things.sh <your_param_file>
 cdp_create_ml_things.sh <your_param_file> 
 ```
 
-### Starting / Stopping (in progress)
+### Starting / Stopping (work in progress)
 ```
 cdp_stop_all_the_things.sh <your_param_file> 
 ```
