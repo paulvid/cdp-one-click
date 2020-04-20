@@ -98,9 +98,11 @@ parse_parameters()
 
     end_date=$(cat ${param_file} | jq -r .optional.tags.end_date)
     if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        date -d "$dt +3 day" "+%m%d%Y"
+        default_date=$(date -d "$dt +3 day" "+%m%d%Y")
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         default_date=$(date -v+3d "+%m%d%Y")
+    else 
+        default_date="05202020"
     fi
 
     
