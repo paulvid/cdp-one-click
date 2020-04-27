@@ -1,9 +1,9 @@
 {
-  "environmentName": "pvi-cdp-env",
+  "environmentName": "tmc-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 1,
-      "name": "coordinator",
+      "nodeCount": 3,
+      "name": "executor",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -43,26 +43,6 @@
     },
     {
       "nodeCount": 1,
-      "name": "master3",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "instanceType": "r5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "standard"
-          }
-        ]
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
       "name": "master1",
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
@@ -82,8 +62,8 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 3,
-      "name": "executor",
+      "nodeCount": 1,
+      "name": "coordinator",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -100,15 +80,35 @@
         ]
       },
       "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "master3",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "dad279ba-5845-4803-664b-a17aae10953c"
+    "id": "fd89dfe4-6e1c-4662-5610-e95162972a79"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-0ef5b6bc20eff0b20"
+      "subnetId": "subnet-0dd5372cfe2e28b0e"
     }
   },
   "cluster": {
@@ -116,19 +116,19 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "pvi-cdp-table"
+          "dynamoTableName": "tmc-cdp-table"
         }
       },
       "locations": [
         {
           "type": "YARN_LOG",
-          "value": "s3a://pvi-cdp-bucket/pvi-dl/oplogs/yarn-app-logs"
+          "value": "s3a://tmc-cdp-bucket/oplogs/yarn-app-logs"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvi-idbroker-role"
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/tmc-log-role"
           },
           "type": "LOG"
         }
@@ -141,7 +141,10 @@
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-cdp-dl"
+    "name": "tmc-cdp-dl"
+  },
+  "externalDatabase": {
+    "availabilityType": "NONE"
   },
   "tags": {
     "application": null,

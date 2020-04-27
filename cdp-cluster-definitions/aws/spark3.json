@@ -2,6 +2,26 @@
   "environmentName": "tmc-cdp-env",
   "instanceGroups": [
     {
+      "nodeCount": 0,
+      "name": "compute",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
       "nodeCount": 1,
       "name": "master",
       "type": "GATEWAY",
@@ -9,7 +29,7 @@
       "template": {
         "instanceType": "m5.2xlarge",
         "rootVolume": {
-          "size": 100
+          "size": 50
         },
         "attachedVolumes": [
           {
@@ -23,7 +43,7 @@
     },
     {
       "nodeCount": 3,
-      "name": "broker",
+      "name": "worker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -33,9 +53,9 @@
         },
         "attachedVolumes": [
           {
-            "size": 500,
+            "size": 100,
             "count": 1,
-            "type": "st1"
+            "type": "standard"
           }
         ]
       },
@@ -48,7 +68,7 @@
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-0dd5372cfe2e28b0e"
+      "subnetId": "subnet-0409abfa8439eb06c"
     }
   },
   "cluster": {
@@ -61,8 +81,8 @@
       },
       "locations": [
         {
-          "type": "DEFAULT_FS",
-          "value": "s3a://tmc-cdp-bucket/pvi-test-kafka"
+          "type": "YARN_LOG",
+          "value": "s3a://tmc-cdp-bucket/oplogs/yarn-app-logs"
         }
       ],
       "identities": [
@@ -77,7 +97,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.1.0 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
+    "blueprintName": "7.1.0 - Data Engineering: Apache Spark3",
     "validateBlueprint": false
   },
   "sdx": {

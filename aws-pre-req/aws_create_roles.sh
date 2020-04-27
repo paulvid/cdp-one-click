@@ -49,7 +49,7 @@ DATALAKE_BUCKET=${bucket}
 # LOGS_LOCATION_BASE=${bucket}/${prefix}-dl/logs
 
 STORAGE_LOCATION_BASE=${bucket}/
-LOGS_LOCATION_BASE=${bucket}/logs
+LOGS_LOCATION_BASE=${bucket}/
 DYNAMODB_TABLE_NAME=${prefix}-cdp-table
 IDBROKER_ROLE=${prefix}-idbroker-role
 sleep_duration=3

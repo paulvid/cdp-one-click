@@ -1,57 +1,12 @@
 {
-  "environmentName": "pvi-cdp-env",
+  "environmentName": "tmc-cdp-env",
   "instanceGroups": [
-    {
-      "nodeCount": 3,
-      "name": "zk",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "aws": {},
-        "instanceType": "m5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "standard"
-          }
-        ],
-        "cloudPlatform": "AWS"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 3,
-      "name": "nifimaster",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "aws": {},
-        "instanceType": "m5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "standard"
-          }
-        ],
-        "cloudPlatform": "AWS"
-      },
-      "recipeNames": []
-    },
     {
       "nodeCount": 1,
       "name": "gateway",
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
-        "aws": {},
         "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
@@ -62,19 +17,38 @@
             "count": 1,
             "type": "standard"
           }
-        ],
-        "cloudPlatform": "AWS"
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 3,
+      "name": "nifi",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 150
+        },
+        "attachedVolumes": [
+          {
+            "size": 500,
+            "count": 4,
+            "type": "standard"
+          }
+        ]
       },
       "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "dad279ba-5845-4803-664b-a17aae10953c"
+    "id": "fd89dfe4-6e1c-4662-5610-e95162972a79"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-0930147fa4e0bfdf4"
+      "subnetId": "subnet-0dd5372cfe2e28b0e"
     }
   },
   "cluster": {
@@ -82,19 +56,19 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "pvi-cdp-table"
+          "dynamoTableName": "tmc-cdp-table"
         }
       },
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "s3a://pvi-cdp-bucket/pvi-dl/nifi-cluster"
+          "value": "s3a://tmc-cdp-bucket/pvi-test-nifi"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvi-idbroker-role"
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/tmc-log-role"
           },
           "type": "LOG"
         }
@@ -103,11 +77,11 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "flow-management",
+    "blueprintName": "7.1.0 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-cdp-dl"
+    "name": "tmc-cdp-dl"
   },
   "tags": {
     "application": null,

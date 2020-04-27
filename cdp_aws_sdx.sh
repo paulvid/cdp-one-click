@@ -77,7 +77,7 @@ else
     handle_exception $? $prefix "environment creation" "$result"
 fi
 
-
+sleep 200 # to avoid environment not found exception
 
 env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
 

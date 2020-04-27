@@ -1,9 +1,9 @@
 {
-  "environmentName": "pvc-cdp-env",
+  "environmentName": "tmc-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 1,
-      "name": "coordinator",
+      "nodeCount": 2,
+      "name": "executor",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -42,8 +42,8 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 2,
-      "name": "executor",
+      "nodeCount": 1,
+      "name": "coordinator",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -64,11 +64,11 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "dad279ba-5845-4803-664b-a17aae10953c"
+    "id": "fd89dfe4-6e1c-4662-5610-e95162972a79"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-0bd06c9931da8c52a"
+      "subnetId": "subnet-0dd5372cfe2e28b0e"
     }
   },
   "cluster": {
@@ -76,19 +76,19 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "pvc-cdp-table"
+          "dynamoTableName": "tmc-cdp-table"
         }
       },
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "s3a://pvc-cdp-bucket/wertew"
+          "value": "s3a://tmc-cdp-bucket/pvi-test-dm"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvc-log-role"
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/tmc-log-role"
           },
           "type": "LOG"
         }
@@ -101,7 +101,10 @@
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvc-cdp-dl"
+    "name": "tmc-cdp-dl"
+  },
+  "externalDatabase": {
+    "availabilityType": "NONE"
   },
   "tags": {
     "application": null,
