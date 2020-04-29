@@ -1,0 +1,43 @@
+{
+  "vers": 1,
+  "config": {
+    "sdx": [
+      {
+        "instance": "freeipa",
+        "instanceTypes": [
+          {
+            "size": "m5.large",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "instance": "idbroker",
+        "instanceTypes": [
+          {
+            "size": "t3.medium",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "instance": "master",
+        "instanceTypes": [
+          {
+            "size": "m5.2xlarge",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "instance": "rds",
+        "instanceTypes": [
+          {
+            "size": "db.m5.large",
+            "quantity": 1
+          }
+        ]
+      }
+    ]
+  }
+}

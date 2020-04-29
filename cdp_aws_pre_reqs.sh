@@ -98,7 +98,7 @@ then
     fi
 
     created_network=$var_out
-
+    mkdir $base_dir/aws-pre-req/tmp_network 2>&1 > /dev/null
     echo $var_out > $base_dir/aws-pre-req/tmp_network/${prefix}_aws_network.json
 
     igw_id=$(echo $created_network | jq -r .InternetGatewayId)

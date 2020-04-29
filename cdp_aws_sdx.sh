@@ -15,7 +15,6 @@ Arguments:
 
 }
 
-
 # check whether user had supplied -h or --help . If yes display usage 
 if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
 then 
@@ -42,9 +41,6 @@ fi
 # Parsing arguments
 parse_parameters ${1}
 
-
-
-    
 # Creating environment
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
@@ -77,7 +73,20 @@ else
     handle_exception $? $prefix "environment creation" "$result"
 fi
 
-sleep 200 # to avoid environment not found exception
+# Adding testt for when ev is not available yet
+
+env_describe_err=$($base_dir/cdp_describe_env.sh  $prefix 2>&1 | grep NOT_FOUND)
+
+
+spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+while [[ ${#env_describe_err} > 1 ]]
+do 
+    i=$(( (i+1) %8 ))
+    printf "\r${spin:$i:1}  $prefix: environment status: WAITING_FOR_API                             "
+    sleep 2
+    env_describe_err=$($base_dir/cdp_describe_env.sh  $prefix 2>&1 | grep NOT_FOUND)
+done
+
 
 env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
 

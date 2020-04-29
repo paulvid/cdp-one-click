@@ -71,7 +71,7 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
    
     if [[ ${cloud_provider} == "aws" ]]
     then
-        result=$($base_dir/cdp_create_aws_dh_cluster.sh $prefix $base_dir/cdp-cluster-definitions/${cloud_provider}/$definition 2>&1 > /dev/null)
+    	result=$($base_dir/cdp_create_aws_dh_cluster.sh $prefix $base_dir/cdp-cluster-definitions/${cloud_provider}/$definition 2>&1 > /dev/null)
         handle_exception $? $prefix "datahub creation" "$result"
     fi
 

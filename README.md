@@ -220,3 +220,5 @@ cdp_start_all_the_things.sh <your_param_file>
 **Steffen Maerkl** - [LinkedIn](https://www.linkedin.com/in/steffen-maerkl-0b862650/)
 
 **Mike Riggs** - [LinkedIn](https://www.linkedin.com/in/mriggs/)
+
+**Ryan Cicak** - [LinkedIn](https://www.linkedin.com/in/ryan-cicak-66221a47/)
