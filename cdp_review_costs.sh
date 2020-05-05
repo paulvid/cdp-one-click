@@ -38,8 +38,11 @@ then
 fi 
 
 sdx_cost_hourly=0
+sdx_cost_daily=0
 dh_cost_hourly=0
+dh_cost_daily=0
 ml_cost_hourly=0
+ml_cost_daily=0
 total_dh_cost_hourly=0
 total_dh_cost_daily=0
 total_ml_cost_hourly=0
@@ -69,6 +72,7 @@ then
     do
         INSTANCE_TYPE=$(jq ".config.sdx[${i}].instanceTypes[].size" cost/aws_sdx_instances.json)
         OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==${INSTANCE_TYPE}).valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
+        if [ ${#OUTPUT} -eq 0 ]; then OUTPUT=0; fi
         sdx_cost_hourly=$(ruby -e "total_cost=(${sdx_cost_hourly}+${OUTPUT});puts total_cost")
     done
 
@@ -89,6 +93,7 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
             node_count=$(_jq '.nodeCount')
             instance_type=$(_jq '.template.instanceType')
             OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==\"${instance_type}\").valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
+            if [ ${#OUTPUT} -eq 0 ]; then OUTPUT=0; fi
             dh_cost_hourly=$(ruby -e "total_cost=(${dh_cost_hourly}+(${OUTPUT}*${node_count}));puts total_cost")
         done
 
@@ -112,6 +117,7 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
             avgInstances=$(ruby -e "avg=((${minInstances}+${maxInstances})/2);puts avg")
             instanceType=$(_jq '.instanceType')
             OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==\"${instance_type}\").valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
+            if [ ${#OUTPUT} -eq 0 ]; then OUTPUT=0; fi
             ml_cost_hourly=$(ruby -e "total_cost=(${ml_cost_hourly}+(${OUTPUT}*${node_count}));puts total_cost")
     done
     ml_cost_daily=$(ruby -e "total_cost=(${ml_cost_hourly}*24);puts total_cost")

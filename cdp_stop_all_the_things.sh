@@ -70,7 +70,7 @@ do
 done
 echo ${underline}
 
-
+wait_for_dh_stop=false
 all_clusters=$(cdp datahub list-clusters --environment-name $prefix-cdp-env 2> /dev/null)
 
 for row in $(echo ${all_clusters} | jq -r '.clusters[] | @base64'); do
@@ -95,11 +95,18 @@ for row in $(echo ${all_clusters} | jq -r '.clusters[] | @base64'); do
         printf "\r${spin:$i:1}  $prefix: $cluster_name datahub cluster status: $dh_status                           "
         sleep 2
         dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
+        wait_for_dh_stop=true
     done
 
     printf "\r${CHECK_MARK}  $prefix: $cluster_name datahub cluster status: $dh_status                            "
 
 done
+
+# Stopping DataHub cluster's take longer than when the CDP CLI actually says they are STOPPED.  Wait 2 minutes for any stopping cluster's to complete. Don't wait if we never needed to stop one.
+if [ "$wait_for_dh_stop" = true ]
+then
+    sleep 120
+fi
 
 # 2. Stopping SDX
 echo ""
@@ -137,7 +144,7 @@ printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                   
 # 2.2 Environment
 
 env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
-if [ "$env_status" != "STOPPED" ]
+if [ "$env_status" != "ENV_STOPPED" ]
 then
     result=$(cdp environments stop-environment --environment-name $prefix-cdp-env 2>&1 > /dev/null)
     handle_exception $? $prefix "environment stop" "$result"
@@ -145,7 +152,7 @@ fi
 env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
 
 spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-while [ "$env_status" != "STOPPED" ]
+while [ "$env_status" != "ENV_STOPPED" ]
 do 
     i=$(( (i+1) %8 ))
     printf "\r${spin:$i:1}  $prefix: environment status: $env_status                              "

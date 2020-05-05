@@ -73,7 +73,7 @@ else
     handle_exception $? $prefix "environment creation" "$result"
 fi
 
-# Adding testt for when ev is not available yet
+# Adding test for when env is not available yet
 
 env_describe_err=$($base_dir/cdp_describe_env.sh  $prefix 2>&1 | grep NOT_FOUND)
 
@@ -98,6 +98,8 @@ do
     printf "\r${spin:$i:1}  $prefix: environment status: $env_status                             "
     sleep 2
     env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
+
+    if [[ "$env_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "environment creation" "Environment creation failed; Check UI for details" fi
 done
 
 printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                             "
@@ -139,6 +141,7 @@ do
     printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
     sleep 2
     dl_status=$($base_dir/cdp_describe_dl.sh  $prefix | jq -r .datalake.status)
+     if [[ "$dl_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "Datalake creation" "Datalake creation failed; Check UI for details" fi
 done
 
 
