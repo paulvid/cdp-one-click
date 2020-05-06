@@ -95,7 +95,7 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
         printf "\r${spin:$i:1}  $prefix: $cluster_name datahub cluster status: $dh_status                           "
         sleep 2
         dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
-         if [[ "$dh_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "Datahub creation" "Datahub creation failed; Check UI for details" fi
+         if [[ "$dh_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "Datahub creation" "Datahub creation failed; Check UI for details"; fi
     done
 
         printf "\r${CHECK_MARK}  $prefix: $cluster_name datahub cluster status: $dh_status                            "

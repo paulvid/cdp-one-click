@@ -87,7 +87,7 @@ do
     sleep 2
     env_status=$($base_dir/cdp_describe_env.sh  $prefix | jq -r .environment.status)
 
-    if [[ "$env_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "environment creation" "Environment creation failed; Check UI for details" fi
+    if [[ "$env_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "environment creation" "Environment creation failed; Check UI for details"; fi
 
 done
 
@@ -132,7 +132,7 @@ do
     printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
     sleep 2
     dl_status=$($base_dir/cdp_describe_dl.sh  $prefix | jq -r .datalake.status)
-    if [[ "$dl_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "Datalake creation" "Datalake creation failed; Check UI for details" fi
+    if [[ "$dl_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "Datalake creation" "Datalake creation failed; Check UI for details"; fi
 done
 
 
