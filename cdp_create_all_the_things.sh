@@ -34,16 +34,38 @@ then
     exit 1
 fi 
 
-if [  $# -gt 2 ] 
+if [  $# -gt 3 ] 
 then 
     echo "Too many arguments!"  >&2
     display_usage
     exit 1
 fi 
 
+param_file=${1}
+RDS_HA=1
+COST_CHECK=1
+while (( "$#" )); do
+  case "$1" in
+    --no-db-ha)
+      RDS_HA=0
+      shift
+      ;;
+    --no-cost-check)
+      COST_CHECK=0
+      shift
+      ;;
+    -*|--*=) # unsupported flags
+      echo "Error: Unsupported flag $1" >&2
+      exit 1
+      ;;
+    *) # preserve positional arguments
+      PARAMS="$PARAMS $1"
+      shift
+      ;;
+  esac
+done
 
-
-
+export RDS_HA=$RDS_HA
 
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┃ Starting to create all the things ┃"
@@ -56,27 +78,27 @@ echo "Parsing parameters and running pre-checks:"
 echo "▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔"
 
 # Parsing arguments
-parse_parameters ${1}
-echo "${CHECK_MARK}  parameters parsed from ${1}"
+parse_parameters ${param_file}
+echo "${CHECK_MARK}  parameters parsed from ${param_file}"
 
 # Running pre-req checks
 run_pre_checks
 echo "${CHECK_MARK}  pre-checks done"
 
 # Evaluating costs
-# if [[ $2 != "--no-cost-check" ]]
-# then
-#     ${base_dir}/cdp_review_costs.sh ${param_file}
-#     code=$?
-#     if [ $code -ne 0 ]
-#     then 
-#         exit 2 
-#     fi
-#     echo ""
-#     echo "${CHECK_MARK}  costs accepted"
+if [ $COST_CHECK -eq 1 ]
+then
+    ${base_dir}/cdp_review_costs.sh ${param_file}
+    code=$?
+    if [ $code -ne 0 ]
+    then 
+        exit 2 
+    fi
+    echo ""
+    echo "${CHECK_MARK}  costs accepted"
  
-# fi
-# echo ""
+fi
+echo ""
 
 if [[ ${cloud_provider} == "aws" ]]
 then

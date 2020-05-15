@@ -102,9 +102,6 @@ _Note: Azure does not support CML yet, so don't add it in your parameters file :
         <b><em>Flag to create cdp credential or not (default: no, possible values: yes, no) </em></b>
         "generate_credential": "no",
 
-        <b><em>External ID for cross account role creation, can be found in register environment screen (only needed for AWS)</em></b>
-        "external_id": "YOUR_EXTERNAL_ID",
-
         <b><em>NOT SUPPORTED YET Flag to generate minimal cross account role policy or not (default: no, possible values: yes, no) </em></b>
         "generate_minimal_cross_account": "no",
 
@@ -196,6 +193,12 @@ cdp_stop_all_the_things.sh <your_param_file>
 cdp_start_all_the_things.sh <your_param_file> 
 ```
 
+# Development Optional flags
+
+Note: some flags require dev cli, not for public consumption, use at your own risk
+
+`--no-cost-check`: removes cost check
+`--no-db-ha`: does not create DB HA backend
 
 # Future Improvements
 

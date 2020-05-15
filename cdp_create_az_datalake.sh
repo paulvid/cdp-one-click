@@ -4,13 +4,14 @@
  display_usage() { 
 	echo "
 Usage:
-    $(basename "$0") <prefix> [--help or -h]
+    $(basename "$0") <prefix> (<rds_ha>) [--help or -h]
 
 Description:
     Creates a data lake post environment creation
 
 Arguments:
     prefix:         prefix for your assets
+    rds_ha:         (optional) flag for rds ha (values 0 or 1)
     --help or -h:   displays this help"
 
 }
@@ -31,11 +32,18 @@ then
     exit 1
 fi 
 
-if [  $# -gt 1 ] 
+if [  $# -gt 2 ] 
 then 
     echo "Too many arguments!"  >&2
     display_usage
     exit 1
+fi 
+
+if [ $# -eq 2 ] 
+then 
+    rds_ha=1
+else
+    rds_ha=$2
 fi 
 
 sleep_duration=1 
@@ -43,7 +51,16 @@ sleep_duration=1
 # Create groups
 
 SUBSCRIPTION_ID=$(az account show | jq -r .id)
-
-cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
-    --environment-name $1-cdp-env \
-    --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@$1cdpsa.dfs.core.windows.net"
+if [ ${rds_ha} -eq 1 ] 
+then 
+    cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
+        --environment-name $1-cdp-env \
+        --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@$1cdpsa.dfs.core.windows.net" \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" 
+else
+    cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
+        --environment-name $1-cdp-env \
+        --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@$1cdpsa.dfs.core.windows.net" \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" \
+        --database-availability-type NONE
+fi

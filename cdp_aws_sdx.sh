@@ -38,6 +38,7 @@ then
     exit 1
 fi 
 
+
 # Parsing arguments
 parse_parameters ${1}
 
@@ -129,7 +130,7 @@ echo ${underline}
 echo ""
 
 # 3. Datalake
-result=$($base_dir/cdp_create_aws_datalake.sh $base_dir $prefix 2>&1 > /dev/null)
+result=$($base_dir/cdp_create_aws_datalake.sh $base_dir $prefix $RDS_HA 2>&1 > /dev/null)
 handle_exception $? $prefix "datalake creation" "$result"
 
 dl_status=$($base_dir/cdp_describe_dl.sh  $prefix | jq -r .datalake.status)

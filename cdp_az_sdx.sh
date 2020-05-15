@@ -119,7 +119,7 @@ echo ${underline}
 echo ""
 
 # 3. Datalake
-result=$($base_dir/cdp_create_az_datalake.sh $prefix 2>&1 > /dev/null)
+result=$($base_dir/cdp_create_az_datalake.sh $prefix $RDS_HA 2>&1 > /dev/null)
 handle_exception $? $prefix "datalake creation" "$result"
 
 

@@ -14,7 +14,7 @@ Arguments:
     --help or -h:   displays this help
 
 Example:
-    ./cdp_delete_all_the_things.sh /Users/pvidal/Documents/sme-cloud/cdp-automation/AWS/aws-one-click-env pvidaldemo"
+    ./cdp_delete_all_the_things.sh /Users/pvidal/Documents/sme-cloud/cdp-automation/AWS/aws-one-click-env/parameters.json"
 
 }
 
@@ -210,7 +210,8 @@ done
 echo ${underline}
 
 cdp environments delete-environment --environment-name $prefix-cdp-env > /dev/null 2>&1
-
+sleep 200 #to avoid API crapping out.
+    
 wc=$($base_dir/cdp_describe_env.sh  $prefix 2> /dev/null | jq -r .environment.status | wc -l)
 
 spin='🌑🌒🌓🌔🌕🌖🌗🌘'

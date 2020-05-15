@@ -4,7 +4,7 @@ source $(cd $(dirname $0); pwd -L)/common.sh
  display_usage() { 
 	echo "
 Usage:
-    $(basename "$0") <prefix> [--help or -h]
+    $(basename "$0") <basedir> <prefix> (<rds_ha>) [--help or -h]
 
 Description:
     Creates a data lake post environment creation
@@ -12,6 +12,7 @@ Description:
 Arguments:
     basedir:        path to the tooling
     prefix:         prefix for your assets
+    rds_ha:         (optional) flag for rds ha (values 0 or 1)
     --help or -h:   displays this help"
 
 }
@@ -32,25 +33,36 @@ then
     exit 1
 fi 
 
-if [  $# -gt 2 ] 
+if [  $# -gt 3 ] 
 then 
     echo "Too many arguments!"  >&2
     display_usage
     exit 1
 fi 
 
+if [ $# -eq 3 ] 
+then 
+    rds_ha=$3
+else
+    rds_ha=1
+fi 
+
 sleep_duration=1 
 
-# Create groups
 
 AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
 
-# cdp datalake create-aws-datalake --datalake-name $2-cdp-dl \
-#     --environment-name $2-cdp-env \
-#     --cloud-provider-configuration instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/$2-idbroker-role",storageBucketLocation="s3a://$2-cdp-bucket/$2-dl"  \
-#     --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}"
+if [ ${rds_ha} -eq 1 ] 
+then 
+    cdp datalake create-aws-datalake --datalake-name $2-cdp-dl \
+        --environment-name $2-cdp-env \
+        --cloud-provider-configuration instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/$2-idbroker-role",storageBucketLocation="s3a://$2-cdp-bucket"  \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}"
+else
+    cdp datalake create-aws-datalake --datalake-name $2-cdp-dl \
+        --environment-name $2-cdp-env \
+        --cloud-provider-configuration instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/$2-idbroker-role",storageBucketLocation="s3a://$2-cdp-bucket"  \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" \
+        --database-availability-type NONE
+fi 
 
-cdp datalake create-aws-datalake --datalake-name $2-cdp-dl \
-    --environment-name $2-cdp-env \
-    --cloud-provider-configuration instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/$2-idbroker-role",storageBucketLocation="s3a://$2-cdp-bucket"  \
-    --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}"

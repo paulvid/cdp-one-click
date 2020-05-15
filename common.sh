@@ -115,9 +115,6 @@ parse_parameters()
     generate_credential=$(cat ${param_file} | jq -r .optional.generate_credential)
     generate_credential=$(handle_null_param "$generate_credential" "no" "no")
 
-    external_id=$(cat ${param_file} | jq -r .optional.external_id)
-    external_id=$(handle_null_param "$external_id" "no" "not_provided")
-
     generate_minimal_cross_account=$(cat ${param_file} | jq -r .optional.generate_minimal_cross_account)
     generate_minimal_cross_account=$(handle_null_param "$generate_minimal_cross_account" "no" "no")
 
@@ -150,6 +147,20 @@ parse_parameters()
     
     owner=$(cdp iam get-user | jq -r .user.email)
     workload_user=$(cdp iam get-user | jq -r .user.workloadUsername)
+
+
+    if [[ ${generate_credential} == "yes" ]]
+    then
+        if [[ ${cloud_provider} == "aws" ]]
+        then
+            external_id=$(cdp environments get-credential-prerequisites --cloud-platform AWS | jq -r .aws.externalId)
+        else
+            external_id="not_provided"
+        fi
+    else
+        external_id="not_provided"
+    fi
+
 
     CHECK_MARK="✅"
 }
