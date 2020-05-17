@@ -4,7 +4,7 @@
  display_usage() { 
 	echo "
 Usage:
-    $(basename "$0") <prefix> <definition> <workspace_name> <cloud_provider> [--help or -h]
+    $(basename "$0") <prefix> <definition> <workspace_name> <cloud_provider> <enable_workspace>[--help or -h]
 
 Description:
     Launches a ML workspace based on definition
@@ -13,6 +13,7 @@ Arguments:
     prefix:             prefix of your assets
     definition:         ML workspace definition file location
     workspace_name:     name of your workspace
+    enable_workspace:   flag to enable workspace with monitoring, governance and model metrics
     --help or -h:   displays this help"
 
 }
@@ -26,14 +27,14 @@ fi
 
 
 # Check the numbers of arguments
-if [  $# -lt 4 ] 
+if [  $# -lt 5 ] 
 then 
     echo "Not enough arguments!" >&2
     display_usage
     exit 1
 fi 
 
-if [  $# -gt 4 ] 
+if [  $# -gt 5 ] 
 then 
     echo "Too many arguments!" >&2
     display_usage
@@ -49,6 +50,7 @@ def_file=${2}
 workspace_name=${3}
 cloud_provider=${4}
 env_name=${prefix}-cdp-env
+enable_workspace=${5}
 owner=$(cdp iam get-user | jq -r .user.email)
 
 #Parse and replace variables in workspace template
@@ -57,13 +59,26 @@ owner=$(cdp iam get-user | jq -r .user.email)
 if [[ ${cloud_provider} == "aws" ]]
 then
 
-    # Create ML Workspace
-    cdp ml create-workspace \
-    --no-disable-tls \
-    --environment-name ${env_name} \
-    --use-public-load-balancer \
-    --workspace-name ${workspace_name} \
-    --provision-k8s-request file://$def_file
+    if [[ ${enable_workspace} == "yes" ]]
+    then
+        # Create ML Workspace
+        cdp ml create-workspace \
+        --no-disable-tls \
+        --environment-name ${env_name} \
+        --use-public-load-balancer \
+        --workspace-name ${workspace_name} \
+        --enable-monitoring \
+        --enable-governance \
+        --enable-model-metrics \
+        --provision-k8s-request file://$def_file
+    else 
+        cdp ml create-workspace \
+        --no-disable-tls \
+        --environment-name ${env_name} \
+        --use-public-load-balancer \
+        --workspace-name ${workspace_name} \
+        --provision-k8s-request file://$def_file
+    fi
 fi
 
 

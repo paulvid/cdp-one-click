@@ -81,7 +81,10 @@ _Note: Azure does not support CML yet, so don't add it in your parameters file :
             <b><em>Element 1: </em></b>
             {
                 <b><em>Definition from cml-workspace-definitions folder: </em></b>
-                "definition": "small_workspace.json"
+                "definition": "small_workspace.json",
+
+                <b><em>Flag to enable monitoring, governance and model metrics (possible values yes or no): </em></b>
+                "enable_workspace": "no"
             }
 
         ]

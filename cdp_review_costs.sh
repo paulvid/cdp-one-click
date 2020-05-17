@@ -49,7 +49,6 @@ total_ml_cost_hourly=0
 total_ml_cost_daily=0
 parse_parameters ${1}
 
-
 # echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 # echo "┃ Evaluating costs and compliance ┃"
 # echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
@@ -92,6 +91,7 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
             }
             node_count=$(_jq '.nodeCount')
             instance_type=$(_jq '.template.instanceType')
+            echo ${region}
             OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==\"${instance_type}\").valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
             if [ ${#OUTPUT} -eq 0 ]; then OUTPUT=0; fi
             dh_cost_hourly=$(ruby -e "total_cost=(${dh_cost_hourly}+(${OUTPUT}*${node_count}));puts total_cost")
@@ -107,7 +107,9 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
     _jq() {
       echo ${item} | base64 --decode | jq -r ${1}
     }
+    
     definition=$(_jq '.definition')
+    
     for row in $(cat $base_dir/cml-workspace-definitions/$definition | jq -r '.instanceGroups[] | @base64'); do
             _jq() {
             echo ${row} | base64 --decode | jq -r ${1}
@@ -116,9 +118,9 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
             maxInstances=$(_jq '.autoscaling.maxInstances')
             avgInstances=$(ruby -e "avg=((${minInstances}+${maxInstances})/2);puts avg")
             instanceType=$(_jq '.instanceType')
-            OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==\"${instance_type}\").valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
+            OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==\"${instanceType}\").valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
             if [ ${#OUTPUT} -eq 0 ]; then OUTPUT=0; fi
-            ml_cost_hourly=$(ruby -e "total_cost=(${ml_cost_hourly}+(${OUTPUT}*${node_count}));puts total_cost")
+            ml_cost_hourly=$(ruby -e "total_cost=(${ml_cost_hourly}+(${OUTPUT}*${avgInstances}));puts total_cost")
     done
     ml_cost_daily=$(ruby -e "total_cost=(${ml_cost_hourly}*24);puts total_cost")
     total_ml_cost_hourly=$(ruby -e "total_cost=(${total_ml_cost_hourly}+${ml_cost_hourly});puts total_cost")
