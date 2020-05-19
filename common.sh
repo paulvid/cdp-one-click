@@ -121,6 +121,9 @@ parse_parameters()
     create_network=$(cat ${param_file} | jq -r .optional.create_network)
     create_network=$(handle_null_param "$create_network" "no" "no")
 
+    sg_cidr=$(cat ${param_file} | jq -r .optional.sg_cidr)
+    sg_cidr=$(handle_null_param "$sg_cidr" "no" "0.0.0.0/0")
+
     # Calculated parameters
     base_dir=$(cd $(dirname $0); pwd -L)
     sleep_duration=3
@@ -154,11 +157,14 @@ parse_parameters()
         if [[ ${cloud_provider} == "aws" ]]
         then
             external_id=$(cdp environments get-credential-prerequisites --cloud-platform AWS | jq -r .aws.externalId)
+            ext_acct_id=$(cdp environments get-credential-prerequisites --cloud-platform AWS | jq -r .accountId)
         else
             external_id="not_provided"
+            ext_acct_id="not_provided"
         fi
     else
         external_id="not_provided"
+        ext_acct_id="not_provided"
     fi
 
 

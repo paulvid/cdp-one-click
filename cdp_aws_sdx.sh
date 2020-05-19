@@ -67,10 +67,10 @@ then
     route_id=$(cat ${network_file} | jq -r .RouteTableId)
     knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
     default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
-    result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 > /dev/null)
+    result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 > /dev/null)
     handle_exception $? $prefix "environment creation" "$result"
 else
-    result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" 2>&1 > /dev/null)
+    result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" 2>&1 > /dev/null)
     handle_exception $? $prefix "environment creation" "$result"
 fi
 

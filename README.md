@@ -111,6 +111,9 @@ _Note: Azure does not support CML yet, so don't add it in your parameters file :
         <b><em>Flag to create network in cloud provider or not (only supported in AWS) (default: no, possible values: yes, no) </em></b>
         "create_network": "no",
 
+        <b><em>CIDR to open in your security group of your network (port 443, 22 and 9443 will be open to this) </em></b>
+        "sg_cidr": "0.0.0.0/0",
+
         <b><em>Tags to setup: </em></b>
         "tags": {
 

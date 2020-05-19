@@ -91,7 +91,7 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
             }
             node_count=$(_jq '.nodeCount')
             instance_type=$(_jq '.template.instanceType')
-            echo ${region}
+
             OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==\"${instance_type}\").valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
             if [ ${#OUTPUT} -eq 0 ]; then OUTPUT=0; fi
             dh_cost_hourly=$(ruby -e "total_cost=(${dh_cost_hourly}+(${OUTPUT}*${node_count}));puts total_cost")

@@ -85,7 +85,7 @@ echo "${CHECK_MARK}  $prefix: new roles created"
 if [[ "$create_network" == "yes" ]]
 then
     result=$(
-        { stdout=$($base_dir/aws-pre-req/aws_create_network.sh $prefix $region) ; } 2>&1
+        { stdout=$($base_dir/aws-pre-req/aws_create_network.sh $prefix $region $sg_cidr) ; } 2>&1
         printf "this is the separator"
         printf "%s\n" "$stdout"
     )
@@ -98,8 +98,8 @@ then
     fi
 
     created_network=$var_out
-    mkdir $base_dir/aws-pre-req/tmp_network 2>&1 > /dev/null
-    echo $var_out > $base_dir/aws-pre-req/tmp_network/${prefix}_aws_network.json
+    mkdir $base_dir/aws-pre-req/tmp_network > /dev/null 2>&1
+    echo $var_out > $base_dir/aws-pre-req/tmp_network/${prefix}_aws_network.json 
 
     igw_id=$(echo $created_network | jq -r .InternetGatewayId)
     vpc_id=$(echo $created_network | jq -r .VpcId)
@@ -161,7 +161,7 @@ then
     fi
 
     # Creating account
-    result=$($base_dir/aws-pre-req/aws_create_cross_account.sh $prefix "$external_id" $generate_minimal_cross_account 2>&1 > /dev/null)
+    result=$($base_dir/aws-pre-req/aws_create_cross_account.sh $prefix "$external_id" "$ext_acct_id" $generate_minimal_cross_account 2>&1 > /dev/null)
     handle_exception $? $prefix "cross account creation" "$result"
     echo "${CHECK_MARK}  $prefix: cross account created"
 

@@ -4,7 +4,7 @@
  display_usage() { 
 	echo "
 Usage:
-    $(basename "$0") [--help or -h] <prefix> <region>
+    $(basename "$0") [--help or -h] <prefix> <region> <sg_cidr>
 
 Description:
     Creates network assets for CDP env demployment
@@ -12,6 +12,7 @@ Description:
 Arguments:
     prefix:         prefix of your assets
     region:         AWS region
+    sg_cidr:        CIDR to open in your security group
     --help or -h:   displays this help"
 
 }
@@ -25,14 +26,14 @@ fi
 
 
 # Check the numbers of arguments
-if [  $# -lt 2 ] 
+if [  $# -lt 3 ] 
 then 
     echo "Not enough arguments!"  >&2
     display_usage
     exit 1
 fi 
 
-if [  $# -gt 2 ] 
+if [  $# -gt 3 ] 
 then 
     echo "Too many arguments!"  >&2
     display_usage
@@ -40,13 +41,14 @@ then
 fi 
 
 prefix=$1
-
 region=$2
-
+sg_cidr=$3
 
 igw_id=$(aws ec2 create-internet-gateway | jq -r .InternetGateway.InternetGatewayId)
 
 vpc_id=$(aws ec2 create-vpc --cidr 10.0.0.0/16 | jq -r .Vpc.VpcId)
+aws ec2 create-tags --resources $vpc_id --tags Key=Name,Value="$prefix-cdp-vpc"
+
 
 aws ec2 attach-internet-gateway --internet-gateway-id $igw_id --vpc-id $vpc_id
 aws ec2 modify-vpc-attribute --enable-dns-support "{\"Value\":true}" --vpc-id $vpc_id
@@ -71,12 +73,12 @@ aws ec2 associate-route-table  --subnet-id $subnet_id1c --route-table-id $route_
 
 knox_sg_id=$(aws ec2 create-security-group --description "AWS CDP Knox security group" --group-name "$prefix-knox-sg" --vpc-id $vpc_id | jq -r .GroupId)
 
-aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 22 --cidr 0.0.0.0/0 >> /dev/null 2>&1
-aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 443 --cidr 0.0.0.0/0 >> /dev/null 2>&1
+aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 22 --cidr $sg_cidr  >> /dev/null 2>&1
+aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 443 --cidr $sg_cidr >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 443 --cidr 52.36.110.208/32 >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 443 --cidr 52.40.165.49/32 >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 443 --cidr 35.166.86.177/32 >> /dev/null 2>&1
-aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 9443 --cidr 0.0.0.0/0 >> /dev/null 2>&1
+aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 9443 --cidr $sg_cidr >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 9443 --cidr 52.36.110.208/32 >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 9443 --cidr 52.40.165.49/32 >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 9443 --cidr 35.166.86.177/32 >> /dev/null 2>&1
@@ -86,12 +88,12 @@ aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol udp -
 
 default_sg_id=$(aws ec2 create-security-group --description "AWS default security group" --group-name "$prefix-default-sg" --vpc-id $vpc_id | jq -r .GroupId)
 
-aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 22 --cidr 0.0.0.0/0 >> /dev/null 2>&1
-aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 443 --cidr 0.0.0.0/0 >> /dev/null 2>&1
+aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 22 --cidr $sg_cidr>> /dev/null 2>&1
+aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 443 --cidr $sg_cidr >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 443 --cidr 52.36.110.208/32 >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 443 --cidr 52.40.165.49/32 >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 443 --cidr 35.166.86.177/32 >> /dev/null 2>&1
-aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 9443 --cidr 0.0.0.0/0 >> /dev/null 2>&1
+aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 9443 --cidr $sg_cidr >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 9443 --cidr 52.36.110.208/32 >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 9443 --cidr 52.40.165.49/32 >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 9443 --cidr 35.166.86.177/32 >> /dev/null 2>&1

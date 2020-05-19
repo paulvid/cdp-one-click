@@ -4,7 +4,7 @@ set -o nounset
 display_usage() { 
     echo "
 Usage:
-    $(basename "$0") [--help or -h] <prefix> <credential> <region> <key>
+    $(basename "$0") [--help or -h] <prefix> <credential> <region> <key> <sg_cidr>
 
 Description:
     Launches a CDP Azure environment
@@ -14,6 +14,7 @@ Arguments:
     credentials:    CDP credential name
     region:         region for your env
     key:            name of the Azure key to re-use
+    sg_cidr:        CIDR to open in your security group
     --help or -h:   displays this help"
 
 }
@@ -45,6 +46,7 @@ prefix=$1
 credential=$2
 region=$3
 key=$4
+sg_cidr=$5
 
 SUBSCRIPTION_ID=$(az account show | jq -r .id)
 
@@ -52,7 +54,7 @@ cdp environments create-azure-environment  --environment-name ${prefix}-cdp-env 
     --credential-name ${credential} \
     --region "${region}" \
     --public-key "${key}" \
-    --security-access cidr="0.0.0.0/0" \
+    --security-access cidr="$sg_cidr" \
     --log-storage storageLocationBase="abfs://logs@${prefix}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
     --new-network-params networkCidr="10.10.0.0/16" \
     --use-public-ip
