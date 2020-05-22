@@ -124,6 +124,9 @@ parse_parameters()
     sg_cidr=$(cat ${param_file} | jq -r .optional.sg_cidr)
     sg_cidr=$(handle_null_param "$sg_cidr" "no" "0.0.0.0/0")
 
+    use_ccm=$(cat ${param_file} | jq -r .optional.use_ccm)
+    use_ccm=$(handle_null_param "$use_ccm" "no" "no")
+
     # Calculated parameters
     base_dir=$(cd $(dirname $0); pwd -L)
     sleep_duration=3
@@ -167,6 +170,15 @@ parse_parameters()
         ext_acct_id="not_provided"
     fi
 
+    if [[ ${use_ccm} == "yes" && ${create_network} == "no" ]]
+    then
+        handle_exception 1 ${prefix} "parsing parameters" "Operation not supported: you can't enable CCM without creating network (see https://jira.cloudera.com/browse/CB-7187)"
+    fi
+
+    if [[ ${cloud_provider} == "az" && ${create_network} == "yes" ]]
+    then
+        handle_exception 1 ${prefix} "parsing parameters" "Operation not supported: I haven't had time to develop network creation in Azure yet (please contribute!)"
+    fi
 
     CHECK_MARK="✅"
 }

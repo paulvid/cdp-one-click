@@ -84,49 +84,126 @@ echo "${CHECK_MARK}  $prefix: new roles created"
 # 5. Creating Network
 if [[ "$create_network" == "yes" ]]
 then
-    result=$(
-        { stdout=$($base_dir/aws-pre-req/aws_create_network.sh $prefix $region $sg_cidr) ; } 2>&1
-        printf "this is the separator"
-        printf "%s\n" "$stdout"
-    )
-    var_out=${result#*this is the separator}
-    var_err=${result%this is the separator*}
 
-    if [ "$var_err" ]
+    if [[ "$use_ccm" == "no" ]]
     then
-        handle_exception 1 $prefix "role creation" "$var_err"
+        result=$(
+            { stdout=$($base_dir/aws-pre-req/aws_create_network.sh $prefix $region $sg_cidr) ; } 2>&1
+            printf "this is the separator"
+            printf "%s\n" "$stdout"
+        )
+        var_out=${result#*this is the separator}
+        var_err=${result%this is the separator*}
+
+        if [ "$var_err" ]
+        then
+            handle_exception 1 $prefix "network creation" "$var_err"
+        fi
+
+        created_network=$var_out
+        mkdir $base_dir/aws-pre-req/tmp_network > /dev/null 2>&1
+        echo $var_out > $base_dir/aws-pre-req/tmp_network/${prefix}_aws_network.json 
+
+        igw_id=$(echo $created_network | jq -r .InternetGatewayId)
+        vpc_id=$(echo $created_network | jq -r .VpcId)
+        subnet_id1a=$(echo $created_network | jq -r .Subnets[0])
+        subnet_id1b=$(echo $created_network | jq -r .Subnets[1])
+        subnet_id1c=$(echo $created_network | jq -r .Subnets[2])
+        route_id=$(echo $created_network | jq -r .RouteTableId)
+        knox_sg_id=$(echo $created_network | jq -r .KnoxGroupId)
+        default_sg_id=$(echo $created_network | jq -r .DefaultGroupId)
+
+
+        echo "
+        aws ec2 delete-security-group  --group-id $knox_sg_id
+        aws ec2 delete-security-group  --group-id $default_sg_id
+        aws ec2 delete-subnet  --subnet-id $subnet_id1a
+        aws ec2 delete-subnet  --subnet-id $subnet_id1b
+        aws ec2 delete-subnet  --subnet-id $subnet_id1c
+        aws ec2 detach-internet-gateway  --internet-gateway-id $igw_id --vpc-id $vpc_id
+        aws ec2 delete-route-table  --route-table-id $route_id
+        aws ec2 delete-vpc  --vpc-id $vpc_id
+        aws ec2 delete-internet-gateway  --internet-gateway-id $igw_id
+
+        " > $base_dir/aws-pre-req/tmp_network/${prefix}_aws_delete_network.sh
+        chmod a+x $base_dir/aws-pre-req/tmp_network/${prefix}_aws_delete_network.sh
+
+
+        echo "${CHECK_MARK}  $prefix: new network created"
     fi
 
-    created_network=$var_out
-    mkdir $base_dir/aws-pre-req/tmp_network > /dev/null 2>&1
-    echo $var_out > $base_dir/aws-pre-req/tmp_network/${prefix}_aws_network.json 
+    if [[ "$use_ccm" == "yes" ]]
+    then
+        result=$(
+            { stdout=$($base_dir/aws-pre-req/aws_create_private_network.sh $prefix $region $sg_cidr) ; } 2>&1
+            printf "this is the separator"
+            printf "%s\n" "$stdout"
+        )
+        var_out=${result#*this is the separator}
+        var_err=${result%this is the separator*}
 
-    igw_id=$(echo $created_network | jq -r .InternetGatewayId)
-    vpc_id=$(echo $created_network | jq -r .VpcId)
-    subnet_id1a=$(echo $created_network | jq -r .Subnets[0])
-    subnet_id1b=$(echo $created_network | jq -r .Subnets[1])
-    subnet_id1c=$(echo $created_network | jq -r .Subnets[2])
-    route_id=$(echo $created_network | jq -r .RouteTableId)
-    knox_sg_id=$(echo $created_network | jq -r .KnoxGroupId)
-    default_sg_id=$(echo $created_network | jq -r .DefaultGroupId)
+        if [ "$var_err" ]
+        then
+            handle_exception 1 $prefix "network creation" "$var_err"
+        fi
+
+        created_network=$var_out
+        mkdir $base_dir/aws-pre-req/tmp_network > /dev/null 2>&1
+        echo $var_out > $base_dir/aws-pre-req/tmp_network/${prefix}_aws_network.json 
+
+        igw_id=$(echo $created_network | jq -r .InternetGatewayId)
+        vpc_id=$(echo $created_network | jq -r .VpcId)
+        pub_sub_1=$(echo $created_network | jq -r .PublicSubnets[0])
+        pub_sub_2=$(echo $created_network | jq -r .PublicSubnets[1])
+        pub_sub_3=$(echo $created_network | jq -r .PublicSubnets[2])
+        pub_route=$(echo $created_network | jq -r .PublicRouteTableId)
+        nat_1=$(echo $created_network | jq -r .PublicNatGatewayIds[0])
+        nat_2=$(echo $created_network | jq -r .PublicNatGatewayIds[1])
+        nat_3=$(echo $created_network | jq -r .PublicNatGatewayIds[2])
+        priv_sub_1=$(echo $created_network | jq -r .PrivateSubnets[0])
+        priv_sub_2=$(echo $created_network | jq -r .PrivateSubnets[1])
+        priv_sub_3=$(echo $created_network | jq -r .PrivateSubnets[2])
+        priv_route_1=$(echo $created_network | jq -r .PrivateRouteTableIds[0])
+        priv_route_2=$(echo $created_network | jq -r .PrivateRouteTableIds[1])
+        priv_route_3=$(echo $created_network | jq -r .PrivateRouteTableIds[2])
+        s3_endpoint=$(echo $created_network | jq -r .VPCEndpoints[0])
+        dyanmo_endpoint=$(echo $created_network | jq -r .VPCEndpoints[1])
+        knox_sg_id=$(echo $created_network | jq -r .KnoxGroupId)
+        default_sg_id=$(echo $created_network | jq -r .DefaultGroupId)
 
 
-    echo "
-    aws ec2 delete-security-group  --group-id $knox_sg_id
-    aws ec2 delete-security-group  --group-id $default_sg_id
-    aws ec2 delete-subnet  --subnet-id $subnet_id1a
-    aws ec2 delete-subnet  --subnet-id $subnet_id1b
-    aws ec2 delete-subnet  --subnet-id $subnet_id1c
-    aws ec2 detach-internet-gateway  --internet-gateway-id $igw_id --vpc-id $vpc_id
-    aws ec2 delete-route-table  --route-table-id $route_id
-    aws ec2 delete-vpc  --vpc-id $vpc_id
-    aws ec2 delete-internet-gateway  --internet-gateway-id $igw_id
+        echo "    
+        aws ec2 delete-nat-gateway --nat-gateway-id $nat_1
+        aws ec2 delete-nat-gateway --nat-gateway-id $nat_2
+        aws ec2 delete-nat-gateway --nat-gateway-id $nat_3
+        sleep 60
+        aws ec2 delete-security-group  --group-id $knox_sg_id
+        aws ec2 delete-security-group  --group-id $default_sg_id
 
+        aws ec2 delete-subnet  --subnet-id $pub_sub_1
+        aws ec2 delete-subnet  --subnet-id $pub_sub_2
+        aws ec2 delete-subnet  --subnet-id $pub_sub_3
+        aws ec2 delete-subnet  --subnet-id $priv_sub_1
+        aws ec2 delete-subnet  --subnet-id $priv_sub_2
+        aws ec2 delete-subnet  --subnet-id $priv_sub_3
+
+        aws ec2 detach-internet-gateway  --internet-gateway-id $igw_id --vpc-id $vpc_id
+        
+        aws ec2 delete-route-table  --route-table-id $pub_route
+        aws ec2 delete-route-table  --route-table-id $priv_route_1
+        aws ec2 delete-route-table  --route-table-id $priv_route_2
+        aws ec2 delete-route-table  --route-table-id $priv_route_3
+
+        aws ec2 delete-vpc-endpoint --vpc-endpoint-ids $s3_endpoint $dyanmo_endpoint
+
+        aws ec2 delete-vpc  --vpc-id $vpc_id
+        aws ec2 delete-internet-gateway  --internet-gateway-id $igw_id
     " > $base_dir/aws-pre-req/tmp_network/${prefix}_aws_delete_network.sh
-    chmod a+x $base_dir/aws-pre-req/tmp_network/${prefix}_aws_delete_network.sh
+        chmod a+x $base_dir/aws-pre-req/tmp_network/${prefix}_aws_delete_network.sh
 
 
-    echo "${CHECK_MARK}  $prefix: new network created"
+        echo "${CHECK_MARK}  $prefix: new network created"
+    fi  
 fi
 
 # 6. Creating cross-account role / credentials if needed

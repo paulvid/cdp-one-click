@@ -1,0 +1,1 @@
+{"InternetGatewayId": "igw-0e5777844eebce75e", "VpcId": "vpc-0e104ccaebdd9cc05", "Subnets": ["subnet-0104791f855c86901", "subnet-01ca2ecc8a54aeb28", "subnet-0d1a4ba975934f87b"], "RouteTableId": "rtb-0d4b15cc8a04c422e", "KnoxGroupId": "sg-0f580c7f8f7a9fec3" , "DefaultGroupId": "sg-05b563722cafba2e1"}

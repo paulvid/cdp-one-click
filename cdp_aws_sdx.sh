@@ -57,21 +57,62 @@ echo ""
 # 1. Environment
 if [[ "$create_network" = "yes" ]]
 then
+    if [[ "$use_ccm" == "no" ]]
+    then
+        network_file=${2}
+        igw_id=$(cat ${network_file} | jq -r .InternetGatewayId)
+        vpc_id=$(cat ${network_file} | jq -r .VpcId)
+        subnet_id1a=$(cat ${network_file} | jq -r .Subnets[0])
+        subnet_id1b=$(cat ${network_file} | jq -r .Subnets[1])
+        subnet_id1c=$(cat ${network_file} | jq -r .Subnets[2])
+        route_id=$(cat ${network_file} | jq -r .RouteTableId)
+        knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
+        default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
 
-    network_file=${2}
-    igw_id=$(cat ${network_file} | jq -r .InternetGatewayId)
-    vpc_id=$(cat ${network_file} | jq -r .VpcId)
-    subnet_id1a=$(cat ${network_file} | jq -r .Subnets[0])
-    subnet_id1b=$(cat ${network_file} | jq -r .Subnets[1])
-    subnet_id1c=$(cat ${network_file} | jq -r .Subnets[2])
-    route_id=$(cat ${network_file} | jq -r .RouteTableId)
-    knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
-    default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
-    result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 > /dev/null)
-    handle_exception $? $prefix "environment creation" "$result"
+
+        result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 > /dev/null)
+        handle_exception $? $prefix "environment creation" "$result"
+    fi
+    if [[ "$use_ccm" == "yes" ]]
+    then
+        network_file=${2}
+ 
+        igw_id=$(cat ${network_file}  | jq -r .InternetGatewayId)
+        vpc_id=$(cat ${network_file}  | jq -r .VpcId)
+        pub_sub_1=$(cat ${network_file}  | jq -r .PublicSubnets[0])
+        pub_sub_2=$(cat ${network_file}  | jq -r .PublicSubnets[1])
+        pub_sub_3=$(cat ${network_file}  | jq -r .PublicSubnets[2])
+        pub_route=$(cat ${network_file}  | jq -r .PublicRouteTableId)
+        nat_1=$(cat ${network_file}  | jq -r .PublicNatGatewayIds[0])
+        nat_2=$(cat ${network_file}  | jq -r .PublicNatGatewayIds[1])
+        nat_3=$(cat ${network_file}  | jq -r .PublicNatGatewayIds[2])
+        priv_sub_1=$(cat ${network_file}  | jq -r .PrivateSubnets[0])
+        priv_sub_2=$(cat ${network_file}  | jq -r .PrivateSubnets[1])
+        priv_sub_3=$(cat ${network_file}  | jq -r .PrivateSubnets[2])
+        priv_route_1=$(cat ${network_file}  | jq -r .PrivateRouteTableIds[0])
+        priv_route_2=$(cat ${network_file}  | jq -r .PrivateRouteTableIds[1])
+        priv_route_3=$(cat ${network_file}  | jq -r .PrivateRouteTableIds[2])
+        s3_endpoint=$(cat ${network_file}  | jq -r .VPCEndpoints[0])
+        dyanmo_endpoint=$(cat ${network_file}  | jq -r .VPCEndpoints[1])
+        knox_sg_id=$(cat ${network_file}  | jq -r .KnoxGroupId)
+        default_sg_id=$(cat ${network_file}  | jq -r .DefaultGroupId)
+
+        result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $pub_sub_1 $pub_sub_2 $pub_sub_3 $priv_sub_1 $priv_sub_2 $priv_sub_3 $vpc_id $knox_sg_id $default_sg_id 2>&1 > /dev/null)
+        handle_exception $? $prefix "environment creation" "$result"
+
+    fi
+
 else
-    result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" 2>&1 > /dev/null)
-    handle_exception $? $prefix "environment creation" "$result"
+    if [[ "$use_ccm" == "no" ]]
+    then
+        result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" 2>&1 > /dev/null)
+        handle_exception $? $prefix "environment creation" "$result"
+    fi
+    if [[ "$use_ccm" == "yes" ]]
+    then
+        result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" 2>&1 > /dev/null)
+        handle_exception $? $prefix "environment creation" "$result"
+    fi
 fi
 
 # Adding test for when env is not available yet

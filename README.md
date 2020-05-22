@@ -114,6 +114,9 @@ _Note: Azure does not support CML yet, so don't add it in your parameters file :
         <b><em>CIDR to open in your security group of your network (port 443, 22 and 9443 will be open to this) </em></b>
         "sg_cidr": "0.0.0.0/0",
 
+         <b><em>Use CCM for env deployment (default: no, possible values: yes, no) </em></b>
+        "use_ccm": "no",
+
         <b><em>Tags to setup: </em></b>
         "tags": {
 
