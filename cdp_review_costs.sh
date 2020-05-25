@@ -172,6 +172,6 @@ fi
 if [[ ${cloud_provider} == "az" ]]
 then
 
-printf "💰 Estimated SDX cost per hour for Azure coming soon! 💰"
+printf "💰 Estimated costs for Azure coming soon! 💰"
 
 fi

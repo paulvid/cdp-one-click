@@ -206,14 +206,6 @@ else
     echo "${CHECK_MARK}  $prefix: user sync was already in progress "  
 fi
 
-# 6. Tag FreeIPA Instance
-
-for i in $(aws ec2 describe-instances  --filters "Name=tag:owner,Values=$1" "Name=iam-instance-profile.arn,Values=arn:aws:iam::${AWS_ACCOUNT_ID}:instance-profile/${prefix}-log-role" "Name=tag:Name,Values=*freeipa*" | jq -r .Reservations[].Instances[].InstanceId); do
-    aws ec2 create-tags  --resources $i --tags Key=enddate,Value=$END_DATE   Key=project,Value="${PROJECT}"
-    echo "" 
-    echo "${CHECK_MARK}  $prefix: freeipa instance tagged " 
-done
-
 echo ""
 echo ""
 echo "CDP datalake for $prefix created!"

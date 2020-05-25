@@ -175,9 +175,9 @@ parse_parameters()
         handle_exception 1 ${prefix} "parsing parameters" "Operation not supported: you can't enable CCM without creating network (see https://jira.cloudera.com/browse/CB-7187)"
     fi
 
-    if [[ ${cloud_provider} == "az" && ${create_network} == "yes" ]]
+    if [[ ${use_ccm} == "yes" && ${cloud_provider} == "yes" ]]
     then
-        handle_exception 1 ${prefix} "parsing parameters" "Operation not supported: I haven't had time to develop network creation in Azure yet (please contribute!)"
+        handle_exception 1 ${prefix} "parsing parameters" "Operation not yet supported: I am still working on CCM setup for Azure. Stay tuned!"
     fi
 
     CHECK_MARK="✅"

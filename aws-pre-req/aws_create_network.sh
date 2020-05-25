@@ -45,12 +45,14 @@ region=$2
 sg_cidr=$3
 
 igw_id=$(aws ec2 create-internet-gateway | jq -r .InternetGateway.InternetGatewayId)
+aws ec2 create-tags --resources $igw_id --tags Key=Name,Value="$prefix-cdp-igw"
 
 vpc_id=$(aws ec2 create-vpc --cidr 10.0.0.0/16 | jq -r .Vpc.VpcId)
 aws ec2 create-tags --resources $vpc_id --tags Key=Name,Value="$prefix-cdp-vpc"
 
 
 aws ec2 attach-internet-gateway --internet-gateway-id $igw_id --vpc-id $vpc_id
+aws ec2 create-tags --resources $vpc_id --tags Key=Name,Value="$prefix-cdp-vpc"
 aws ec2 modify-vpc-attribute --enable-dns-support "{\"Value\":true}" --vpc-id $vpc_id
 aws ec2 modify-vpc-attribute --enable-dns-hostnames "{\"Value\":true}" --vpc-id $vpc_id
 
@@ -61,6 +63,9 @@ aws ec2 create-route --route-table-id $route_id --destination-cidr-block 0.0.0.0
 subnet_id1a=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.0.0/19 --availability-zone "$region"a | jq -r .Subnet.SubnetId)
 subnet_id1b=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.160.0/19 --availability-zone "$region"b | jq -r .Subnet.SubnetId)
 subnet_id1c=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.64.0/19 --availability-zone "$region"c | jq -r .Subnet.SubnetId)
+aws ec2 create-tags --resources $subnet_id1a --tags Key=Name,Value="$prefix-pub-subnet-1"
+aws ec2 create-tags --resources $subnet_id1b --tags Key=Name,Value="$prefix-pub-subnet-1"
+aws ec2 create-tags --resources $subnet_id1c --tags Key=Name,Value="$prefix-pub-subnet-1"
 
 
 aws ec2 modify-subnet-attribute --subnet-id $subnet_id1a --map-public-ip-on-launch

@@ -86,7 +86,8 @@ then
         --subnet-ids "${pub_sub_1}" "${pub_sub_2}" "${pub_sub_3}" "${priv_sub_1}" "${priv_sub_2}" "${priv_sub_3}" \
         --vpc-id "${vpc}" \
         --s3-guard-table-name ${prefix}-cdp-table \
-        --enable-tunnel
+        --enable-tunnel \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" 
 
 
 else 
@@ -101,5 +102,6 @@ else
         --network-cidr "10.0.0.0/16" \
         --s3-guard-table-name ${prefix}-cdp-table \ 
         --enable-tunnel \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" \
         #--create-private-network
 fi
