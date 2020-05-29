@@ -81,7 +81,9 @@ if [[ "$create_network" == "yes" ]]
 then
     if [[ "$use_ccm" == "yes" ]]
     then
-        handle_exception 2 $prefix "network creation" "CCM is not yet supported in azure!"
+        result=$($base_dir/az-pre-req/az_create_private_network.sh $prefix $sg_cidr 2>&1 > /dev/null)
+        handle_exception $? $prefix "network creation" "$result"
+        echo "${CHECK_MARK}  $prefix: network created"
     else
         result=$($base_dir/az-pre-req/az_create_network.sh $prefix $sg_cidr 2>&1 > /dev/null)
         handle_exception $? $prefix "network creation" "$result"

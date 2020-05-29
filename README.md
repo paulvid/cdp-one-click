@@ -15,7 +15,7 @@ This repository contains a set of scripts that will create CDP minimal assets fo
 * AWS ssh key ([Instructions](https://docs.aws.amazon.com/opsworks/latest/userguide/security-settingsshkey.html)); Alternatively, you can use the `field` or `_field` keys setup in our AWS SE accounts
 
 ## Azure
-* Azure CLI ([Instructions](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-macos?view=azure-cli-latest)
+* Azure CLI ([Instructions](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-macos?view=azure-cli-latest))
     * Use `az login` after install to login
 * ssh Key: you will need to paste the public key into your parameters file
 

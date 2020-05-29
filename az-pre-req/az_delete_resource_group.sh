@@ -42,11 +42,15 @@ prefix=$1
 
 
 # Listing all resources
-rg_list=$( az group list | jq -r .[].id | grep $prefix | awk -F '/' '{print $5}')
+rg_list=$( az group list | jq -r .[].id | awk -F '/' '{print $5}')
 
 for resource_group_name in $(echo $rg_list)
 do 
-    az group delete --name ${resource_group_name} --yes
+
+    if [[ $resource_group_name == $prefix-* ]]
+    then
+        az group delete --name ${resource_group_name} --yes
+    fi
 done
 
 

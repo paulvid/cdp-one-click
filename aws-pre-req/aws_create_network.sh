@@ -64,8 +64,8 @@ subnet_id1a=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.0.0/19 --
 subnet_id1b=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.160.0/19 --availability-zone "$region"b | jq -r .Subnet.SubnetId)
 subnet_id1c=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.64.0/19 --availability-zone "$region"c | jq -r .Subnet.SubnetId)
 aws ec2 create-tags --resources $subnet_id1a --tags Key=Name,Value="$prefix-pub-subnet-1"
-aws ec2 create-tags --resources $subnet_id1b --tags Key=Name,Value="$prefix-pub-subnet-1"
-aws ec2 create-tags --resources $subnet_id1c --tags Key=Name,Value="$prefix-pub-subnet-1"
+aws ec2 create-tags --resources $subnet_id1b --tags Key=Name,Value="$prefix-pub-subnet-2"
+aws ec2 create-tags --resources $subnet_id1c --tags Key=Name,Value="$prefix-pub-subnet-3"
 
 
 aws ec2 modify-subnet-attribute --subnet-id $subnet_id1a --map-public-ip-on-launch

@@ -57,9 +57,14 @@ done
 echo ${underline}
 
 # 1. Environment
-result=$($base_dir/cdp_create_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" $create_network 2>&1 > /dev/null)
-handle_exception $? $prefix "environment creation" "$result"
-
+if [[ "$use_ccm" == "no" ]]
+then
+    result=$($base_dir/cdp_create_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" $create_network 2>&1 > /dev/null)
+    handle_exception $? $prefix "environment creation" "$result"
+else
+    result=$($base_dir/cdp_create_private_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" $create_network 2>&1 > /dev/null)
+    handle_exception $? $prefix "environment creation" "$result"
+fi
 # Adding test for when env is not available yet
 
 env_describe_err=$($base_dir/cdp_describe_env.sh  $prefix 2>&1 | grep NOT_FOUND)

@@ -46,9 +46,9 @@ sg_cidr=$2
 # 1. Vnets and subnets
 az network vnet create -g $prefix-cdp-rg  --name $prefix-cdp-vnet --address-prefix 10.10.0.0/16
 
-az network vnet subnet create -g $prefix-cdp-rg --vnet-name $prefix-cdp-vnet  -n $prefix-pub-subnet-1 --address-prefixes 10.10.0.0/24
-az network vnet subnet create -g $prefix-cdp-rg --vnet-name $prefix-cdp-vnet  -n $prefix-pub-subnet-2 --address-prefixes 10.10.1.0/24
-az network vnet subnet create -g $prefix-cdp-rg --vnet-name $prefix-cdp-vnet  -n $prefix-pub-subnet-3 --address-prefixes 10.10.2.0/24
+az network vnet subnet create -g $prefix-cdp-rg --vnet-name $prefix-cdp-vnet  -n $prefix-pub-subnet-1 --address-prefixes 10.10.160.0/19
+az network vnet subnet create -g $prefix-cdp-rg --vnet-name $prefix-cdp-vnet  -n $prefix-pub-subnet-2 --address-prefixes 10.10.192.0/19
+az network vnet subnet create -g $prefix-cdp-rg --vnet-name $prefix-cdp-vnet  -n $prefix-pub-subnet-3 --address-prefixes 10.10.224.0/19
 
 az network vnet subnet update -n $prefix-pub-subnet-1 --vnet-name $prefix-cdp-vnet -g $prefix-cdp-rg --service-endpoints "Microsoft.Sql" "Microsoft.Storage"
 az network vnet subnet update -n $prefix-pub-subnet-2 --vnet-name $prefix-cdp-vnet -g $prefix-cdp-rg --service-endpoints "Microsoft.Sql" "Microsoft.Storage"
