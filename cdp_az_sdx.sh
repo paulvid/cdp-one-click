@@ -63,12 +63,9 @@ if [[ ("$env_status" != "NOT_FOUND") && (\
     handle_exception 2 "create environment" "Unknown environment status: $env_status"
 fi
 
-echo "use_ccm $use_ccm"
 
 if [[ "$env_status" == "NOT_FOUND" ]]; then
     if [[ "$use_ccm" == "no" ]]; then
-    echo "$base_dir/cdp_create_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" $create_network"
-    exit 1
         result=$($base_dir/cdp_create_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" $create_network 2>&1 >/dev/null)
         handle_exception $? $prefix "environment creation" "$result"
     else
