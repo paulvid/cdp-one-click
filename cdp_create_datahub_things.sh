@@ -68,13 +68,29 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
         dh_status="NOT_FOUND"
     fi
 
-    if [[ ("$dh_status" != "NOT_FOUND") && (\
-        "$dh_status" != "AVAILABLE") && (\
-        "$dh_status" != "STOPPED") ]]; then
-        handle_exception 2 "create datahub" "Unknown datahub status: $dh_status"
+    if [[ "$dh_status" == "AVAILABLE" ]]; then
+        printf "\r${ALREADY_DONE}  $prefix: $cluster_name already available                             "
     fi
 
-    if [[ "$dh_status" == "NOT_FOUND" ]]; then
+    if [[ "$dh_status" == "STOPPED" ]]; then
+        if [ "$dh_status" != "AVAILABLE" ]; then
+            result=$(cdp datahub start-cluster --cluster-name $cluster_name 2>&1 >/dev/null)
+            handle_exception $? $prefix "datahub start" "$result"
+        fi
+
+        dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
+
+        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+        while [ "$dh_status" != "AVAILABLE" ]; do
+            i=$(((i + 1) % 8))
+            printf "\r${spin:$i:1}  $prefix: $cluster_name datahub cluster status: $dh_status                           "
+            sleep 2
+            dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
+        done
+
+        printf "\r${CHECK_MARK}  $prefix: $cluster_name datahub cluster status: $dh_status                            "
+        echo ""
+    else
 
         if [[ ${cloud_provider} == "aws" ]]; then
             result=$($base_dir/cdp_create_aws_dh_cluster.sh $prefix $base_dir/cdp-cluster-definitions/${cloud_provider}/$definition 2>&1 >/dev/null)
@@ -115,29 +131,6 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
 
     fi
 
-    if [[ "$dh_status" == "AVAILABLE" ]]; then
-        printf "\r${ALREADY_DONE}  $prefix: $cluster_name already available                             "
-    fi
-
-    if [[ "$dh_status" == "STOPPED" ]]; then
-        if [ "$dh_status" != "AVAILABLE" ]; then
-            result=$(cdp datahub start-cluster --cluster-name $cluster_name 2>&1 >/dev/null)
-            handle_exception $? $prefix "datahub start" "$result"
-        fi
-
-        dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
-
-        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-        while [ "$dh_status" != "AVAILABLE" ]; do
-            i=$(((i + 1) % 8))
-            printf "\r${spin:$i:1}  $prefix: $cluster_name datahub cluster status: $dh_status                           "
-            sleep 2
-            dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
-        done
-
-        printf "\r${CHECK_MARK}  $prefix: $cluster_name datahub cluster status: $dh_status                            "
-        echo ""
-    fi
 done
 
 # 1.2. Syncing users

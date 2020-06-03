@@ -66,12 +66,10 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
         workspace_status="NOT_FOUND"
     fi
 
-    if [[ ("$workspace_status" != "NOT_FOUND") && (\
-        "$workspace_status" != "installation:finished") ]]; then
-        handle_exception 2 "create ml workspace" "Unknown ml workspace status: $workspace_status"
-    fi
-
-    if [[ ("$workspace_status" != "NOT_FOUND") ]]; then
+    if [[ ("$workspace_status" != "installation:finished") ]]; then
+        printf "\r${ALREADY_DONE}  $prefix: $workspace_name already set     "
+        echo ""
+    else
         workspace_name=${prefix}-$(echo $definition | awk -F "." '{print $1}' | sed s/\_/\-/g)
 
         workspace_template=$(sed "s/<project>/${PROJECT}/g;s/<owner>/${owner}/g;s/<enddate>/${END_DATE}/g;s/<prefix>/${prefix}/g" $base_dir/cml-workspace-definitions/$definition)
@@ -97,8 +95,4 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
 
     fi
 
-    if [[ ("$workspace_status" != "installation:finished") ]]; then
-        printf "\r${ALREADY_DONE}  $prefix: $workspace_name already set     "
-        echo ""
-    fi
 done

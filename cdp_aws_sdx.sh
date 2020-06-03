@@ -57,13 +57,26 @@ if [ ${#env_status} -eq 0 ]; then
     env_status="NOT_FOUND"
 fi
 
-if [[ ("$env_status" != "NOT_FOUND") && (\
-    "$env_status" != "AVAILABLE") && (\
-    "$env_status" != "ENV_STOPPED") ]]; then
-    handle_exception 2 "create environment" "Unknown environment status: $env_status"
+if [[ "$env_status" == "AVAILABLE" ]]; then
+    printf "\r${ALREADY_DONE}  $prefix: $prefix-cdp-env already available                             "
+    echo ""
 fi
 
-if [[ "$env_status" == "NOT_FOUND" ]]; then
+if [[ "$env_status" == "ENV_STOPPED" ]]; then
+    result=$(cdp environments start-environment --environment-name $prefix-cdp-env 2>&1 >/dev/null)
+    handle_exception $? $prefix "environment start" "$result"
+    env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
+
+    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+    while [ "$env_status" != "AVAILABLE" ]; do
+        i=$(((i + 1) % 8))
+        printf "\r${spin:$i:1}  $prefix: environment status: $env_status                              "
+        sleep 2
+        env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
+    done
+
+    printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                                   "
+else
     if [[ "$create_network" == "yes" ]]; then
         if [[ "$use_ccm" == "no" ]]; then
             network_file=${2}
@@ -155,27 +168,6 @@ if [[ "$env_status" == "NOT_FOUND" ]]; then
     echo "CDP environment for $prefix created!"
 fi
 
-if [[ "$env_status" == "AVAILABLE" ]]; then
-    printf "\r${ALREADY_DONE}  $prefix: $prefix-cdp-env already available                             "
-    echo ""
-fi
-
-if [[ "$env_status" == "ENV_STOPPED" ]]; then
-    result=$(cdp environments start-environment --environment-name $prefix-cdp-env 2>&1 >/dev/null)
-    handle_exception $? $prefix "environment start" "$result"
-    env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
-
-    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-    while [ "$env_status" != "AVAILABLE" ]; do
-        i=$(((i + 1) % 8))
-        printf "\r${spin:$i:1}  $prefix: environment status: $env_status                              "
-        sleep 2
-        env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
-    done
-
-    printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                                   "
-fi
-
 # Creating datalake
 echo ""
 echo "⏱  $(date +%H%Mhrs)"
@@ -193,30 +185,6 @@ dl_status=$($base_dir/cdp_describe_dl.sh $prefix 2>/dev/null | jq -r .datalake.s
 if [ ${#dl_status} -eq 0 ]; then
     dl_status="NOT_FOUND"
 fi
-if [[ ("$dl_status" != "NOT_FOUND") && (\
-    "$dl_status" != "RUNNING") && (\
-    "$dl_status" != "STOPPED") ]]; then
-    handle_exception 2 "create datalake" "Unknown datalake status: $dl_status"
-fi
-
-if [[ "$dl_status" == "NOT_FOUND" ]]; then
-    result=$($base_dir/cdp_create_aws_datalake.sh $base_dir $prefix $RDS_HA 2>&1 >/dev/null)
-    handle_exception $? $prefix "datalake creation" "$result"
-
-    dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
-
-    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-    while [ "$dl_status" != "RUNNING" ]; do
-        i=$(((i + 1) % 8))
-        printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
-        sleep 2
-        dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
-        if [[ "$dl_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "Datalake creation" "Datalake creation failed; Check UI for details"; fi
-    done
-
-    printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                             "
-fi
-
 if [[ "$dl_status" == "RUNNING" ]]; then
     printf "\r${ALREADY_DONE}  $prefix: $prefix-cdp-dl already running                             "
 fi
@@ -238,6 +206,22 @@ if [[ "$dl_status" == "STOPPED" ]]; then
     done
 
     printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                                 "
+else
+    result=$($base_dir/cdp_create_aws_datalake.sh $base_dir $prefix $RDS_HA 2>&1 >/dev/null)
+    handle_exception $? $prefix "datalake creation" "$result"
+
+    dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
+
+    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+    while [ "$dl_status" != "RUNNING" ]; do
+        i=$(((i + 1) % 8))
+        printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
+        sleep 2
+        dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
+        if [[ "$dl_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "Datalake creation" "Datalake creation failed; Check UI for details"; fi
+    done
+
+    printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                             "
 fi
 
 # 4. Creating user workload password
