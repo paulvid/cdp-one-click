@@ -70,10 +70,7 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
         "$workspace_status" != "installation:finished") ]]; then
         handle_exception 2 "create ml workspace" "Unknown ml workspace status: $workspace_status"
     fi
-    if [[ ("$workspace_status" != "installation:finished") ]]; then
-        printf "\r${ALREADY_DONE}  $prefix: $workspace_name already set     "
-        echo ""
-    fi
+
     if [[ ("$workspace_status" != "NOT_FOUND") ]]; then
         workspace_name=${prefix}-$(echo $definition | awk -F "." '{print $1}' | sed s/\_/\-/g)
 
@@ -100,5 +97,8 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
 
     fi
 
-
+    if [[ ("$workspace_status" != "installation:finished") ]]; then
+        printf "\r${ALREADY_DONE}  $prefix: $workspace_name already set     "
+        echo ""
+    fi
 done
