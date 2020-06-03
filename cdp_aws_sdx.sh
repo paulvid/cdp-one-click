@@ -52,7 +52,7 @@ echo ${underline}
 echo ""
 
 # 1. Environment
-env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
+env_status=$($base_dir/cdp_describe_env.sh $prefix 2>/dev/null | jq -r .environment.status)
 if [ ${#env_status} -eq 0 ]; then
     env_status="NOT_FOUND"
 fi
@@ -189,7 +189,7 @@ echo ${underline}
 echo ""
 
 # 3. Datalake
-dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
+dl_status=$($base_dir/cdp_describe_dl.sh $prefix 2>/dev/null | jq -r .datalake.status)
 if [ ${#dl_status} -eq 0 ]; then
     dl_status="NOT_FOUND"
 fi
@@ -248,12 +248,8 @@ echo ""
 echo "${CHECK_MARK}  $prefix: workload password setup "
 
 # 5. Syncing users
-result=$($base_dir/cdp_sync_users.sh $prefix 2>&1 >/dev/null)
-if [ $? -ne 255 ]; then
-    handle_exception $? $prefix "syncing users" "$result"
-    echo "${CHECK_MARK}  $prefix: user sync launched "
-else
-    echo "${ALREADY_DONE}  $prefix: user sync was already in progress "
+if [[ "$SYNC_USERS" == 1 ]]; then
+    $base_dir/cdp_sync_users.sh $prefix
 fi
 
 echo ""

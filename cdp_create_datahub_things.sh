@@ -63,7 +63,7 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
     cluster_type=$(echo $base_dir/cdp-cluster-definitions/${cloud_provider}/$definition | awk -F "/" '{print $NF}' | awk -F "." '{print $1}')
     cluster_name=${prefix}-${cluster_type}
 
-    dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name | jq -r .cluster.status)
+    dh_status=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name 2>/dev/null | jq -r .cluster.status)
     if [ ${#dh_status} -eq 0 ]; then
         dh_status="NOT_FOUND"
     fi
@@ -141,7 +141,10 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
 done
 
 # 1.2. Syncing users
-$base_dir/cdp_sync_users.sh $prefix >/dev/null 2>&1
+if [[ "$SYNC_USERS" == 1 ]]; then
+    $base_dir/cdp_sync_users.sh $prefix
+fi
+
 echo ""
 echo ""
 echo "CDP datahub clusters for $prefix created!"

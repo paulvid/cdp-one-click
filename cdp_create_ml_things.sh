@@ -61,7 +61,7 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
     enable_workspace=$(_jq '.enable_workspace')
     workspace_name=${prefix}-$(echo $definition | awk -F "." '{print $1}' | sed s/\_/\-/g)
     env_name=${prefix}-cdp-env
-    workspace_status=$($base_dir/cdp_describe_ml_workspace.sh $env_name $workspace_name | jq -r .workspace.instanceStatus)
+    workspace_status=$($base_dir/cdp_describe_ml_workspace.sh $env_name $workspace_name 2>/dev/null | jq -r .workspace.instanceStatus)
     if [ ${#workspace_status} -eq 0 ]; then
         workspace_status="NOT_FOUND"
     fi

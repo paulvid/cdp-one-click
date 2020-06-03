@@ -19,7 +19,7 @@ This repository contains a set of scripts that will create CDP minimal assets fo
     * Use `az login` after install to login
 * ssh Key: you will need to paste the public key into your parameters file
 
-_Note: Azure does not support CML yet, so don't add it in your parameters file :)_
+_Note: Azure CML is not supported yet, so don't add it in your parameters file :)_
 
 ## CDP
 * CDP CLI ([Instructions](https://docs.cloudera.com/management-console/cloud/cli/topics/mc-cli-client-setup.html))
@@ -208,6 +208,7 @@ Note: some flags require dev cli, not for public consumption, use at your own ri
 
 `--no-cost-check`: removes cost check
 `--no-db-ha`: does not create DB HA backend
+`--no-sync-users`: does launch sync users to free-ipa
 
 # Future Improvements
 

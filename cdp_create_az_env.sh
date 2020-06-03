@@ -49,20 +49,7 @@ credential=$2
 region=$3
 key=$4
 sg_cidr=$5
-
-
-network_created="no"
-if [  $# -eq 6 ] 
-then 
-    network_created="yes"
-    network_id="$prefix-cdp-vnet"
-    subnet_1="$prefix-pub-subnet-1"
-    subnet_2="$prefix-pub-subnet-2"
-    subnet_3="$prefix-pub-subnet-3"
-    knox_nsg=$(az network nsg show -g $prefix-cdp-rg -n $prefix-knox-nsg | jq -r .id)
-    default_nsg=$(az network nsg show -g $prefix-cdp-rg -n $prefix-default-nsg | jq -r .id)
-    
-fi
+network_created=$6
 
 SUBSCRIPTION_ID=$(az account show | jq -r .id)
 if [[ "$network_created" == "no" ]]
