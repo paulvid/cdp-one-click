@@ -66,18 +66,20 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
         workspace_status="NOT_FOUND"
     fi
 
-    if [[ ("$workspace_status" != "installation:finished") ]]; then
-        printf "\r${ALREADY_DONE}  $prefix: $workspace_name already set     "
+    if [[ ("$workspace_status" == "installation:finished") ]]; then
+        printf "\r${ALREADY_DONE}  $prefix: $workspace_name already setup     "
         echo ""
     else
         workspace_name=${prefix}-$(echo $definition | awk -F "." '{print $1}' | sed s/\_/\-/g)
 
-        workspace_template=$(sed "s/<project>/${PROJECT}/g;s/<owner>/${owner}/g;s/<enddate>/${END_DATE}/g;s/<prefix>/${prefix}/g" $base_dir/cml-workspace-definitions/$definition)
-        echo $workspace_template >$base_dir/cml-workspace-definitions/${prefix}_$definition
-        result=$($base_dir/cdp_create_ml_workspace.sh $prefix $base_dir/cml-workspace-definitions/${prefix}_$definition ${workspace_name} ${cloud_provider} ${enable_workspace} 2>&1 >/dev/null)
-        handle_exception $? $prefix "ml workspace creation" "$result"
+        if [[ ("$workspace_status" == "NOT_FOUND") ]]; then
+            workspace_template=$(sed "s/<project>/${PROJECT}/g;s/<owner>/${owner}/g;s/<enddate>/${END_DATE}/g;s/<prefix>/${prefix}/g" $base_dir/cml-workspace-definitions/$definition)
+            echo $workspace_template >$base_dir/cml-workspace-definitions/${prefix}_$definition
+            result=$($base_dir/cdp_create_ml_workspace.sh $prefix $base_dir/cml-workspace-definitions/${prefix}_$definition ${workspace_name} ${cloud_provider} ${enable_workspace} 2>&1 >/dev/null)
+            handle_exception $? $prefix "ml workspace creation" "$result"
 
-        rm $base_dir/cml-workspace-definitions/${prefix}_$definition 2>&1 >/dev/null
+            rm $base_dir/cml-workspace-definitions/${prefix}_$definition 2>&1 >/dev/null
+        fi
         env_name=${prefix}-cdp-env
 
         workspace_status=$($base_dir/cdp_describe_ml_workspace.sh $env_name $workspace_name | jq -r .workspace.instanceStatus)

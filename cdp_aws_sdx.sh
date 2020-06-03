@@ -60,114 +60,116 @@ fi
 if [[ "$env_status" == "AVAILABLE" ]]; then
     printf "\r${ALREADY_DONE}  $prefix: $prefix-cdp-env already available                             "
     echo ""
-fi
-
-if [[ "$env_status" == "ENV_STOPPED" ]]; then
-    result=$(cdp environments start-environment --environment-name $prefix-cdp-env 2>&1 >/dev/null)
-    handle_exception $? $prefix "environment start" "$result"
-    env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
-
-    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-    while [ "$env_status" != "AVAILABLE" ]; do
-        i=$(((i + 1) % 8))
-        printf "\r${spin:$i:1}  $prefix: environment status: $env_status                              "
-        sleep 2
-        env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
-    done
-
-    printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                                   "
+    echo ""
 else
-    if [[ "$create_network" == "yes" ]]; then
-        if [[ "$use_ccm" == "no" ]]; then
-            network_file=${2}
-            igw_id=$(cat ${network_file} | jq -r .InternetGatewayId)
-            vpc_id=$(cat ${network_file} | jq -r .VpcId)
-            subnet_id1a=$(cat ${network_file} | jq -r .Subnets[0])
-            subnet_id1b=$(cat ${network_file} | jq -r .Subnets[1])
-            subnet_id1c=$(cat ${network_file} | jq -r .Subnets[2])
-            route_id=$(cat ${network_file} | jq -r .RouteTableId)
-            knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
-            default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
 
-            result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
-            handle_exception $? $prefix "environment creation" "$result"
-        fi
-        if [[ "$use_ccm" == "yes" ]]; then
-            network_file=${2}
-
-            igw_id=$(cat ${network_file} | jq -r .InternetGatewayId)
-            vpc_id=$(cat ${network_file} | jq -r .VpcId)
-            pub_sub_1=$(cat ${network_file} | jq -r .PublicSubnets[0])
-            pub_sub_2=$(cat ${network_file} | jq -r .PublicSubnets[1])
-            pub_sub_3=$(cat ${network_file} | jq -r .PublicSubnets[2])
-            pub_route=$(cat ${network_file} | jq -r .PublicRouteTableId)
-            nat_1=$(cat ${network_file} | jq -r .PublicNatGatewayIds[0])
-            nat_2=$(cat ${network_file} | jq -r .PublicNatGatewayIds[1])
-            nat_3=$(cat ${network_file} | jq -r .PublicNatGatewayIds[2])
-            priv_sub_1=$(cat ${network_file} | jq -r .PrivateSubnets[0])
-            priv_sub_2=$(cat ${network_file} | jq -r .PrivateSubnets[1])
-            priv_sub_3=$(cat ${network_file} | jq -r .PrivateSubnets[2])
-            priv_route_1=$(cat ${network_file} | jq -r .PrivateRouteTableIds[0])
-            priv_route_2=$(cat ${network_file} | jq -r .PrivateRouteTableIds[1])
-            priv_route_3=$(cat ${network_file} | jq -r .PrivateRouteTableIds[2])
-            s3_endpoint=$(cat ${network_file} | jq -r .VPCEndpoints[0])
-            dyanmo_endpoint=$(cat ${network_file} | jq -r .VPCEndpoints[1])
-            knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
-            default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
-
-            result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $pub_sub_1 $pub_sub_2 $pub_sub_3 $priv_sub_1 $priv_sub_2 $priv_sub_3 $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
-            handle_exception $? $prefix "environment creation" "$result"
-
-        fi
-
-    else
-        if [[ "$use_ccm" == "no" ]]; then
-            result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" 2>&1 >/dev/null)
-            handle_exception $? $prefix "environment creation" "$result"
-        fi
-        if [[ "$use_ccm" == "yes" ]]; then
-            result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" 2>&1 >/dev/null)
-            handle_exception $? $prefix "environment creation" "$result"
-        fi
-    fi
-
-    # Adding test for when env is not available yet
-
-    env_describe_err=$($base_dir/cdp_describe_env.sh $prefix 2>&1 | grep NOT_FOUND)
-
-    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-    while [[ ${#env_describe_err} > 1 ]]; do
-        i=$(((i + 1) % 8))
-        printf "\r${spin:$i:1}  $prefix: environment status: WAITING_FOR_API                             "
-        sleep 2
-        env_describe_err=$($base_dir/cdp_describe_env.sh $prefix 2>&1 | grep NOT_FOUND)
-    done
-
-    env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
-
-    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-    while [ "$env_status" != "AVAILABLE" ]; do
-        i=$(((i + 1) % 8))
-        printf "\r${spin:$i:1}  $prefix: environment status: $env_status                             "
-        sleep 2
+    if [[ "$env_status" == "ENV_STOPPED" ]]; then
+        result=$(cdp environments start-environment --environment-name $prefix-cdp-env 2>&1 >/dev/null)
+        handle_exception $? $prefix "environment start" "$result"
         env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
 
-        if [[ "$env_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "environment creation" "Environment creation failed; Check UI for details"; fi
-    done
+        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+        while [ "$env_status" != "AVAILABLE" ]; do
+            i=$(((i + 1) % 8))
+            printf "\r${spin:$i:1}  $prefix: environment status: $env_status                              "
+            sleep 2
+            env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
+        done
 
-    printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                             "
-    echo ""
+        printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                                   "
+    else
+        if [ "$env_status" == "NOT_FOUND" ]; then
+            if [[ "$create_network" == "yes" ]]; then
+                if [[ "$use_ccm" == "no" ]]; then
+                    network_file=${2}
+                    igw_id=$(cat ${network_file} | jq -r .InternetGatewayId)
+                    vpc_id=$(cat ${network_file} | jq -r .VpcId)
+                    subnet_id1a=$(cat ${network_file} | jq -r .Subnets[0])
+                    subnet_id1b=$(cat ${network_file} | jq -r .Subnets[1])
+                    subnet_id1c=$(cat ${network_file} | jq -r .Subnets[2])
+                    route_id=$(cat ${network_file} | jq -r .RouteTableId)
+                    knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
+                    default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
 
-    # 2. IDBroker mappings
-    result=$($base_dir/cdp_aws_create_group_iam.sh $base_dir $prefix 2>&1 >/dev/null)
-    handle_exception $? $prefix "idbroker mappings creation" "$result"
+                    result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
+                    handle_exception $? $prefix "environment creation" "$result"
+                fi
+                if [[ "$use_ccm" == "yes" ]]; then
+                    network_file=${2}
 
-    echo "${CHECK_MARK}  $prefix: idbroker mappings set"
-    echo ""
-    echo ""
-    echo "CDP environment for $prefix created!"
+                    igw_id=$(cat ${network_file} | jq -r .InternetGatewayId)
+                    vpc_id=$(cat ${network_file} | jq -r .VpcId)
+                    pub_sub_1=$(cat ${network_file} | jq -r .PublicSubnets[0])
+                    pub_sub_2=$(cat ${network_file} | jq -r .PublicSubnets[1])
+                    pub_sub_3=$(cat ${network_file} | jq -r .PublicSubnets[2])
+                    pub_route=$(cat ${network_file} | jq -r .PublicRouteTableId)
+                    nat_1=$(cat ${network_file} | jq -r .PublicNatGatewayIds[0])
+                    nat_2=$(cat ${network_file} | jq -r .PublicNatGatewayIds[1])
+                    nat_3=$(cat ${network_file} | jq -r .PublicNatGatewayIds[2])
+                    priv_sub_1=$(cat ${network_file} | jq -r .PrivateSubnets[0])
+                    priv_sub_2=$(cat ${network_file} | jq -r .PrivateSubnets[1])
+                    priv_sub_3=$(cat ${network_file} | jq -r .PrivateSubnets[2])
+                    priv_route_1=$(cat ${network_file} | jq -r .PrivateRouteTableIds[0])
+                    priv_route_2=$(cat ${network_file} | jq -r .PrivateRouteTableIds[1])
+                    priv_route_3=$(cat ${network_file} | jq -r .PrivateRouteTableIds[2])
+                    s3_endpoint=$(cat ${network_file} | jq -r .VPCEndpoints[0])
+                    dyanmo_endpoint=$(cat ${network_file} | jq -r .VPCEndpoints[1])
+                    knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
+                    default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
+
+                    result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $pub_sub_1 $pub_sub_2 $pub_sub_3 $priv_sub_1 $priv_sub_2 $priv_sub_3 $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
+                    handle_exception $? $prefix "environment creation" "$result"
+
+                fi
+
+            else
+                if [[ "$use_ccm" == "no" ]]; then
+                    result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" 2>&1 >/dev/null)
+                    handle_exception $? $prefix "environment creation" "$result"
+                fi
+                if [[ "$use_ccm" == "yes" ]]; then
+                    result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" 2>&1 >/dev/null)
+                    handle_exception $? $prefix "environment creation" "$result"
+                fi
+            fi
+        fi
+        # Adding test for when env is not available yet
+
+        env_describe_err=$($base_dir/cdp_describe_env.sh $prefix 2>&1 | grep NOT_FOUND)
+
+        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+        while [[ ${#env_describe_err} > 1 ]]; do
+            i=$(((i + 1) % 8))
+            printf "\r${spin:$i:1}  $prefix: environment status: WAITING_FOR_API                             "
+            sleep 2
+            env_describe_err=$($base_dir/cdp_describe_env.sh $prefix 2>&1 | grep NOT_FOUND)
+        done
+
+        env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
+
+        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+        while [ "$env_status" != "AVAILABLE" ]; do
+            i=$(((i + 1) % 8))
+            printf "\r${spin:$i:1}  $prefix: environment status: $env_status                             "
+            sleep 2
+            env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
+
+            if [[ "$env_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "environment creation" "Environment creation failed; Check UI for details"; fi
+        done
+
+        printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                             "
+        echo ""
+
+        # 2. IDBroker mappings
+        result=$($base_dir/cdp_aws_create_group_iam.sh $base_dir $prefix 2>&1 >/dev/null)
+        handle_exception $? $prefix "idbroker mappings creation" "$result"
+
+        echo "${CHECK_MARK}  $prefix: idbroker mappings set"
+        echo ""
+        echo ""
+        echo "CDP environment for $prefix created!"
+    fi
 fi
-
 # Creating datalake
 echo ""
 echo "⏱  $(date +%H%Mhrs)"
@@ -187,43 +189,46 @@ if [ ${#dl_status} -eq 0 ]; then
 fi
 if [[ "$dl_status" == "RUNNING" ]]; then
     printf "\r${ALREADY_DONE}  $prefix: $prefix-cdp-dl already running                             "
-fi
-
-if [[ "$dl_status" == "STOPPED" ]]; then
-    dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
-    if [ "$dl_status" != "RUNNING" ]; then
-        result=$(cdp datalake start-datalake --datalake-name $prefix-cdp-dl 2>&1 >/dev/null)
-        handle_exception $? $prefix "datalake start" "$result"
-    fi
-    dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
-
-    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-    while [ "$dl_status" != "RUNNING" ]; do
-        i=$(((i + 1) % 8))
-        printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
-        sleep 2
-        dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
-    done
-
-    printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                                 "
+    echo ""
+    echo ""
 else
-    result=$($base_dir/cdp_create_aws_datalake.sh $base_dir $prefix $RDS_HA 2>&1 >/dev/null)
-    handle_exception $? $prefix "datalake creation" "$result"
 
-    dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
-
-    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-    while [ "$dl_status" != "RUNNING" ]; do
-        i=$(((i + 1) % 8))
-        printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
-        sleep 2
+    if [[ "$dl_status" == "STOPPED" ]]; then
         dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
-        if [[ "$dl_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "Datalake creation" "Datalake creation failed; Check UI for details"; fi
-    done
+        if [ "$dl_status" != "RUNNING" ]; then
+            result=$(cdp datalake start-datalake --datalake-name $prefix-cdp-dl 2>&1 >/dev/null)
+            handle_exception $? $prefix "datalake start" "$result"
+        fi
+        dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
 
-    printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                             "
+        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+        while [ "$dl_status" != "RUNNING" ]; do
+            i=$(((i + 1) % 8))
+            printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
+            sleep 2
+            dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
+        done
+
+        printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                                 "
+    else
+        if [ "$dl_status" == "NOT_FOUND" ]; then
+            result=$($base_dir/cdp_create_aws_datalake.sh $base_dir $prefix $RDS_HA 2>&1 >/dev/null)
+            handle_exception $? $prefix "datalake creation" "$result"
+        fi
+        dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
+
+        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+        while [ "$dl_status" != "RUNNING" ]; do
+            i=$(((i + 1) % 8))
+            printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
+            sleep 2
+            dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
+            if [[ "$dl_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "Datalake creation" "Datalake creation failed; Check UI for details"; fi
+        done
+
+        printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                             "
+    fi
 fi
-
 # 4. Creating user workload password
 result=$($base_dir/cdp_set_workload_pwd.sh ${workload_pwd} 2>&1 >/dev/null)
 handle_exception $? $prefix "workload password setup" "$result"
