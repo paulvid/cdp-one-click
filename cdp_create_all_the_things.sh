@@ -85,20 +85,20 @@ echo "${CHECK_MARK}  parameters parsed from ${param_file}"
 run_pre_checks
 echo "${CHECK_MARK}  pre-checks done"
 
-# Evaluating costs
-if [ $COST_CHECK -eq 1 ]
-then
-    ${base_dir}/cdp_review_costs.sh ${param_file}
-    code=$?
-    if [ $code -ne 0 ]
-    then 
-        exit 2 
-    fi
-    echo ""
-    echo "${CHECK_MARK}  costs accepted"
+# # Evaluating costs
+# if [ $COST_CHECK -eq 1 ]
+# then
+#     ${base_dir}/cdp_review_costs.sh ${param_file}
+#     code=$?
+#     if [ $code -ne 0 ]
+#     then 
+#         exit 2 
+#     fi
+#     echo ""
+#     echo "${CHECK_MARK}  costs accepted"
  
-fi
-echo ""
+# fi
+# echo ""
 
 if [[ ${cloud_provider} == "aws" ]]
 then
