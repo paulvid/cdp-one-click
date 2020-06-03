@@ -86,26 +86,26 @@ run_pre_checks
 echo "${CHECK_MARK}  pre-checks done"
 
 # Evaluating costs
-# if [ $COST_CHECK -eq 1 ]
-# then
-#     ${base_dir}/cdp_review_costs.sh ${param_file}
-#     code=$?
-#     if [ $code -ne 0 ]
-#     then 
-#         exit 2 
-#     fi
-#     echo ""
-#     echo "${CHECK_MARK}  costs accepted"
+if [ $COST_CHECK -eq 1 ]
+then
+    ${base_dir}/cdp_review_costs.sh ${param_file}
+    code=$?
+    if [ $code -ne 0 ]
+    then 
+        exit 2 
+    fi
+    echo ""
+    echo "${CHECK_MARK}  costs accepted"
  
-# fi
-# echo ""
+fi
+echo ""
 
 if [[ ${cloud_provider} == "aws" ]]
 then
     # 1. AWS pre-reqs
     ${base_dir}/cdp_aws_pre_reqs.sh ${param_file}
     handle_exception $? $prefix "creating AWS pre-requisites" "Error creating AWS pre-requisites"
- 
+
     # 2. AWS SDX
      ${base_dir}/cdp_aws_sdx.sh ${param_file} ${base_dir}/aws-pre-req/tmp_network/${prefix}_aws_network.json
     handle_exception $? $prefix "creating AWS SDX" "Error creating AWS SDX"

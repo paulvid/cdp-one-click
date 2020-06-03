@@ -153,7 +153,7 @@ read -p "Do you agree to delete all these assets when you're finished? (Y for Ye
     then
         echo ""
         echo ""
-        echo "🚫 You must agree to delete your assets when you're finished!"  >&2
+        echo "💥 You must agree to delete your assets when you're finished!"  >&2
         exit 2
     fi
 
