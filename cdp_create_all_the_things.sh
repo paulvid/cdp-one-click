@@ -34,7 +34,7 @@ then
     exit 1
 fi 
 
-if [  $# -gt 3 ] 
+if [  $# -gt 4 ] 
 then 
     echo "Too many arguments!"  >&2
     display_usage

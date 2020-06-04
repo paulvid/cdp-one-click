@@ -185,6 +185,14 @@ done
 echo ${underline}
 
 cdp environments delete-environment --environment-name $prefix-cdp-env >/dev/null 2>&1
+spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+time=0
+while [ $time -lt 150 ]; do
+    i=$(((i + 1) % 8))
+    printf "\r${spin:$i:1}  $prefix: environment status: WAITING_FOR_API        "
+    sleep 2                    
+    time=$((time+1))
+done
 wc=$($base_dir/cdp_describe_env.sh $prefix 2>/dev/null | jq -r .environment.status | wc -l)
 
 spin='🌑🌒🌓🌔🌕🌖🌗🌘'
