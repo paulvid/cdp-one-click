@@ -70,7 +70,7 @@ done
 echo ${underline}
 echo ""
 
-all_workspaces=$(cdp ml list-workspaces | jq -r '.workspaces[] | select(.environmentName=="'${prefix}'-cdp-env") | .instanceName' | grep ${prefix}-small 2>/dev/null)
+all_workspaces=$(cdp ml list-workspaces | jq -r '.workspaces[] | select(.environmentName=="'${prefix}'-cdp-env") | .instanceName' 2>/dev/null)
 
 for workspace in $(echo ${all_workspaces}); do
 
