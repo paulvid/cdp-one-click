@@ -27,37 +27,6 @@ create_identity()
    sleep 60 # Needed to avoid "Principal xxxxxxxxxx does not exist in the directory" error.  
 }
 
-
-error_check() {
-    local error=$1
-    if [[ ! -z "$error" ]]; then
-       if [[ "$error" != "null" ]] && [[ "$error" != *"already exists"* ]]; then
-          echo "Error: $error"
-          exit 1
-       fi
-    fi
-}
-assign_blob_contributor()
-{
-    local SCOPE="$1"
-    echo "Assigning user MSI $PRINCIPALID role Storage Blob Contributor under storage account $STORAGE_ACCOUNT_NAME... " 
-    UUID=$(uuidgen)
-    local RESULT=$(curl -s -X PUT -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -d "{\"properties\":{\"roleDefinitionId\":\"$SCOPE/providers/Microsoft.Authorization/roleDefinitions/$AZURE_STORAGE_CONTRIBUTOR_GUID\",\"principalId\":\"$PRINCIPALID\"}}"  "https://management.azure.com$SCOPE/providers/Microsoft.Authorization/roleAssignments/$UUID?api-version=2020-03-01-preview")
-    ERROR=$(echo ${RESULT} | jq -r '.error.message')
-    error_check "$ERROR"  
-}
-
-assign_blob_owner()
-{
-    local SCOPE="$1"
-    echo "Assigning user MSI $PRINCIPALID role Storage Blob Owner under storage account $STORAGE_ACCOUNT_NAME... " 
-    UUID=$(uuidgen)
-    local RESULT=$(curl -s -X PUT -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -d "{\"properties\":{\"roleDefinitionId\":\"$SCOPE/providers/Microsoft.Authorization/roleDefinitions/$AZURE_STORAGE_OWNER_GUID\",\"principalId\":\"$PRINCIPALID\"}}"  "https://management.azure.com$SCOPE/providers/Microsoft.Authorization/roleAssignments/$UUID?api-version=2020-03-01-preview")
-    ERROR=$(echo ${RESULT} | jq -r '.error.message')
-    error_check "$ERROR"  
-}
-
-
 # check whether user had supplied -h or --help . If yes display usage 
 if [[ ( ${1:-x} == "--help") ||  ${1:-x} == "-h" ]] 
 then 
@@ -92,35 +61,31 @@ LOGGER_IDENTITY="loggerIdentity"
 RANGER_IDENTITY="rangerIdentity"
 STORAGE_RESOURCE_GROUP_ID=$(az group list --query "[?name=='$RESOURCE_GROUP_NAME']" | jq -r '.[0].id')
 
-# Constants
-SCOPE="/subscriptions//$SUBSCRIPTION_ID"
-
 # Create assumer identity
 create_identity "$ASSUMER_IDENTITY" "ASSUMER_MSI_ID"
-ACCESS_TOKEN=$(az account get-access-token | jq -r '.accessToken')
+ASSUMER_OBJECTID=$(az identity list -g $RESOURCE_GROUP_NAME|jq '.[]|{"name":.name,"principalId":.principalId}|select(.name | test("assumerIdentity"))|.principalId'| tr -d '"')
 
-UUID=$(uuidgen)
-RESULT=$(curl -s -X PUT -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -d "{\"properties\":{\"roleDefinitionId\":\"/$SCOPE/providers/Microsoft.Authorization/roleDefinitions/$AZURE_VM_CONTRIBUTOR_GUID\",\"principalId\":\"$PRINCIPALID\"}}"  "https://management.azure.com/$SCOPE/providers/Microsoft.Authorization/roleAssignments/$UUID?api-version=2020-03-01-preview")
-ERROR=$(echo ${RESULT} | jq -r '.error.message')
-error_check "$ERROR"
-echo "Assigned Virtual Machine Contributor role." 
-
-echo "Assigning Managed Identity Operator role..."
-UUID=$(uuidgen)
-RESULT=$(curl -s -X PUT -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" -d "{\"properties\":{\"roleDefinitionId\":\"/$SCOPE/providers/Microsoft.Authorization/roleDefinitions/$AZURE_MANAGED_IDENTITY_OPERATOR_GUID\",\"principalId\":\"$PRINCIPALID\"}}"  "https://management.azure.com/$SCOPE/providers/Microsoft.Authorization/roleAssignments/$UUID?api-version=2020-03-01-preview")
-ERROR=$(echo ${RESULT} | jq -r '.error.message')
-error_check "$ERROR"
-echo "Assigned Managed Identity Operator role." 
+# Assign Managed Identity Operator role to the assumerIdentity principal at subscription scope
+az role assignment create --assignee $ASSUMER_OBJECTID --role 'f1a07417-d97a-45cb-824c-7a7467783830' --scope "/subscriptions/$SUBSCRIPTION_ID"
+# Assign Virtual Machine Contributor role to the assumerIdentity principal at subscription scope
+az role assignment create --assignee $ASSUMER_OBJECTID --role '9980e02c-c2be-4d73-94e8-173b1dc7cf3c' --scope "/subscriptions/$SUBSCRIPTION_ID"
 
 # Create admin identity
-SCOPE="${STORAGE_RESOURCE_GROUP_ID}/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME"
 create_identity "$ADMIN_IDENTITY" "ADMIN_MSI_ID"
-assign_blob_owner "$SCOPE"
+ADMIN_OBJECTID=$(az identity list -g $RESOURCE_GROUP_NAME|jq '.[]|{"name":.name,"principalId":.principalId}|select(.name | test("adminIdentity"))|.principalId'| tr -d '"')
+# Assign Storage Blob Data Owner role to the dataAccessIdentity principal at logs/data filesystem scope
+az role assignment create --assignee $ADMIN_OBJECTID --role 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME/blobServices/default/containers/data"
+az role assignment create --assignee $ADMIN_OBJECTID --role 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME/blobServices/default/containers/logs"
+
 
 # Create logging identity
 create_identity "$LOGGER_IDENTITY" "LOGGER_MSI_ID"
-assign_blob_contributor "$SCOPE"
+LOGGER_OBJECTID=$(az identity list -g $RESOURCE_GROUP_NAME|jq '.[]|{"name":.name,"principalId":.principalId}|select(.name | test("loggerIdentity"))|.principalId'| tr -d '"')
+# Assign Storage Blob Data Contributor role to the loggerIdentity principal at logs filesystem scope
+az role assignment create --assignee $LOGGER_OBJECTID --role 'ba92f5b4-2d11-453d-a403-e96b0029c9fe' --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME/blobServices/default/containers/logs"
 
-
+# Create ranger identity
 create_identity "$RANGER_IDENTITY" "RANGER_MSI_ID"
-assign_blob_contributor "$SCOPE"
+RANGER_OBJECTID=$(az identity list -g $RESOURCE_GROUP_NAME|jq '.[]|{"name":.name,"principalId":.principalId}|select(.name | test("rangerIdentity"))|.principalId'| tr -d '"')
+# Assign Storage Blob Data Contributor role to the rangerIdentity principal at data filesystem scope
+az role assignment create --assignee $RANGER_OBJECTID --role 'ba92f5b4-2d11-453d-a403-e96b0029c9fe' --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT_NAME/blobServices/default/containers/data"

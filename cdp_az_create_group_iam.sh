@@ -96,6 +96,6 @@ ADMIN_MSI_ID=$(az identity list -g "$2-cdp-rg" --query "[?name=='adminIdentity']
 RANGER_MSI_ID=$(az identity list -g "$2-cdp-rg" --query "[?name=='rangerIdentity']" | jq -r '.[0].id' | sed -e "s|resourcegroup|resourceGroup|g" )
 cdp environments set-id-broker-mappings \
                --environment-name "$2-cdp-env" \
-               --baseline-role "$ADMIN_MSI_ID" \
-               --data-access-role "$RANGER_MSI_ID" \
+               --baseline-role "$RANGER_MSI_ID" \
+               --data-access-role "$ADMIN_MSI_ID" \
                --mappings accessorCrn="$group_crn",role="${ADMIN_MSI_ID}"

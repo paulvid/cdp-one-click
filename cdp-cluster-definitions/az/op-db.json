@@ -2,33 +2,8 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pvi-cdp-env",
+  "environmentName": "fef0-az-20200608-env",
   "instanceGroups": [
-    {
-      "nodeCount": 1,
-      "name": "leader",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
     {
       "nodeCount": 2,
       "name": "master",
@@ -103,15 +78,40 @@
         "cloudPlatform": "AZURE"
       },
       "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "leader",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "StandardSSD_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "2adec07f-4c80-4301-4cd3-32bbce073b56"
+    "id": "9a18b360-7e57-4e28-7a6d-64df93033b75"
   },
   "network": {
     "azure": {
-      "subnetId": "subnet5"
+      "subnetId": "fef0-az-20200608-subnet-0"
     }
   },
   "cluster": {
@@ -120,7 +120,11 @@
       "locations": [
         {
           "type": "HBASE_ROOT",
-          "value": "abfs://data@pvicdpsa.dfs.core.windows.net/op-db-phoenix/hbase"
+          "value": "abfs://data@fef0az20200608westeurope.dfs.core.windows.net/dsfsadfsdafsadf/hbase"
+        },
+        {
+          "type": "YARN_LOG",
+          "value": "abfs://data@fef0az20200608westeurope.dfs.core.windows.net/oplogs/yarn-app-logs"
         }
       ],
       "identities": [
@@ -128,7 +132,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/3b4df54c-3c29-4484-a5bf-a4aee6d2eb0f/resourceGroups/pvi-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/d03b96f5-4d5b-4bb6-be9b-1e0ab5086602/resourcegroups/fef0-az-20200608-rmgp/providers/Microsoft.ManagedIdentity/userAssignedIdentities/fef0-az-20200608-log-role-ident",
             "secure": false
           },
           "type": "LOG"
@@ -138,15 +142,25 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.1.0 - Operational Database: Apache HBase",
+    "blueprintName": "7.1.0 - Operational Database: Apache HBase, Phoenix",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-cdp-dl"
+    "name": "fef0-az-20200608-dl"
+  },
+  "externalDatabase": {
+    "availabilityType": "NONE"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "owner": "field-staging-alerts@cloudera.com",
+      "deploytool": "ClouderaCanary",
+      "hours_of_operation": "weekdays",
+      "enddate": "20200608",
+      "project": "field-staging-alerts",
+      "dept": "se"
+    },
     "defaults": null
   },
   "inputs": {},
