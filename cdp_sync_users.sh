@@ -39,7 +39,7 @@ if [ $# -gt 1 ]; then
 fi
 
 prefix=$1
-CHECK_MARK="🟢"
+CHECK_MARK="✅"
 # Create groups
 env_crn=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r .environment.crn)
 

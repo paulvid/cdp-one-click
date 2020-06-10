@@ -12,7 +12,7 @@ handle_exception()
         operation=$3
         error=$4
         echo ""
-        echo "🔴  $prefix: error during operation: $operation $error"
+        echo "⛔  $prefix: error during operation: $operation $error"
         exit $1
     fi
 }
@@ -32,7 +32,7 @@ handle_null_param()
     if [[ ${param_value} == "null" ]]; then
         if [[ ${required} == "yes" ]]; then
             echo ""
-            echo "🔴  error during parsing parameters"
+            echo "⛔  error during parsing parameters"
             echo ""
             echo "Error details:"
             echo "▔▔▔▔▔▔▔▔▔▔▔▔▔▔"
@@ -169,8 +169,8 @@ parse_parameters()
         handle_exception 1 ${prefix} "parsing parameters" "Operation not supported: you can't enable CCM without creating network (see https://jira.cloudera.com/browse/CB-7187)"
     fi
 
-    CHECK_MARK="🟢"
-    ALREADY_DONE="🔵"
+    CHECK_MARK="✅"
+    ALREADY_DONE="❎"
 }
 
 run_pre_checks() 
