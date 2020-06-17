@@ -49,18 +49,18 @@ fi
 sleep_duration=1 
 
 # Create groups
-
+owner=$(cdp iam get-user | jq -r .user.email)
 SUBSCRIPTION_ID=$(az account show | jq -r .id)
 if [ ${rds_ha} -eq 1 ] 
 then 
     cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
         --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@$1cdpsa.dfs.core.windows.net" \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" 
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}"
 else
     cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
         --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@$1cdpsa.dfs.core.windows.net" \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}" \
         --database-availability-type NONE
 fi

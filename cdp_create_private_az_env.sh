@@ -63,7 +63,7 @@ then
     default_nsg=$(az network nsg show -g $prefix-cdp-rg -n $prefix-default-nsg | jq -r .id)
     
 fi
-
+owner=$(cdp iam get-user | jq -r .user.email)
 SUBSCRIPTION_ID=$(az account show | jq -r .id)
 if [[ "$network_created" == "no" ]]
 then
@@ -74,7 +74,7 @@ then
         --security-access cidr="$sg_cidr" \
         --log-storage storageLocationBase="abfs://logs@${prefix}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
         --new-network-params networkCidr="10.10.0.0/16" \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}" \
         --no-use-public-ip \
         --enable-tunnel
 else
@@ -85,7 +85,7 @@ else
         --security-access securityGroupIdForKnox="$knox_nsg",defaultSecurityGroupId="$default_nsg" \
         --log-storage storageLocationBase="abfs://logs@${prefix}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
         --existing-network-params networkId="$network_id",resourceGroupName="$prefix-cdp-rg",subnetIds="$subnet_1","$subnet_2","$subnet_3" \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}" \
         --no-use-public-ip \
         --enable-tunnel
 fi

@@ -65,6 +65,8 @@ credential=$2
 region=$3
 key=$4
 sg_cidr=$5
+owner=$(cdp iam get-user | jq -r .user.email)
+
 if [  $# -gt 5 ]
 then
     pub_sub_1=$6
@@ -87,7 +89,7 @@ then
         --vpc-id "${vpc}" \
         --s3-guard-table-name ${prefix}-cdp-table \
         --enable-tunnel \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" 
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}" 
 
 
 else 
@@ -102,6 +104,6 @@ else
         --network-cidr "10.0.0.0/16" \
         --s3-guard-table-name ${prefix}-cdp-table \ 
         --enable-tunnel \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}"  \
         #--create-private-network
 fi

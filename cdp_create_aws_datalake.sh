@@ -51,18 +51,19 @@ sleep_duration=1
 
 
 AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
+owner=$(cdp iam get-user | jq -r .user.email)
 
 if [ ${rds_ha} -eq 1 ] 
 then 
     cdp datalake create-aws-datalake --datalake-name $2-cdp-dl \
         --environment-name $2-cdp-env \
         --cloud-provider-configuration instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/$2-idbroker-role",storageBucketLocation="s3a://$2-cdp-bucket"  \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click"
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}"
 else
     cdp datalake create-aws-datalake --datalake-name $2-cdp-dl \
         --environment-name $2-cdp-env \
         --cloud-provider-configuration instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/$2-idbroker-role",storageBucketLocation="s3a://$2-cdp-bucket"  \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}" \
         --database-availability-type NONE
 fi 
 

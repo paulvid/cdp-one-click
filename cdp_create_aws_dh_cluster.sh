@@ -94,6 +94,7 @@ subnet_id=$(cdp environments describe-environment --environment-name ${prefix}-c
 # --subnet-id ${subnet_id} \
 # --image ${image} \
 # --tags key=\"enddate\",value=\"${END_DATE}\" key=\"project\",value=\"${PROJECT}\""
+owner=$(cdp iam get-user | jq -r .user.email)
 
 cdp datahub create-aws-cluster --cluster-name ${cluster_name} \
 --environment-name ${env_name} \
@@ -101,5 +102,5 @@ cdp datahub create-aws-cluster --cluster-name ${cluster_name} \
 --instance-groups ${instance_groups} \
 --subnet-id ${subnet_id} \
 --image ${image} \
---tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click"
+--tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}"
 
