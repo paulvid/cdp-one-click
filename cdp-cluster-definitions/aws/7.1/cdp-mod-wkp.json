@@ -1,5 +1,5 @@
 {
-  "environmentName": "qas-cdp-env",
+  "environmentName": "vv01-cdp-env",
   "instanceGroups": [
     {
       "nodeCount": 1,
@@ -7,6 +7,7 @@
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
+        "aws": {},
         "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
@@ -17,38 +18,41 @@
             "count": 1,
             "type": "standard"
           }
-        ]
+        ],
+        "cloudPlatform": "AWS"
       },
       "recipeNames": []
     },
     {
-      "nodeCount": 3,
+      "nodeCount": 1,
       "name": "nifi",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
+        "aws": {},
         "instanceType": "m5.2xlarge",
         "rootVolume": {
-          "size": 150
+          "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 500,
-            "count": 4,
+            "size": 100,
+            "count": 1,
             "type": "standard"
           }
-        ]
+        ],
+        "cloudPlatform": "AWS"
       },
-      "recipeNames": []
+      "recipeNames": ["cdp-mod-wkp"]
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "9cdcf579-beb1-4d5f-4e15-0fb985298bbe"
+    "id": "aa312f8b-4882-4274-5b98-2c958b7eadae"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-096b86385720e30b6"
+      "subnetId": "subnet-085849c1d23204c9f"
     }
   },
   "cluster": {
@@ -56,19 +60,19 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "qas-cdp-table"
+          "dynamoTableName": "vv01-cdp-table"
         }
       },
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "s3a://qas-cdp-bucket/pvi-nifi"
+          "value": "s3a://vv01-cdp-bucket/erewqew"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/qas-log-role"
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/vv01-log-role"
           },
           "type": "LOG"
         }
@@ -77,18 +81,15 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.0 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry",
+    "blueprintName": "cdp-mod-wkp",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "qas-cdp-dl"
+    "name": "vv01-cdp-dl"
   },
   "tags": {
     "application": null,
-    "userDefined": {
-      "enddate": "06152020",
-      "project": "qas_one_click_project"
-    },
+    "userDefined": {},
     "defaults": null
   },
   "inputs": {}

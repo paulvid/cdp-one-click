@@ -87,7 +87,7 @@ then
         --vpc-id "${vpc}" \
         --s3-guard-table-name ${prefix}-cdp-table \
         --enable-tunnel \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" 
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" 
 
 
 else 
@@ -102,6 +102,6 @@ else
         --network-cidr "10.0.0.0/16" \
         --s3-guard-table-name ${prefix}-cdp-table \ 
         --enable-tunnel \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" \
         #--create-private-network
 fi

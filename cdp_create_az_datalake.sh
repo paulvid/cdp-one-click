@@ -56,11 +56,11 @@ then
     cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
         --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@$1cdpsa.dfs.core.windows.net" \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" 
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" 
 else
     cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
         --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@$1cdpsa.dfs.core.windows.net" \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" \
         --database-availability-type NONE
 fi

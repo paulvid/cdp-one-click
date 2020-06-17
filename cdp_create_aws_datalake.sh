@@ -57,12 +57,12 @@ then
     cdp datalake create-aws-datalake --datalake-name $2-cdp-dl \
         --environment-name $2-cdp-env \
         --cloud-provider-configuration instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/$2-idbroker-role",storageBucketLocation="s3a://$2-cdp-bucket"  \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}"
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click"
 else
     cdp datalake create-aws-datalake --datalake-name $2-cdp-dl \
         --environment-name $2-cdp-env \
         --cloud-provider-configuration instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/$2-idbroker-role",storageBucketLocation="s3a://$2-cdp-bucket"  \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" \
+        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" \
         --database-availability-type NONE
 fi 
 

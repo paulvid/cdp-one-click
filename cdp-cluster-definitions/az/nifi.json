@@ -5,8 +5,8 @@
   "environmentName": "qzs-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 0,
-      "name": "compute",
+      "nodeCount": 3,
+      "name": "nifi",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -16,38 +16,13 @@
         },
         "instanceType": "Standard_D8_v3",
         "rootVolume": {
-          "size": 50
+          "size": 150
         },
         "attachedVolumes": [
           {
-            "size": 100,
-            "count": 1,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 0,
-      "name": "gateway",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "StandardSSD_LRS"
+            "size": 500,
+            "count": 4,
+            "type": "Standard_LRS"
           }
         ],
         "cloudPlatform": "AZURE"
@@ -56,7 +31,7 @@
     },
     {
       "nodeCount": 1,
-      "name": "master",
+      "name": "gateway",
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
@@ -72,32 +47,7 @@
           {
             "size": 100,
             "count": 1,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 3,
-      "name": "worker",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "StandardSSD_LRS"
+            "type": "Standard_LRS"
           }
         ],
         "cloudPlatform": "AZURE"
@@ -119,12 +69,8 @@
     "cloudStorage": {
       "locations": [
         {
-          "type": "YARN_LOG",
-          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/oplogs/yarn-app-logs"
-        },
-        {
-          "type": "ZEPPELIN_NOTEBOOK",
-          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/pvi-test/zeppelin/notebook"
+          "type": "DEFAULT_FS",
+          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/pvi-test"
         }
       ],
       "identities": [
@@ -142,7 +88,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.0 - Data Engineering: Apache Spark, Apache Hive, Apache Oozie",
+    "blueprintName": "7.2.0 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry",
     "validateBlueprint": false
   },
   "sdx": {

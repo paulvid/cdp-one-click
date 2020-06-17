@@ -101,5 +101,5 @@ cdp datahub create-aws-cluster --cluster-name ${cluster_name} \
 --instance-groups ${instance_groups} \
 --subnet-id ${subnet_id} \
 --image ${image} \
---tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}"
+--tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click"
 

@@ -2,8 +2,33 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "qzs-cdp-env",
+  "environmentName": "pvi-cdp-env",
   "instanceGroups": [
+    {
+      "nodeCount": 3,
+      "name": "broker",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 500,
+            "count": 1,
+            "type": "StandardSSD_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
     {
       "nodeCount": 1,
       "name": "master",
@@ -28,40 +53,15 @@
         "cloudPlatform": "AZURE"
       },
       "recipeNames": []
-    },
-    {
-      "nodeCount": 3,
-      "name": "broker",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1000,
-            "count": 1,
-            "type": "Standard_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "cd1b36ec-7da6-4c3e-515b-999d05fd712c"
+    "id": "2adec07f-4c80-4301-4cd3-32bbce073b56"
   },
   "network": {
     "azure": {
-      "subnetId": "subnet1"
+      "subnetId": "subnet5"
     }
   },
   "cluster": {
@@ -70,7 +70,7 @@
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/pvi-test"
+          "value": "abfs://data@pvicdpsa.dfs.core.windows.net/kafka-cluster"
         }
       ],
       "identities": [
@@ -78,7 +78,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/3b4df54c-3c29-4484-a5bf-a4aee6d2eb0f/resourceGroups/qzs-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/3b4df54c-3c29-4484-a5bf-a4aee6d2eb0f/resourceGroups/pvi-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -88,21 +88,15 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.0 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
+    "blueprintName": "7.1.0 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "qzs-cdp-dl"
-  },
-  "externalDatabase": {
-    "availabilityType": "NON_HA"
+    "name": "pvi-cdp-dl"
   },
   "tags": {
     "application": null,
-    "userDefined": {
-      "enddate": "06152020",
-      "project": "qzs_one_click_project"
-    },
+    "userDefined": {},
     "defaults": null
   },
   "inputs": {},

@@ -1,26 +1,6 @@
 {
-  "environmentName": "tmc-cdp-env",
+  "environmentName": "qas-cdp-env",
   "instanceGroups": [
-    {
-      "nodeCount": 2,
-      "name": "executor",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "instanceType": "r5d.4xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 300,
-            "count": 2,
-            "type": "ephemeral"
-          }
-        ]
-      },
-      "recipeNames": []
-    },
     {
       "nodeCount": 1,
       "name": "master",
@@ -36,6 +16,26 @@
             "size": 100,
             "count": 1,
             "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 2,
+      "name": "executor",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "r5d.4xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 300,
+            "count": 2,
+            "type": "ephemeral"
           }
         ]
       },
@@ -64,11 +64,11 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "fd89dfe4-6e1c-4662-5610-e95162972a79"
+    "id": "9cdcf579-beb1-4d5f-4e15-0fb985298bbe"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-0dd5372cfe2e28b0e"
+      "subnetId": "subnet-04d69dcc2a16ec577"
     }
   },
   "cluster": {
@@ -76,19 +76,19 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "tmc-cdp-table"
+          "dynamoTableName": "qas-cdp-table"
         }
       },
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "s3a://tmc-cdp-bucket/pvi-test-dm"
+          "value": "s3a://qas-cdp-bucket/testtes"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/tmc-log-role"
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/qas-log-role"
           },
           "type": "LOG"
         }
@@ -97,18 +97,18 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.1.0 - Data Mart: Apache Impala, Hue",
+    "blueprintName": "7.2.0 - Data Mart: Apache Impala, Hue",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "tmc-cdp-dl"
-  },
-  "externalDatabase": {
-    "availabilityType": "NONE"
+    "name": "qas-cdp-dl"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "enddate": "06152020",
+      "project": "qas_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {}

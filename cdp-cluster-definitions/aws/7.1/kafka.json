@@ -1,15 +1,15 @@
 {
-  "environmentName": "qas-cdp-env",
+  "environmentName": "tmc-cdp-env",
   "instanceGroups": [
     {
       "nodeCount": 1,
-      "name": "gateway",
+      "name": "master",
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
         "instanceType": "m5.2xlarge",
         "rootVolume": {
-          "size": 50
+          "size": 100
         },
         "attachedVolumes": [
           {
@@ -23,19 +23,19 @@
     },
     {
       "nodeCount": 3,
-      "name": "nifi",
+      "name": "broker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
         "instanceType": "m5.2xlarge",
         "rootVolume": {
-          "size": 150
+          "size": 50
         },
         "attachedVolumes": [
           {
             "size": 500,
-            "count": 4,
-            "type": "standard"
+            "count": 1,
+            "type": "st1"
           }
         ]
       },
@@ -44,11 +44,11 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "9cdcf579-beb1-4d5f-4e15-0fb985298bbe"
+    "id": "fd89dfe4-6e1c-4662-5610-e95162972a79"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-096b86385720e30b6"
+      "subnetId": "subnet-0dd5372cfe2e28b0e"
     }
   },
   "cluster": {
@@ -56,19 +56,19 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "qas-cdp-table"
+          "dynamoTableName": "tmc-cdp-table"
         }
       },
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "s3a://qas-cdp-bucket/pvi-nifi"
+          "value": "s3a://tmc-cdp-bucket/pvi-test-kafka"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/qas-log-role"
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/tmc-log-role"
           },
           "type": "LOG"
         }
@@ -77,18 +77,18 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.0 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry",
+    "blueprintName": "7.1.0 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "qas-cdp-dl"
+    "name": "tmc-cdp-dl"
+  },
+  "externalDatabase": {
+    "availabilityType": "NONE"
   },
   "tags": {
     "application": null,
-    "userDefined": {
-      "enddate": "06152020",
-      "project": "qas_one_click_project"
-    },
+    "userDefined": {},
     "defaults": null
   },
   "inputs": {}

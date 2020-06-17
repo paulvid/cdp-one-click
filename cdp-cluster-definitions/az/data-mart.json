@@ -2,8 +2,33 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pvi-cdp-env",
+  "environmentName": "qzs-cdp-env",
   "instanceGroups": [
+    {
+      "nodeCount": 1,
+      "name": "coordinator",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 300,
+            "count": 1,
+            "type": "StandardSSD_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
     {
       "nodeCount": 2,
       "name": "executor",
@@ -53,40 +78,15 @@
         "cloudPlatform": "AZURE"
       },
       "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "coordinator",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 300,
-            "count": 1,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "2adec07f-4c80-4301-4cd3-32bbce073b56"
+    "id": "cd1b36ec-7da6-4c3e-515b-999d05fd712c"
   },
   "network": {
     "azure": {
-      "subnetId": "subnet5"
+      "subnetId": "subnet1"
     }
   },
   "cluster": {
@@ -95,7 +95,7 @@
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "abfs://data@pvicdpsa.dfs.core.windows.net/data-mart"
+          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/pvi-test"
         }
       ],
       "identities": [
@@ -103,7 +103,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/3b4df54c-3c29-4484-a5bf-a4aee6d2eb0f/resourceGroups/pvi-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/3b4df54c-3c29-4484-a5bf-a4aee6d2eb0f/resourceGroups/qzs-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -113,15 +113,18 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.1.0 - Data Mart: Apache Impala, Hue",
+    "blueprintName": "7.2.0 - Data Mart: Apache Impala, Hue",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-cdp-dl"
+    "name": "qzs-cdp-dl"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "enddate": "06152020",
+      "project": "qzs_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {},

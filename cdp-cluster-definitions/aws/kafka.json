@@ -1,5 +1,5 @@
 {
-  "environmentName": "tmc-cdp-env",
+  "environmentName": "qas-cdp-env",
   "instanceGroups": [
     {
       "nodeCount": 1,
@@ -10,6 +10,26 @@
         "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 100
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "registry",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
         },
         "attachedVolumes": [
           {
@@ -33,9 +53,29 @@
         },
         "attachedVolumes": [
           {
-            "size": 500,
+            "size": 1000,
             "count": 1,
-            "type": "st1"
+            "type": "gp2"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "smm",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
           }
         ]
       },
@@ -44,11 +84,11 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "fd89dfe4-6e1c-4662-5610-e95162972a79"
+    "id": "9cdcf579-beb1-4d5f-4e15-0fb985298bbe"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-0dd5372cfe2e28b0e"
+      "subnetId": "subnet-096b86385720e30b6"
     }
   },
   "cluster": {
@@ -56,19 +96,19 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "tmc-cdp-table"
+          "dynamoTableName": "qas-cdp-table"
         }
       },
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "s3a://tmc-cdp-bucket/pvi-test-kafka"
+          "value": "s3a://qas-cdp-bucket/pvi-nifi"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/tmc-log-role"
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/qas-log-role"
           },
           "type": "LOG"
         }
@@ -77,18 +117,21 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.1.0 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
+    "blueprintName": "7.2.0 - Streams Messaging Heavy Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "tmc-cdp-dl"
+    "name": "qas-cdp-dl"
   },
   "externalDatabase": {
-    "availabilityType": "NONE"
+    "availabilityType": "HA"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "enddate": "06152020",
+      "project": "qas_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {}
