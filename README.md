@@ -162,7 +162,7 @@ cdp_delete_all_the_things.sh <your_param_file>
 
 ### Pre-requisites
 ```
-cdp_aws_pre_reqs.sh.sh <your_param_file>
+cdp_aws_pre_reqs.sh <your_param_file>
 ```
 
 ### SDX
@@ -175,7 +175,7 @@ cdp_aws_sdx.sh <your_param_file> [<network_file>]
 
 ### Pre-requisites
 ```
-cdp_az_pre_reqs.sh.sh <your_param_file>
+cdp_az_pre_reqs.sh <your_param_file>
 ```
 
 ### SDX
