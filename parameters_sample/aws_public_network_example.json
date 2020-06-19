@@ -1,0 +1,8 @@
+{
+    "VpcId": "vpc-00a402d722c3f9201", 
+    "PublicSubnets": ["subnet-03b7a9569e05c538e", "subnet-0c62a26ec264619ed", "subnet-0f7c79e66e19750e9"], 
+    "KnoxGroupId": "sg-04533a744eb6a3c65", 
+    "DefaultGroupId": "sg-0458bb6ee982a9aab"
+}
+
+

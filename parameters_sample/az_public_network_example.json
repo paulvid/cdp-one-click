@@ -1,0 +1,7 @@
+{
+    "resourceGroupName": "axx-cdp-rg",
+    "NetworkName": "axx-cdp-vnet", 
+    "PrivateSubnets": ["axx-priv-subnet-1", "axx-priv-subnet-2", "axx-priv-subnet-3"], 
+    "KnoxGroupId": "/subscriptions/3b4df54c-3c29-4484-a5bf-a4aee6d2eb0f/resourceGroups/axx-cdp-rg/providers/Microsoft.Network/networkSecurityGroups/axx-knox-nsg" , 
+    "DefaultGroupId": "/subscriptions/3b4df54c-3c29-4484-a5bf-a4aee6d2eb0f/resourceGroups/axx-cdp-rg/providers/Microsoft.Network/networkSecurityGroups/axx-default-nsg"
+}

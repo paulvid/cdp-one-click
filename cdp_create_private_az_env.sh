@@ -54,7 +54,7 @@ sg_cidr=$5
 network_created="no"
 if [  $# -eq 6 ] 
 then 
-    network_created="yes"
+    network_created=$6
     network_id="$prefix-cdp-vnet"
     subnet_1="$prefix-priv-subnet-1"
     subnet_2="$prefix-priv-subnet-2"

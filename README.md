@@ -117,6 +117,9 @@ _Note: Azure CML is not supported yet, so don't add it in your parameters file :
          <b><em>Use CCM for env deployment (default: no, possible values: yes, no) </em></b>
         "use_ccm": "no",
 
+        <b><em>Use existing network for env deployment (path to the network file, see examples in parameters_sample) </em></b>
+        "existing_network_file": "[path_to_network_file]",
+
         <b><em>Tags to setup: </em></b>
         "tags": {
 

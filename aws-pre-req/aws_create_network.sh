@@ -107,4 +107,4 @@ aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tc
 aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol udp --port 0-65535 --cidr 10.0.0.0/16 >> /dev/null 2>&1
 
 
-echo "{\"InternetGatewayId\": \"$igw_id\", \"VpcId\": \"$vpc_id\", \"Subnets\": [\"$subnet_id1a\", \"$subnet_id1b\", \"$subnet_id1c\"], \"RouteTableId\": \"$route_id\", \"KnoxGroupId\": \"$knox_sg_id\" , \"DefaultGroupId\": \"$default_sg_id\"}"
+echo "{\"InternetGatewayId\": \"$igw_id\", \"VpcId\": \"$vpc_id\", \"PublicSubnets\": [\"$subnet_id1a\", \"$subnet_id1b\", \"$subnet_id1c\"], \"RouteTableId\": \"$route_id\", \"KnoxGroupId\": \"$knox_sg_id\" , \"DefaultGroupId\": \"$default_sg_id\"}"

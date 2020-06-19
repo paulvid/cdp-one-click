@@ -1,0 +1,12 @@
+{
+    "required": {
+        "prefix":         "pvi",
+        "credential":     "pvidal-aws-se-credential",
+        "region":         "us-east-1",
+        "key":            "field",
+        "workload_pwd":   "cdpw0rksh0p",
+        "datahub_list": [],
+        "ml_workspace_list": []
+    },
+    "optional": {} 
+}

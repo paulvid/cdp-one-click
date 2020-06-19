@@ -121,6 +121,10 @@ parse_parameters()
     use_ccm=$(cat ${param_file} | jq -r .optional.use_ccm)
     use_ccm=$(handle_null_param "$use_ccm" "no" "no")
 
+
+    existing_network_file=$(cat ${param_file} | jq -r .optional.existing_network_file)
+    existing_network_file=$(handle_null_param "$existing_network_file" "no" "")
+
     # Calculated parameters
     base_dir=$(cd $(dirname $0); pwd -L)
     sleep_duration=3
@@ -130,6 +134,13 @@ parse_parameters()
     export CDP_PROFILE=$cdp_profile
     export END_DATE=$end_date
     export PROJECT=$project
+
+    if [ ${#existing_network_file} -gt 0 ]
+    then
+        export EXISTING_NETWORK_FILE=${existing_network_file}
+        export USE_EXISTING_NETWORK="yes"
+    fi
+
 
     if [[ ${cloud_provider} == "az" ]]
     then
@@ -164,7 +175,12 @@ parse_parameters()
         ext_acct_id="not_provided"
     fi
 
-    if [[ ${use_ccm} == "yes" && ${create_network} == "no" ]]
+    if [[ ${create_network} == "yes" && ${USE_EXISTING_NETWORK} == "yes" ]]
+    then
+        handle_exception 1 ${prefix} "parsing parameters" "Wrong parameters: you can't refer an existing network and create a network"
+    fi
+
+    if [[ ${use_ccm} == "yes" && ${create_network} == "no" && ${cloud_provider} == "aws" && ${USE_EXISTING_NETWORK} != "yes" ]]
     then
         handle_exception 1 ${prefix} "parsing parameters" "Operation not supported: you can't enable CCM without creating network (see https://jira.cloudera.com/browse/CB-7187)"
     fi

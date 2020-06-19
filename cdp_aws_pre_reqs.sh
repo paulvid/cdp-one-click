@@ -116,9 +116,9 @@ then
 
             igw_id=$(echo $created_network | jq -r .InternetGatewayId)
             vpc_id=$(echo $created_network | jq -r .VpcId)
-            subnet_id1a=$(echo $created_network | jq -r .Subnets[0])
-            subnet_id1b=$(echo $created_network | jq -r .Subnets[1])
-            subnet_id1c=$(echo $created_network | jq -r .Subnets[2])
+            subnet_id1a=$(echo $created_network | jq -r .PublicSubnets[0])
+            subnet_id1b=$(echo $created_network | jq -r .PublicSubnets[1])
+            subnet_id1c=$(echo $created_network | jq -r .PublicSubnets[2])
             route_id=$(echo $created_network | jq -r .RouteTableId)
             knox_sg_id=$(echo $created_network | jq -r .KnoxGroupId)
             default_sg_id=$(echo $created_network | jq -r .DefaultGroupId)
