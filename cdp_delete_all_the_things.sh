@@ -117,7 +117,7 @@ for row in $(echo ${all_clusters} | jq -r '.clusters[] | @base64'); do
     }
     cluster_name=$(_jq '.clusterName')
 
-    cdp datahub delete-cluster --cluster-name $cluster_name --force >/dev/null 2>&1
+    cdp datahub delete-cluster --cluster-name $cluster_name >/dev/null 2>&1
 
     wc=$($base_dir/cdp_describe_dh_cluster.sh $cluster_name 2>/dev/null | jq -r .cluster.status | wc -l)
 
@@ -154,7 +154,7 @@ done
 echo ${underline}
 echo ""
 
-cdp datalake delete-datalake --datalake-name $prefix-cdp-dl --force >/dev/null 2>&1
+cdp datalake delete-datalake --datalake-name $prefix-cdp-dl >/dev/null 2>&1
 
 wc=$($base_dir/cdp_describe_dl.sh $prefix 2>/dev/null | jq -r .datalake.status | wc -l)
 
