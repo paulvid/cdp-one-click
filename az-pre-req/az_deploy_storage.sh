@@ -38,9 +38,10 @@ then
     display_usage
     exit 1
 fi 
-
+prefix=$1
+prefix_no_dash=$(echo $prefix | sed s/-//g)
 resource_group_name="$1-cdp-rg"
-storage_account_name="$1cdpsa"
+storage_account_name="$prefix_no_dash""cdpsa"
 file_system="data"
 location=$2
 

@@ -155,6 +155,12 @@ parse_parameters()
         export AWS_PROFILE=${cloud_profile}
         export AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq .Account -r)
     fi
+
+    if [[ ${cloud_provider} == "az"  && ${cloud_profile} != "default" ]]
+    then
+        result=$(az account set --subscription "${cloud_profile}" 2>&1 > /dev/null)
+        handle_exception $? $prefix "az subscription verification" "$result"
+    fi
     
     owner=$(cdp iam get-user | jq -r .user.email)
     workload_user=$(cdp iam get-user | jq -r .user.workloadUsername)

@@ -96,7 +96,7 @@ _Note: Azure CML is not supported yet, so don't add it in your parameters file :
         <b><em>Cloud provider (default: aws, possible values: aws, az): </em></b>
         "cloud_provider": "aws", 
 
-        <b><em>Cloud provider cli profile (only supported in AWS) (default: default): </em></b>
+        <b><em>Cloud provider cli profile (AWS-your profile name / AZ-your subscription name or ID) (default: default): </em></b>
         "cloud_profile":    "default",
 
         <b><em>CDP cli profile (default: default): </em></b>
