@@ -54,7 +54,7 @@ if [[ "$resource" == "rg" ]]; then
 fi
 
 if [[ "$resource" == "storage" ]]; then
-    storage_state=$(az storage account show -g $prefix-cdp-rg -n "${prefix/-/}"cdpsa 2>/dev/null | jq -r .provisioningState)
+    storage_state=$(az storage account show -g $prefix-cdp-rg -n "${prefix//-}"cdpsa 2>/dev/null | jq -r .provisioningState)
     if [[ "$storage_state" == "Succeeded" ]]; then
         response="yes"
     fi

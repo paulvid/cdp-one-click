@@ -54,7 +54,7 @@ fi
 
 SUBSCRIPTION_ID=$(az account show | jq -r .id)
 RESOURCE_GROUP_NAME="$1-cdp-rg"
-STORAGE_ACCOUNT_NAME="${1/-/}cdpsa"
+STORAGE_ACCOUNT_NAME="${1//-}cdpsa"
 ASSUMER_IDENTITY="assumerIdentity"
 ADMIN_IDENTITY="adminIdentity"
 LOGGER_IDENTITY="loggerIdentity"

@@ -40,7 +40,7 @@ then
 fi 
 prefix=$1
 resource_group_name="$1-cdp-rg"
-storage_account_name="${prefix/-/}cdpsa"
+storage_account_name="${prefix//-}cdpsa"
 file_system="data"
 location=$2
 

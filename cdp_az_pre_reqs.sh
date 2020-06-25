@@ -67,10 +67,10 @@ if [[ "$($base_dir/az-pre-req/az_check_if_resource_exists.sh $prefix storage)" =
     result=$($base_dir/az-pre-req/az_deploy_storage.sh $prefix "$region" 2>&1 >/dev/null)
     handle_exception $? $prefix "storage deployment" "$result"
 
-    storage_account_name="${prefix/-/}cdpsa"
+    storage_account_name="${prefix//-}cdpsa"
     echo "${CHECK_MARK}  $prefix: storage account $storage_account_name created"
 else
-    storage_account_name="${prefix/-/}cdpsa"
+    storage_account_name="${prefix//-}cdpsa"
     echo "${ALREADY_DONE}  $prefix: storage account $storage_account_name already created"
 fi
 
