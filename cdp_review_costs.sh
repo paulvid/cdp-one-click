@@ -69,8 +69,8 @@ then
 
     for i in $(seq 0 ${SDX_NUM_ELEMENTS});
     do
-        INSTANCE_TYPE=$(jq ".config.sdx[${i}].instanceTypes[].size" cost/aws_sdx_instances.json)
-        OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==${INSTANCE_TYPE}).valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
+        INSTANCE_TYPE=$(jq -r ".config.sdx[${i}].instanceTypes[].size" cost/aws_sdx_instances.json)
+        OUTPUT=$(curl -s 'https://ec2.shop?format=json' | jq ".Prices[] | select(.InstanceType==\"${INSTANCE_TYPE}\")".Cost)
         if [ ${#OUTPUT} -eq 0 ]; then OUTPUT=0; fi
         sdx_cost_hourly=$(ruby -e "total_cost=(${sdx_cost_hourly}+${OUTPUT});puts total_cost")
     done
@@ -91,8 +91,9 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
             }
             node_count=$(_jq '.nodeCount')
             instance_type=$(_jq '.template.instanceType')
+            OUTPUT=$(curl -s 'https://ec2.shop?format=json' | jq ".Prices[] | select(.InstanceType==\"${instance_type}\")".Cost)
 
-            OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==\"${instance_type}\").valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
+            #OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==\"${instance_type}\").valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
             if [ ${#OUTPUT} -eq 0 ]; then OUTPUT=0; fi
             dh_cost_hourly=$(ruby -e "total_cost=(${dh_cost_hourly}+(${OUTPUT}*${node_count}));puts total_cost")
         done
@@ -118,7 +119,8 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
             maxInstances=$(_jq '.autoscaling.maxInstances')
             avgInstances=$(ruby -e "avg=((${minInstances}+${maxInstances})/2);puts avg")
             instanceType=$(_jq '.instanceType')
-            OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==\"${instanceType}\").valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
+            OUTPUT=$(curl -s 'https://ec2.shop?format=json' | jq ".Prices[] | select(.InstanceType==\"${instanceType}\")".Cost)
+            #OUTPUT="$(cat cost/aws_pricing_calculator_version_0.01.json | jq ".config.regions[] | select(.region==\"${region}\").instanceTypes[].sizes[] | select (.size==\"${instanceType}\").valueColumns[].prices.USD" | bc -l | xargs printf "%.3f")"
             if [ ${#OUTPUT} -eq 0 ]; then OUTPUT=0; fi
             ml_cost_hourly=$(ruby -e "total_cost=(${ml_cost_hourly}+(${OUTPUT}*${avgInstances}));puts total_cost")
     done
