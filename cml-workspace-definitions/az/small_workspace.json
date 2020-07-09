@@ -1,0 +1,53 @@
+{
+    "environmentName": "<prefix>-cdp-env",
+    "instanceGroups": [
+        {
+            "autoscaling": {
+                "enabled": true,
+                "maxInstances": 5,
+                "minInstances": 1
+            },
+            "ingressRules": [
+                ""
+            ],
+            "instanceCount": 1,
+            "instanceTier": "",
+            "instanceType": "Standard_DS5_v2",
+            "name": "cpu_settings",
+            "rootVolume": {
+                "size": 60
+            }
+        },
+        {
+            "autoscaling": {
+                "enabled": true,
+                "maxInstances": 1,
+                "minInstances": 1
+            },
+            "ingressRules": [
+                ""
+            ],
+            "instanceCount": 1,
+            "instanceTier": "",
+            "instanceType": "Standard_NC6s_v2",
+            "name": "gpu_settings",
+            "rootVolume": {
+                "size": 40
+            }
+        }
+    ],
+    "tags": [
+        {
+            "key": "owner",
+            "value": "<owner>"
+        },
+        {
+            "key": "enddate",
+            "value": "<enddate>"
+        },
+        {
+            "key": "project",
+            "value": "<project>"
+        }
+    ]
+}

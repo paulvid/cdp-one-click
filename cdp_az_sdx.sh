@@ -16,6 +16,113 @@ Arguments:
     parameter_file: location of your parameter json file (template can be found in parameters_template.json)"
 
 }
+##########################################
+# Arguments:                             #
+#   $1 -> wait status (e.g. NOT_FOUND)   #
+##########################################
+get_env_status() {
+        wait_status=$1
+        result=$(
+                { stdout=$($base_dir/cdp_describe_env.sh $prefix) ; } 2>&1
+                printf "this is the separator"
+                printf "%s\n" "$stdout"
+            )
+        var_out=${result#*this is the separator}
+        var_err=${result%this is the separator*}
+        if [[ ${#var_out} -eq 0 ]]
+        then
+            env_describe_err=$(echo $var_err | grep $wait_status)
+            if [[ ${#env_describe_err} > 1 ]]
+            then 
+                env_status="WAITING_FOR_API"
+            else
+                handle_exception 2 $prefix "environment creation" $var_err
+            fi
+        else
+            env_status=$(echo ${var_out} | jq -r .environment.status)
+        fi
+
+        echo $env_status
+}
+
+
+########################################
+# Arguments:                           #
+#   $1 -> wait status (e.g. UNKNOWN)   #
+########################################
+get_dl_status() {
+        wait_status=$1
+        result=$(
+                { stdout=$($base_dir/cdp_describe_dl.sh $prefix) ; } 2>&1
+                printf "this is the separator"
+                printf "%s\n" "$stdout"
+            )
+        var_out=${result#*this is the separator}
+        var_err=${result%this is the separator*}
+        if [[ ${#var_out} -eq 0 ]]
+        then
+            dl_describe_err=$(echo $var_err | grep $wait_status)
+            if [[ ${#dl_describe_err} > 1 ]]
+            then 
+                dl_status="WAITING_FOR_API"
+            else
+                handle_exception 2 $prefix "datalake creation" $var_err
+            fi
+        else
+            dl_status=$(echo ${var_out} | jq -r .datalake.status)
+        fi
+
+        echo $dl_status
+}
+
+
+##########################################
+# Arguments:                             #
+#   $1 -> type (ENV/DL)                  #
+#   $2 -> complete status (e.g. RUNNING) #
+#   $3 -> wait status (e.g. NOT_FOUND)   #
+##########################################
+wait_for_deployment() {
+
+    type=$1
+    complete_status=$2
+    wait_status=$3
+    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+
+    if [[ "$type" == "ENV" ]]
+    then
+
+        env_status=$(get_env_status $wait_status)
+        while [ "$env_status" != "$complete_status" ]; do
+            if [[ "$env_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "environment creation" "Environment creation failed; Check UI for details"; exit 2; fi
+            i=$(((i + 1) % 8))
+            printf "\r${spin:$i:1}  $prefix: environment status: $env_status                              "
+            sleep 2
+            env_status=$(get_env_status $wait_status)
+        done
+        printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                           "
+        echo ""
+    fi
+
+
+    if [[ "$type" == "DL" ]]
+    then
+        dl_status=$(get_dl_status $wait_status)
+        
+        while [ "$dl_status" != "$complete_status" ]; do
+            if [[ "$dl_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "datalake creation" "Datalake creation failed; Check UI for details"; exit 2; fi
+            i=$(((i + 1) % 8))
+            printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
+            sleep 2
+            dl_status=$(get_dl_status $wait_status)
+        done
+        printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                                  "
+        echo ""
+    fi
+
+
+
+}
 
 # check whether user had supplied -h or --help . If yes display usage
 if [[ ($1 == "--help") || $1 == "-h" ]]; then
@@ -65,17 +172,8 @@ else
     if [[ "$env_status" == "ENV_STOPPED" ]]; then
         result=$(cdp environments start-environment --environment-name $prefix-cdp-env 2>&1 >/dev/null)
         handle_exception $? $prefix "environment start" "$result"
-        env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
+        wait_for_deployment ENV AVAILABLE NOT_FOUND
 
-        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-        while [ "$env_status" != "AVAILABLE" ]; do
-            i=$(((i + 1) % 8))
-            printf "\r${spin:$i:1}  $prefix: environment status: $env_status                              "
-            sleep 2
-            env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
-        done
-
-        printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                                   "
     else
         if [[ "$env_status" == "NOT_FOUND" ]]; then
             if [[ "$use_ccm" == "no" ]]; then
@@ -86,33 +184,7 @@ else
                 handle_exception $? $prefix "environment creation" "$result"
             fi
         fi
-        # Adding test for when env is not available yet
-
-        env_describe_err=$($base_dir/cdp_describe_env.sh $prefix 2>&1 | grep NOT_FOUND)
-
-        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-        while [[ ${#env_describe_err} > 1 ]]; do
-            i=$(((i + 1) % 8))
-            printf "\r${spin:$i:1}  $prefix: environment status: WAITING_FOR_API                             "
-            sleep 2
-            env_describe_err=$($base_dir/cdp_describe_env.sh $prefix 2>&1 | grep NOT_FOUND)
-        done
-
-        env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
-
-        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-        while [ "$env_status" != "AVAILABLE" ]; do
-            i=$(((i + 1) % 8))
-            printf "\r${spin:$i:1}  $prefix: environment status: $env_status                             "
-            sleep 2
-            env_status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
-
-            if [[ "$env_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "environment creation" "Environment creation failed; Check UI for details"; fi
-
-        done
-
-        printf "\r${CHECK_MARK}  $prefix: environment status: $env_status                             "
-        echo ""
+       wait_for_deployment ENV AVAILABLE NOT_FOUND
 
         # 2. IDBroker mappings
         result=$($base_dir/cdp_az_create_group_iam.sh $base_dir $prefix 2>&1 >/dev/null)
@@ -155,34 +227,14 @@ else
             result=$(cdp datalake start-datalake --datalake-name $prefix-cdp-dl 2>&1 >/dev/null)
             handle_exception $? $prefix "datalake start" "$result"
         fi
-        dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
 
-        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-        while [ "$dl_status" != "RUNNING" ]; do
-            i=$(((i + 1) % 8))
-            printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
-            sleep 2
-            dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
-        done
-
-        printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                                 "
+        wait_for_deployment DL RUNNING UNKNOWN
     else
         if [[ "$dl_status" == "NOT_FOUND" ]]; then
             result=$($base_dir/cdp_create_az_datalake.sh $prefix $RDS_HA 2>&1 >/dev/null)
             handle_exception $? $prefix "datalake creation" "$result"
         fi
-        dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
-
-        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-        while [ "$dl_status" != "RUNNING" ]; do
-            i=$(((i + 1) % 8))
-            printf "\r${spin:$i:1}  $prefix: datalake status: $dl_status                              "
-            sleep 2
-            dl_status=$($base_dir/cdp_describe_dl.sh $prefix | jq -r .datalake.status)
-            if [[ "$dl_status" == "CREATE_FAILED" ]]; then handle_exception 2 $prefix "Datalake creation" "Datalake creation failed; Check UI for details"; fi
-        done
-
-        printf "\r${CHECK_MARK}  $prefix: datalake status: $dl_status                             "
+        wait_for_deployment DL RUNNING UNKNOWN
     fi
 
 fi

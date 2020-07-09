@@ -51,7 +51,7 @@ key=$4
 sg_cidr=$5
 network_created=$6
 owner=$(cdp iam get-user | jq -r .user.email)
-if [  $# -eq 6 ] 
+if [  $# -gt 6 ] 
 then 
     network_created=$6
     network_id="$prefix-cdp-vnet"

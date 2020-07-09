@@ -43,7 +43,7 @@ fi
 
 
 #Variables
-sleep_duration=1
+sleep_duration=2
 
 prefix=${1}
 def_file=${2}
@@ -52,41 +52,6 @@ cloud_provider=${4}
 env_name=${prefix}-cdp-env
 enable_workspace=${5}
 owner=$(cdp iam get-user | jq -r .user.email)
-
-#Parse and replace variables in workspace template
-
-
-if [[ ${cloud_provider} == "aws" ]]
-then
-
-    if [[ ${enable_workspace} == "yes" ]]
-    then
-        # Create ML Workspace
-        cdp ml create-workspace \
-        --no-disable-tls \
-        --environment-name ${env_name} \
-        --use-public-load-balancer \
-        --workspace-name ${workspace_name} \
-        --enable-monitoring \
-        --enable-governance \
-        --enable-model-metrics \
-        --provision-k8s-request file://$def_file
-    else 
-        cdp ml create-workspace \
-        --no-disable-tls \
-        --environment-name ${env_name} \
-        --use-public-load-balancer \
-        --workspace-name ${workspace_name} \
-        --provision-k8s-request file://$def_file
-    fi
-fi
-
-
-if [[ ${cloud_provider} == "az" ]]
-then
-    echo "not supported"  >&2
-    exit 1
-fi
 
 #Grant access to workspace
 env_crn=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.crn)
@@ -124,3 +89,106 @@ then
         --resource-crn $env_crn
 fi
 sleep $sleep_duration
+
+
+
+
+
+#Parse and replace variables in workspace template
+
+
+if [[ ${cloud_provider} == "aws" ]]
+then
+
+    if [[ ${enable_workspace} == "yes" ]]
+    then
+        # Create ML Workspace
+        cdp ml create-workspace \
+        --no-disable-tls \
+        --environment-name ${env_name} \
+        --use-public-load-balancer \
+        --workspace-name ${workspace_name} \
+        --enable-monitoring \
+        --enable-governance \
+        --enable-model-metrics \
+        --provision-k8s-request file://$def_file
+    else 
+        cdp ml create-workspace \
+        --no-disable-tls \
+        --environment-name ${env_name} \
+        --use-public-load-balancer \
+        --workspace-name ${workspace_name} \
+        --provision-k8s-request file://$def_file
+    fi
+fi
+
+
+if [[ ${cloud_provider} == "az" ]]
+then
+
+    # 1. Creating netapp
+    vnet=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.network.azure.networkId)
+    rg=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.network.azure.resourceGroupName)
+    free_subnet=""
+
+    # 1.1. Finding available subnet
+    for subnet in $(az network vnet show --resource-group ${rg} --name ${vnet}  | jq -r .subnets[].name)
+    do 
+        
+        ip_config=$(az network vnet subnet show --resource-group ${rg} --vnet-name ${vnet} --name ${subnet} | jq -r .ipConfigurations | wc -l)
+        if [[ ${ip_config} -eq 1 ]] 
+        then
+            free_subnet=${subnet}
+            break
+        fi
+    done
+    
+    if [[ ${#free_subnet} -eq 0 ]] 
+    then
+        echo "No free subnet found fo vnet ${vnet} in resource group ${rg}!" >&2
+        exit 1
+    fi
+
+
+    # 1.2. Adding Netapp delegation for this subnet
+    az network vnet subnet update --resource-group ${rg} --vnet-name ${vnet} --name ${free_subnet} --remove serviceEndpoints
+    sleep $sleep_duration
+    az network vnet subnet update --resource-group ${rg} --vnet-name ${vnet} --name ${free_subnet} --delegations Microsoft.Netapp/volumes
+    sleep $sleep_duration
+
+    # 1.3. Creating netapp
+    az netappfiles account create --resource-group ${rg} --name ${prefix}-netapp-acct
+    sleep $sleep_duration
+    az netappfiles pool create --resource-group ${rg} --account-name ${prefix}-netapp-acct --pool-name ${prefix}-pool --service-level Standard --size 4
+    sleep $sleep_duration
+    az netappfiles volume create --resource-group ${rg} --account-name ${prefix}-netapp-acct --pool-name ${prefix}-pool --volume-name ${prefix}-volume --file-path "${prefix}-path" --usage-threshold 2000 --vnet ${vnet} --subnet ${free_subnet}
+    sleep $sleep_duration
+    start_ip=$(az netappfiles volume show --resource-group ${rg} --account-name ${prefix}-netapp-acct --pool-name ${prefix}-pool --volume-name ${prefix}-volume | jq -r .mountTargets[0].startIp)
+   
+
+    # 2. Creating workspace
+    if [[ ${enable_workspace} == "yes" ]]
+    then
+        # Create ML Workspace
+        cdp ml create-workspace \
+        --no-disable-tls \
+        --environment-name ${env_name} \
+        --use-public-load-balancer \
+        --workspace-name ${workspace_name} \
+        --enable-monitoring \
+        --enable-governance \
+        --enable-model-metrics \ 
+        --existing-nfs "$start_ip:/${prefix}-path" \
+        --provision-k8s-request file://$def_file
+    else 
+        cdp ml create-workspace \
+        --no-disable-tls \
+        --environment-name ${env_name} \
+        --use-public-load-balancer \
+        --workspace-name ${workspace_name} \
+        --existing-nfs "$start_ip:/${prefix}-path" \
+        --provision-k8s-request file://$def_file
+    fi
+  
+fi
+

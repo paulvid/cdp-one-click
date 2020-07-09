@@ -1,0 +1,21 @@
+{
+    "required": {
+        "prefix":         "XXX",
+        "credential":     "XXXXXX",
+        "region":         "XXXXXX",
+        "key":            "XXXXXX",
+        "workload_pwd":   "XXXXXX",
+        "datahub_list": [
+            {
+                "definition": "data-engineering.json",
+                "custom_script": "setup_vizbank.sh"
+            }],
+        "ml_workspace_list": [
+            {
+                "definition": "small_workspace.json"
+            }
+        ]
+    },
+    "optional": {}
+ }
+ 

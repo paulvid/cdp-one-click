@@ -81,6 +81,9 @@ parse_parameters()
     ml_workspace_list=$(cat ${param_file} | jq -r .required.ml_workspace_list)
 
     # Optional parameters
+    create_dw_cluster=$(cat ${param_file} | jq -r .optional.create_dw_cluster)
+    create_dw_cluster=$(handle_null_param "$create_dw_cluster" "no" "no")
+
     cloud_provider=$(cat ${param_file} | jq -r .optional.cloud_provider)
     cloud_provider=$(handle_null_param "$cloud_provider" "no" "aws")
 
