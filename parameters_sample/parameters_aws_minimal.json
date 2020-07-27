@@ -6,7 +6,8 @@
         "key":            "field",
         "workload_pwd":   "cdpw0rksh0p",
         "datahub_list": [],
-        "ml_workspace_list": []
+        "ml_workspace_list": [],
+        "op_db_list": []
     },
     "optional": {} 
 }

@@ -14,6 +14,12 @@
             {
                 "definition": "small_workspace.json"
             }
+        ],
+        "op_db_list": [
+            {
+                "database_name": "opdb-test"
+            }
+
         ]
     },
     "optional": {

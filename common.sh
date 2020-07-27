@@ -79,6 +79,7 @@ parse_parameters()
 
     datahub_list=$(cat ${param_file} | jq -r .required.datahub_list)
     ml_workspace_list=$(cat ${param_file} | jq -r .required.ml_workspace_list)
+    op_db_list=$(cat ${param_file} | jq -r .required.op_db_list)
 
     # Optional parameters
     create_dw_cluster=$(cat ${param_file} | jq -r .optional.create_dw_cluster)
@@ -233,6 +234,7 @@ print_params()
     echo "workload_pwd: $workload_pwd"
     echo "datahub_list: $datahub_list"
     echo "ml_workspace_list: $ml_workspace_list"
+    echo "op_db_list: $op_db_list"
     echo ""
     echo "OPTIONAL:"
     echo "cloud_provider: $cloud_provider"

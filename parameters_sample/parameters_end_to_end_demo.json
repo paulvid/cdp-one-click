@@ -14,7 +14,8 @@
             {
                 "definition": "small_workspace.json"
             }
-        ]
+        ],
+        "op_db_list": []
     },
     "optional": {}
  }

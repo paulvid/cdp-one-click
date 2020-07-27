@@ -134,10 +134,10 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
     fi
 done
 
-# 1.2. Syncing users
-if [[ "$SYNC_USERS" == 1 ]]; then
-    $base_dir/cdp_sync_users.sh $prefix
-fi
+# # 1.2. Syncing users
+# if [[ "$SYNC_USERS" == 1 ]]; then
+#     $base_dir/cdp_sync_users.sh $prefix
+# fi
 
 echo ""
 echo ""

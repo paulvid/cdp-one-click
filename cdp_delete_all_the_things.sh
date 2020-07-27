@@ -59,7 +59,48 @@ run_pre_checks
 echo "${CHECK_MARK}  pre-checks done"
 echo ""
 
-# 1. Deleting ml workspace
+# 1. Deleting op databases
+echo "⏱  $(date +%H%Mhrs)"
+echo ""
+echo "Deleting CDP op databases for $prefix:"
+underline="▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔"
+for ((i = 1; i <= $prefix_length; i++)); do
+    underline=${underline}"▔"
+done
+echo ${underline}
+echo ""
+
+env_name=${prefix}-cdp-env
+env_crn=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.crn)
+all_dbs=$(cdp opdb list-databases | jq -r '.databases[] | select(.environmentCrn=="'${env_crn}'") | .databaseName' 2>/dev/null)
+
+for db in $(echo ${all_dbs}); do
+
+    cdp opdb drop-database --environment-name $env_name --database-name $db >/dev/null 2>&1
+
+    wc=$(cdp opdb describe-database --environment-name $env_name --database-name $db 2>/dev/null | jq -r .databaseDetails.status | wc -l)
+
+    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+    while [ $wc -ne 0 ]; do
+        db_status=$(cdp opdb describe-database --environment-name $env_name --database-name $db 2>/dev/null | jq -r .databaseDetails.status)
+        i=$(((i + 1) % 8))
+        printf "\r${spin:$i:1}  $prefix: $db database status: $db_status                           "
+        sleep 2
+        wc=$(cdp opdb describe-database --environment-name $env_name --database-name $db 2>/dev/null | jq -r .databaseDetails.status | wc -l)
+    done
+
+    printf "\r${CHECK_MARK}  $prefix: $db database status: NOT_FOUND                                 "
+    echo ""
+done
+
+echo "${CHECK_MARK}  $prefix: no op database remaining"
+
+echo ""
+echo "CDP op databases for $prefix deleted!"
+echo ""
+
+
+# 2. Deleting ml workspace
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
 echo "Deleting CDP ml workspaces for $prefix:"
@@ -97,7 +138,7 @@ echo ""
 echo "CDP ml workspaces for $prefix deleted!"
 echo ""
 
-# 2. Deleting datahub clusters
+# 3. Deleting datahub clusters
 echo ""
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
@@ -142,7 +183,7 @@ echo ""
 # Generating network deletion
 $base_dir/aws-pre-req/aws_generate_delete_network.sh $prefix $base_dir >/dev/null 2>&1
 
-# 2. Deleting datalake
+# 4. Deleting datalake
 echo ""
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
@@ -173,7 +214,7 @@ echo ""
 echo "CDP datalake for $prefix deleted!"
 echo ""
 
-# 3. Deleting environment
+# 5. Deleting environment
 echo ""
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
@@ -213,7 +254,7 @@ echo ""
 echo "CDP environment for $prefix deleted!"
 echo ""
 
-# 4. Deleting cloud assets
+# 6. Deleting cloud assets
 if [[ ${cloud_provider} == "aws" ]]; then
     echo "⏱  $(date +%H%Mhrs)"
     echo ""
@@ -255,7 +296,7 @@ if [[ ${cloud_provider} == "aws" ]]; then
     echo ""
 fi
 
-# 4. Deleting AZ assets
+# 6. Deleting AZ assets
 if [[ ${cloud_provider} == "az" ]]; then
     echo "⏱  $(date +%H%Mhrs)"
     echo ""

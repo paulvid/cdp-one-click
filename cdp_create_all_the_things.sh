@@ -151,6 +151,17 @@ then
     handle_exception $? $prefix "creating ml workspaces" "Error ml workspaces"
 fi
 
+# 6. Creating op databases if we have at least definition
+list_size=$(echo ${op_db_list} | jq -r .[] 2> /dev/null | wc -l)
+database_name_size=$(echo ${op_db_list} | jq -r .[0].database_name 2> /dev/null |  awk '{print length}')
+
+if ([ $list_size -gt 0 ] && [ $database_name_size -gt 0 ])
+then
+    $base_dir/cdp_create_opdb_things.sh $param_file
+    handle_exception $? $prefix "creating op databases" "Error op databases"
+fi
+
+
 
 echo "⏱  $(date +%H%Mhrs)"
 echo ""

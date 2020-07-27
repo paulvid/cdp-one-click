@@ -87,6 +87,17 @@ _Note: Azure CML is not supported yet, so don't add it in your parameters file :
                 "enable_workspace": "no"
             }
 
+        ],
+
+        <b><em>Array of op database to setup (can be empty): </em></b>
+        "op_db_list": [
+
+            <b><em>Element 1: </em></b>
+            {
+                <b><em>Name of the database you want to creaate: </em></b>
+                "database_name": "your_db_name"
+            }
+
         ]
     },
 
@@ -190,10 +201,14 @@ cdp_az_sdx.sh <your_param_file>
 cdp_create_datahub_things.sh <your_param_file>
 ```
 
-
 ### ML 
 ```
 cdp_create_ml_things.sh <your_param_file> 
+```
+
+### COD 
+```
+cdp_create_opdb_things.sh <your_param_file> 
 ```
 
 ### Starting / Stopping (work in progress)

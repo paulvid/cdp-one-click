@@ -1,0 +1,43 @@
+{
+  "vers": 1,
+  "config": {
+    "opdb": [
+      {
+        "instance": "master",
+        "instanceTypes": [
+          {
+            "size": "m5.2xlarge",
+            "quantity": 2
+          }
+        ]
+      },
+      {
+        "instance": "gateway",
+        "instanceTypes": [
+          {
+            "size": "m5.2xlarge",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "instance": "leader",
+        "instanceTypes": [
+          {
+            "size": "m5.2xlarge",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "instance": "worker",
+        "instanceTypes": [
+          {
+            "size": "m5.2xlarge",
+            "quantity": 3
+          }
+        ]
+      }
+    ]
+  }
+}

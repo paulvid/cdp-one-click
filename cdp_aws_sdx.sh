@@ -310,7 +310,6 @@ fi
 if [[ "$dl_status" == "RUNNING" ]]; then
     printf "\r${ALREADY_DONE}  $prefix: $prefix-cdp-dl already running                             "
     echo ""
-    echo ""
 else
 
     if [[ "$dl_status" == "STOPPED" ]]; then
