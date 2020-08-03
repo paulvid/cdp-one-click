@@ -3,11 +3,31 @@
   "instanceGroups": [
     {
       "nodeCount": 1,
-      "name": "master1",
+      "name": "master",
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
-        "instanceType": "r5.2xlarge",
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 100
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "registry",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -23,39 +43,19 @@
     },
     {
       "nodeCount": 3,
-      "name": "executor",
+      "name": "broker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "instanceType": "i3.4xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 1900,
-            "count": 2,
-            "type": "ephemeral"
-          }
-        ]
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master2",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "instanceType": "r5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
+            "size": 1000,
             "count": 1,
-            "type": "standard"
+            "type": "gp2"
           }
         ]
       },
@@ -63,31 +63,11 @@
     },
     {
       "nodeCount": 1,
-      "name": "coordinator",
+      "name": "smm",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "instanceType": "i3.4xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1900,
-            "count": 2,
-            "type": "ephemeral"
-          }
-        ]
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master3",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "instanceType": "r5.2xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -104,11 +84,11 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6c3e9e69-8868-4f72-5d95-fe38d77ffccf"
+    "id": "9cdcf579-beb1-4d5f-4e15-0fb985298bbe"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-04d69dcc2a16ec577"
+      "subnetId": "subnet-096b86385720e30b6"
     }
   },
   "cluster": {
@@ -121,8 +101,8 @@
       },
       "locations": [
         {
-          "type": "YARN_LOG",
-          "value": "s3a://qas-cdp-bucket/oplogs/yarn-app-logs"
+          "type": "DEFAULT_FS",
+          "value": "s3a://qas-cdp-bucket/pvi-nifi"
         }
       ],
       "identities": [
@@ -137,11 +117,14 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.1 - Real-time Data Mart: Apache Impala, Hue, Apache Kudu, Apache Spark",
+    "blueprintName": "7.2.0 - Streams Messaging Heavy Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
     "validateBlueprint": false
   },
   "sdx": {
     "name": "qas-cdp-dl"
+  },
+  "externalDatabase": {
+    "availabilityType": "HA"
   },
   "tags": {
     "application": null,

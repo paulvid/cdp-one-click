@@ -5,83 +5,58 @@
   "environmentName": "qzs-cdp-env",
   "instanceGroups": [
     {
+      "nodeCount": 1,
+      "name": "coordinator",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 300,
+            "count": 1,
+            "type": "StandardSSD_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
       "nodeCount": 2,
+      "name": "executor",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 300,
+            "count": 1,
+            "type": "StandardSSD_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
       "name": "master",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "leader",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 3,
-      "name": "worker",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "gateway",
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
@@ -89,7 +64,7 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D8_v3",
+        "instanceType": "Standard_D16_v3",
         "rootVolume": {
           "size": 50
         },
@@ -107,7 +82,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "648f59eb-321a-42b9-4124-41d15dccbafd"
+    "id": "cd1b36ec-7da6-4c3e-515b-999d05fd712c"
   },
   "network": {
     "azure": {
@@ -119,12 +94,8 @@
     "cloudStorage": {
       "locations": [
         {
-          "type": "HBASE_ROOT",
-          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/pvi-test/hbase"
-        },
-        {
-          "type": "YARN_LOG",
-          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/oplogs/yarn-app-logs"
+          "type": "DEFAULT_FS",
+          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/pvi-test"
         }
       ],
       "identities": [
@@ -142,7 +113,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.1 - Operational Database: Apache HBase, Phoenix",
+    "blueprintName": "7.2.0 - Data Mart: Apache Impala, Hue",
     "validateBlueprint": false
   },
   "sdx": {

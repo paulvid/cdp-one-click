@@ -57,7 +57,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "cd1b36ec-7da6-4c3e-515b-999d05fd712c"
+    "id": "648f59eb-321a-42b9-4124-41d15dccbafd"
   },
   "network": {
     "azure": {
@@ -88,7 +88,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.0 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
+    "blueprintName": "7.2.1 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
     "validateBlueprint": false
   },
   "sdx": {

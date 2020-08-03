@@ -2,12 +2,12 @@
   "environmentName": "qas-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 1,
-      "name": "master1",
-      "type": "GATEWAY",
+      "nodeCount": 2,
+      "name": "master",
+      "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "instanceType": "r5.2xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -23,31 +23,11 @@
     },
     {
       "nodeCount": 3,
-      "name": "executor",
+      "name": "worker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "instanceType": "i3.4xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1900,
-            "count": 2,
-            "type": "ephemeral"
-          }
-        ]
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master2",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "instanceType": "r5.2xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -63,19 +43,19 @@
     },
     {
       "nodeCount": 1,
-      "name": "coordinator",
-      "type": "CORE",
+      "name": "gateway",
+      "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
-        "instanceType": "i3.4xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 1900,
-            "count": 2,
-            "type": "ephemeral"
+            "size": 100,
+            "count": 1,
+            "type": "standard"
           }
         ]
       },
@@ -83,11 +63,11 @@
     },
     {
       "nodeCount": 1,
-      "name": "master3",
+      "name": "leader",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "instanceType": "r5.2xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -104,11 +84,11 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6c3e9e69-8868-4f72-5d95-fe38d77ffccf"
+    "id": "9cdcf579-beb1-4d5f-4e15-0fb985298bbe"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-04d69dcc2a16ec577"
+      "subnetId": "subnet-096b86385720e30b6"
     }
   },
   "cluster": {
@@ -120,6 +100,10 @@
         }
       },
       "locations": [
+        {
+          "type": "HBASE_ROOT",
+          "value": "s3a://qas-cdp-bucket/pvi-nifi/hbase"
+        },
         {
           "type": "YARN_LOG",
           "value": "s3a://qas-cdp-bucket/oplogs/yarn-app-logs"
@@ -137,7 +121,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.1 - Real-time Data Mart: Apache Impala, Hue, Apache Kudu, Apache Spark",
+    "blueprintName": "7.2.0 - Operational Database: Apache HBase, Phoenix",
     "validateBlueprint": false
   },
   "sdx": {

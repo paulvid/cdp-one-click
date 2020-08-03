@@ -84,7 +84,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "9cdcf579-beb1-4d5f-4e15-0fb985298bbe"
+    "id": "6c3e9e69-8868-4f72-5d95-fe38d77ffccf"
   },
   "network": {
     "aws": {
@@ -121,7 +121,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.0 - Data Engineering: Apache Spark, Apache Hive, Apache Oozie",
+    "blueprintName": "7.2.1 - Data Engineering: Apache Spark, Apache Hive, Apache Oozie",
     "validateBlueprint": false
   },
   "sdx": {

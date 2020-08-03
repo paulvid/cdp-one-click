@@ -287,7 +287,7 @@ else
         echo "${CHECK_MARK}  $prefix: idbroker mappings set"
         echo ""
         echo ""
-        echo "SDX for $prefix created!"
+        echo "CDP environment for $prefix created!"
     fi
 fi
 # Creating datalake

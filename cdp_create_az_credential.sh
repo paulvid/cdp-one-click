@@ -44,7 +44,9 @@ credential_name=$1
 app_id=$2
 app_secret=$3
 
-details=$(az account list|jq '.[0]|{"name": .name, "subscriptionId": .id, "tenantId": .tenantId, "state": .state}')
+
+
+details=$(az account list |jq '.[] | select(.isDefault==true) |{"name": .name, "subscriptionId": .id, "tenantId": .tenantId, "state": .state}')
 subscriptionId=$(echo $details | jq -r .subscriptionId)
 tenantId=$(echo $details | jq -r .tenantId)
 

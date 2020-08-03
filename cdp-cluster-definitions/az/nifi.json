@@ -57,7 +57,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "cd1b36ec-7da6-4c3e-515b-999d05fd712c"
+    "id": "648f59eb-321a-42b9-4124-41d15dccbafd"
   },
   "network": {
     "azure": {
@@ -88,7 +88,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.0 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry",
+    "blueprintName": "7.2.1 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry",
     "validateBlueprint": false
   },
   "sdx": {

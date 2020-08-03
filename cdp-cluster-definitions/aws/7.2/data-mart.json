@@ -3,11 +3,11 @@
   "instanceGroups": [
     {
       "nodeCount": 1,
-      "name": "master1",
+      "name": "master",
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
-        "instanceType": "r5.2xlarge",
+        "instanceType": "r5.4xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -22,40 +22,20 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 3,
+      "nodeCount": 2,
       "name": "executor",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "instanceType": "i3.4xlarge",
+        "instanceType": "r5d.4xlarge",
         "rootVolume": {
           "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 1900,
+            "size": 300,
             "count": 2,
             "type": "ephemeral"
-          }
-        ]
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master2",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "instanceType": "r5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "standard"
           }
         ]
       },
@@ -67,35 +47,15 @@
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "instanceType": "i3.4xlarge",
+        "instanceType": "r5d.4xlarge",
         "rootVolume": {
           "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 1900,
+            "size": 300,
             "count": 2,
             "type": "ephemeral"
-          }
-        ]
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master3",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "instanceType": "r5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "standard"
           }
         ]
       },
@@ -104,7 +64,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6c3e9e69-8868-4f72-5d95-fe38d77ffccf"
+    "id": "9cdcf579-beb1-4d5f-4e15-0fb985298bbe"
   },
   "network": {
     "aws": {
@@ -121,8 +81,8 @@
       },
       "locations": [
         {
-          "type": "YARN_LOG",
-          "value": "s3a://qas-cdp-bucket/oplogs/yarn-app-logs"
+          "type": "DEFAULT_FS",
+          "value": "s3a://qas-cdp-bucket/testtes"
         }
       ],
       "identities": [
@@ -137,7 +97,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.1 - Real-time Data Mart: Apache Impala, Hue, Apache Kudu, Apache Spark",
+    "blueprintName": "7.2.0 - Data Mart: Apache Impala, Hue",
     "validateBlueprint": false
   },
   "sdx": {

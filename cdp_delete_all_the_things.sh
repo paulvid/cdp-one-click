@@ -71,7 +71,7 @@ echo ${underline}
 echo ""
 
 env_name=${prefix}-cdp-env
-env_crn=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.crn)
+env_crn=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env  2>/dev/null | jq -r .environment.crn)
 all_dbs=$(cdp opdb list-databases | jq -r '.databases[] | select(.environmentCrn=="'${env_crn}'") | .databaseName' 2>/dev/null)
 
 for db in $(echo ${all_dbs}); do
@@ -225,29 +225,56 @@ for ((i = 1; i <= $prefix_length; i++)); do
 done
 echo ${underline}
 
-cdp environments delete-environment --environment-name $prefix-cdp-env >/dev/null 2>&1
-
-spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-while [ $wc -ne 0 ]; do
-    env_status=$($base_dir/cdp_describe_env.sh $prefix 2>/dev/null | jq -r .environment.status)
-    i=$(((i + 1) % 8))
-    printf "\r${spin:$i:1}  $prefix: environment status: $env_status                       "
-    sleep 2
-    wc=$($base_dir/cdp_describe_env.sh $prefix 2>/dev/null | jq -r .environment.status | wc -l)
-done
-
-spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-time=0
-while [ $time -lt 300 ]; do
-    i=$(((i + 1) % 8))
-    printf "\r${spin:$i:1}  $prefix: environment status: WAITING_FOR_API        "
-    sleep 2                    
-    time=$((time+1))
-done
 wc=$($base_dir/cdp_describe_env.sh $prefix 2>/dev/null | jq -r .environment.status | wc -l)
+if [ $wc -ne 0 ]; then
+    if [[ ${cloud_provider} == "az" ]]; then
+        env_rg_name=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r .environment.network.azure.resourceGroupName)
+    fi
+
+    if [[ ${cloud_provider} == "aws" ]]; then
+        env_vpc_id=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r .environment.network.aws.vpcId)
+    fi
+
+    cdp environments delete-environment --environment-name $prefix-cdp-env >/dev/null 2>&1
 
 
-printf "\r${CHECK_MARK}  $prefix: environment status: NOT_FOUND                                        "
+    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+    while [ $wc -ne 0 ]; do
+        env_status=$($base_dir/cdp_describe_env.sh $prefix 2>/dev/null | jq -r .environment.status)
+        i=$(((i + 1) % 8))
+        printf "\r${spin:$i:1}  $prefix: environment status: $env_status                       "
+        sleep 2
+        wc=$($base_dir/cdp_describe_env.sh $prefix 2>/dev/null | jq -r .environment.status | wc -l)
+    done
+
+    if [[ "$create_network" == "no" ]]; then
+        if [[ ${cloud_provider} == "az" ]]; then
+            wc=$(az group show --name $env_rg_name 2>/dev/null | jq -r .properties.provisioningState | wc -l)
+            while [ $wc -ne 0 ]; do
+                rg_status=$(az group show --name $env_rg_name 2>/dev/null | jq -r .properties.provisioningState)
+                i=$(((i + 1) % 8))
+                printf "\r${spin:$i:1}  $prefix: environment status: NO_CDP_API_RESPONSE ($env_rg_name rg status: $rg_status)       "
+                sleep 2                    
+                wc=$(az group show --name $env_rg_name 2>/dev/null | jq -r .properties.provisioningState | wc -l)
+            done
+        fi
+
+
+        if [[ ${cloud_provider} == "aws" ]]; then
+            wc=$(aws ec2 describe-vpcs | jq -r .Vpcs[].VpcId | grep $env_vpc_id | wc -l)
+            while [ $wc -ne 0 ]; do
+                i=$(((i + 1) % 8))
+                printf "\r${spin:$i:1}  $prefix: environment status: NO_CDP_API_RESPONSE (waiting for $env_vpc_id to be deleted)       "
+                sleep 2                    
+                wc=$(aws ec2 describe-vpcs | jq -r .Vpcs[].VpcId | grep $env_vpc_id | wc -l)
+            done
+
+        fi
+    fi
+fi
+
+
+printf "\r${CHECK_MARK}  $prefix: environment status: NOT_FOUND                                                 "
 
 echo ""
 echo ""

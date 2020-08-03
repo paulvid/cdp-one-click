@@ -5,8 +5,33 @@
   "environmentName": "qzs-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 2,
-      "name": "master",
+      "nodeCount": 0,
+      "name": "compute",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "StandardSSD_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 0,
+      "name": "gateway",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -31,8 +56,8 @@
     },
     {
       "nodeCount": 1,
-      "name": "leader",
-      "type": "CORE",
+      "name": "master",
+      "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
         "azure": {
@@ -78,36 +103,11 @@
         "cloudPlatform": "AZURE"
       },
       "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "gateway",
-      "type": "GATEWAY",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "648f59eb-321a-42b9-4124-41d15dccbafd"
+    "id": "cd1b36ec-7da6-4c3e-515b-999d05fd712c"
   },
   "network": {
     "azure": {
@@ -119,12 +119,12 @@
     "cloudStorage": {
       "locations": [
         {
-          "type": "HBASE_ROOT",
-          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/pvi-test/hbase"
-        },
-        {
           "type": "YARN_LOG",
           "value": "abfs://data@qzscdpsa.dfs.core.windows.net/oplogs/yarn-app-logs"
+        },
+        {
+          "type": "ZEPPELIN_NOTEBOOK",
+          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/pvi-test/zeppelin/notebook"
         }
       ],
       "identities": [
@@ -142,7 +142,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.1 - Operational Database: Apache HBase, Phoenix",
+    "blueprintName": "7.2.0 - Data Engineering: Apache Spark, Apache Hive, Apache Oozie",
     "validateBlueprint": false
   },
   "sdx": {
