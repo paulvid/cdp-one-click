@@ -1,0 +1,134 @@
+{
+  "azure": {
+    "encryptStorage": false
+  },
+  "environmentName": "aaa-cdp-env",
+  "instanceGroups": [
+    {
+      "nodeCount": 3,
+      "name": "zookeeper",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 150
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "Standard_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "gateway",
+      "type": "GATEWAY",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "Standard_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 3,
+      "name": "nifi",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_F16s_v2",
+        "rootVolume": {
+          "size": 150
+        },
+        "attachedVolumes": [
+          {
+            "size": 1000,
+            "count": 4,
+            "type": "Premium_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    }
+  ],
+  "image": {
+    "catalog": "cdp-default",
+    "id": "648f59eb-321a-42b9-4124-41d15dccbafd"
+  },
+  "network": {
+    "azure": {
+      "subnetId": "subnet1"
+    }
+  },
+  "cluster": {
+    "databases": [],
+    "cloudStorage": {
+      "locations": [
+        {
+          "type": "DEFAULT_FS",
+          "value": "abfs://data@aaacdpsa.dfs.core.windows.net/pvi-az-nifi-heavy"
+        }
+      ],
+      "identities": [
+        {
+          "adlsGen2": {
+            "accountKey": null,
+            "accountName": null,
+            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/aaa-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "secure": false
+          },
+          "type": "LOG"
+        }
+      ]
+    },
+    "exposedServices": [
+      "ALL"
+    ],
+    "blueprintName": "7.2.1 - Flow Management Heavy Duty with Apache NiFi, Apache NiFi Registry",
+    "validateBlueprint": false
+  },
+  "sdx": {
+    "name": "aaa-cdp-dl"
+  },
+  "tags": {
+    "application": null,
+    "userDefined": {
+      "owner": "pvidal@cloudera.com",
+      "deploytool": "one-click",
+      "enddate": "08062020",
+      "project": "aaa_one_click_project"
+    },
+    "defaults": null
+  },
+  "inputs": {},
+  "cloudPlatform": "AZURE"
+}

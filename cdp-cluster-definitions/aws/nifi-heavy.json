@@ -2,9 +2,9 @@
   "environmentName": "aal-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 3,
-      "name": "broker",
-      "type": "CORE",
+      "nodeCount": 1,
+      "name": "gateway",
+      "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
         "aws": {},
@@ -14,9 +14,9 @@
         },
         "attachedVolumes": [
           {
-            "size": 1000,
+            "size": 100,
             "count": 1,
-            "type": "st1"
+            "type": "standard"
           }
         ],
         "cloudPlatform": "AWS"
@@ -24,21 +24,43 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 1,
-      "name": "master",
-      "type": "GATEWAY",
+      "nodeCount": 3,
+      "name": "zookeeper",
+      "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
         "aws": {},
         "instanceType": "m5.2xlarge",
         "rootVolume": {
-          "size": 100
+          "size": 150
         },
         "attachedVolumes": [
           {
             "size": 100,
             "count": 1,
             "type": "standard"
+          }
+        ],
+        "cloudPlatform": "AWS"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 3,
+      "name": "nifi",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "aws": {},
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 150
+        },
+        "attachedVolumes": [
+          {
+            "size": 1000,
+            "count": 4,
+            "type": "gp2"
           }
         ],
         "cloudPlatform": "AWS"
@@ -52,7 +74,7 @@
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-0b30ef74296b8ca30"
+      "subnetId": "subnet-022a84936099fdf52"
     }
   },
   "cluster": {
@@ -66,7 +88,7 @@
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "s3a://aal-cdp-bucket/pvi-test-de"
+          "value": "s3a://aal-cdp-bucket/pvi-nifi-heavy"
         }
       ],
       "identities": [
@@ -81,14 +103,11 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.1 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
+    "blueprintName": "7.2.1 - Flow Management Heavy Duty with Apache NiFi, Apache NiFi Registry",
     "validateBlueprint": false
   },
   "sdx": {
     "name": "aal-cdp-dl"
-  },
-  "externalDatabase": {
-    "availabilityType": "NON_HA"
   },
   "tags": {
     "application": null,

@@ -2,28 +2,6 @@
   "environmentName": "aal-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 3,
-      "name": "broker",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "aws": {},
-        "instanceType": "m5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1000,
-            "count": 1,
-            "type": "st1"
-          }
-        ],
-        "cloudPlatform": "AWS"
-      },
-      "recipeNames": []
-    },
-    {
       "nodeCount": 1,
       "name": "master",
       "type": "GATEWAY",
@@ -39,6 +17,72 @@
             "size": 100,
             "count": 1,
             "type": "standard"
+          }
+        ],
+        "cloudPlatform": "AWS"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "smm",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "aws": {},
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ],
+        "cloudPlatform": "AWS"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "registry",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "aws": {},
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ],
+        "cloudPlatform": "AWS"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 3,
+      "name": "broker",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "aws": {},
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 1000,
+            "count": 1,
+            "type": "gp2"
           }
         ],
         "cloudPlatform": "AWS"
@@ -66,7 +110,7 @@
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "s3a://aal-cdp-bucket/pvi-test-de"
+          "value": "s3a://aal-cdp-bucket/pvi-kafka-heavy"
         }
       ],
       "identities": [
@@ -81,14 +125,14 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.1 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
+    "blueprintName": "7.2.1 - Streams Messaging Heavy Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
     "validateBlueprint": false
   },
   "sdx": {
     "name": "aal-cdp-dl"
   },
   "externalDatabase": {
-    "availabilityType": "NON_HA"
+    "availabilityType": "HA"
   },
   "tags": {
     "application": null,
