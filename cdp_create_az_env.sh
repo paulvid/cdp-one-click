@@ -42,7 +42,20 @@ then
     display_usage
     exit 1
 fi 
-
+flatten_tags() {
+    tags=$1
+    flattened_tags=""
+    for item in $(echo ${tags} | jq -r '.[] | @base64'); do
+        _jq() {
+            echo ${item} | base64 --decode | jq -r ${1}
+        }
+        #echo ${item} | base64 --decode
+        key=$(_jq '.key')
+        value=$(_jq '.value')
+        flattened_tags=$flattened_tags" key=\"$key\",value=\"$value\""
+    done
+    echo $flattened_tags
+}
 
 prefix=$1
 credential=$2
@@ -73,7 +86,7 @@ then
         --security-access cidr="$sg_cidr" \
         --log-storage storageLocationBase="abfs://logs@${prefix//-/}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
         --new-network-params networkCidr="10.10.0.0/16" \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}"  \
+        --tags $(flatten_tags $TAGS)  \
         --use-public-ip
 else
     cdp environments create-azure-environment  --environment-name ${prefix}-cdp-env \
@@ -83,7 +96,7 @@ else
         --security-access securityGroupIdForKnox="$knox_nsg",defaultSecurityGroupId="$default_nsg" \
         --log-storage storageLocationBase="abfs://logs@${prefix//-/}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
         --existing-network-params networkId="$network_id",resourceGroupName="$prefix-cdp-rg",subnetIds="$subnet_1","$subnet_2","$subnet_3" \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}" \
+        --tags $(flatten_tags $TAGS) \
         --use-public-ip
 fi
 

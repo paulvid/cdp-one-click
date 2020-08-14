@@ -131,14 +131,17 @@ _Note: Azure CML is not supported yet, so don't add it in your parameters file :
         <b><em>Use existing network for env deployment (path to the network file, see examples in parameters_sample) </em></b>
         "existing_network_file": "[path_to_network_file]",
 
-        <b><em>Tags to setup: </em></b>
-        "tags": {
-
-            <b><em>End date tag (default: today's date +3 days): </em></b>
-            "end_date":       "04102020",
-            <b><em>End date tag (default: [prefix]_one_click_project): </em></b>
-            "project":        "pvi_test"
-        },
+        <b><em>Array of custom tags to setup (if empty the scripts will generate project, owner, end_date and deploytool tags): </em></b>
+        "tags": [
+            {
+                "key": "my_tag",
+                "value": "my_value"
+            },
+            {
+                "key": "my_other_tag",
+                "value": "my_other_value"
+            }
+        ],
 
     }
 

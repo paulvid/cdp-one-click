@@ -94,21 +94,43 @@ parse_parameters()
     cdp_profile=$(cat ${param_file} | jq -r .optional.cdp_profile)
     cdp_profile=$(handle_null_param "$cdp_profile" "no" "default")
 
-    end_date=$(cat ${param_file} | jq -r .optional.tags.end_date)
-    if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        default_date=$(date -d "$dt +3 day" "+%m%d%Y")
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        default_date=$(date -v+3d "+%m%d%Y")
-    else 
-        default_date="05202020"
-    fi
 
+    owner=$(cdp iam get-user | jq -r .user.email)
+    workload_user=$(cdp iam get-user | jq -r .user.workloadUsername)
+
+
+    # Tags
+    tags=$(cat ${param_file} | jq -r .optional.tags)
+    tags_length=$(echo $tags | 	jq '. | length')
+   
+    # If the tags list is empty, we use default tags
+    if [ $tags_length -eq 0 ]; then
+        if [[ "$OSTYPE" == "linux-gnu" ]]; then
+            default_date=$(date -d "$dt +3 day" "+%m%d%Y")
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+            default_date=$(date -v+3d "+%m%d%Y")
+        else 
+            default_date="05202020"
+        fi
+        default_project=$prefix"_one_click_project"
+
+        tags=$(echo "[
+                {
+                    \"key\": \"end_date\",
+                    \"value\": \"$default_date\"
+                },{
+                    \"key\": \"project\",
+                    \"value\": \"$default_project\"
+                },{
+                    \"key\": \"deploytool\",
+                    \"value\": \"one-click\"
+                },{
+                    \"key\": \"owner\",
+                    \"value\": \"$owner\"
+                }
+            ]")
     
-    end_date=$(handle_null_param "$end_date" "no" "$default_date")
-
-    default_project=$prefix"_one_click_project"
-    project=$(cat ${param_file} | jq -r .optional.tags.project)
-    project=$(handle_null_param "$project" "no" "$default_project")
+    fi
 
     generate_credential=$(cat ${param_file} | jq -r .optional.generate_credential)
     generate_credential=$(handle_null_param "$generate_credential" "no" "no")
@@ -136,8 +158,7 @@ parse_parameters()
 
     # Export defaults
     export CDP_PROFILE=$cdp_profile
-    export END_DATE=$end_date
-    export PROJECT=$project
+    export TAGS=$tags
 
     if [ ${#existing_network_file} -gt 0 ]
     then
@@ -166,9 +187,7 @@ parse_parameters()
         handle_exception $? $prefix "az subscription verification" "$result"
     fi
     
-    owner=$(cdp iam get-user | jq -r .user.email)
-    workload_user=$(cdp iam get-user | jq -r .user.workloadUsername)
-
+    
 
     if [[ ${generate_credential} == "yes" ]]
     then

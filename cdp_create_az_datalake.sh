@@ -46,6 +46,22 @@ else
     rds_ha=1
 fi 
 
+flatten_tags() {
+    tags=$1
+    flattened_tags=""
+    for item in $(echo ${tags} | jq -r '.[] | @base64'); do
+        _jq() {
+            echo ${item} | base64 --decode | jq -r ${1}
+        }
+        #echo ${item} | base64 --decode
+        key=$(_jq '.key')
+        value=$(_jq '.value')
+        flattened_tags=$flattened_tags" key=\"$key\",value=\"$value\""
+    done
+    echo $flattened_tags
+}
+
+
 sleep_duration=1 
 
 # Create groups
@@ -56,11 +72,11 @@ then
     cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
         --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@${1//-/}cdpsa.dfs.core.windows.net" \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}"
+        --tags $(flatten_tags $TAGS)
 else
     cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
         --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@${1//-/}cdpsa.dfs.core.windows.net" \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}" \
+        --tags $(flatten_tags $TAGS)
         --database-availability-type NONE
 fi

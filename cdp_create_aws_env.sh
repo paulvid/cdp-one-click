@@ -55,7 +55,20 @@ then
     display_usage
     exit 1
 fi 
-
+flatten_tags() {
+    tags=$1
+    flattened_tags=""
+    for item in $(echo ${tags} | jq -r '.[] | @base64'); do
+        _jq() {
+            echo ${item} | base64 --decode | jq -r ${1}
+        }
+        #echo ${item} | base64 --decode
+        key=$(_jq '.key')
+        value=$(_jq '.value')
+        flattened_tags=$flattened_tags" key=\"$key\",value=\"$value\""
+    done
+    echo $flattened_tags
+}
 
 prefix=$1
 credential=$2
@@ -81,7 +94,7 @@ then
         --subnet-ids "${subnet1}" "${subnet2}" "${subnet3}" \
         --vpc-id "${vpc}" \
         --s3-guard-table-name ${prefix}-cdp-table \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}"
+        --tags $(flatten_tags "$TAGS")
 
 
 else 
@@ -93,5 +106,5 @@ else
         --log-storage storageLocationBase="${prefix}-cdp-bucket",instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/${prefix}-log-role" \
         --network-cidr "10.0.0.0/16" \
         --s3-guard-table-name ${prefix}-cdp-table \
-        --tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}"
+        --tags $(flatten_tags "$TAGS")
 fi

@@ -40,19 +40,35 @@ then
     exit 1
 fi 
 
+
+flatten_tags() {
+    tags=$1
+    flattened_tags=""
+    for item in $(echo ${tags} | jq -r '.[] | @base64'); do
+        _jq() {
+            echo ${item} | base64 --decode | jq -r ${1}
+        }
+        #echo ${item} | base64 --decode
+        key=$(_jq '.key')
+        value=$(_jq '.value')
+        flattened_tags=$flattened_tags" key=\"$key\",value=\"$value\""
+    done
+    echo $flattened_tags
+}
+
 prefix=$1
 region=$2
 sg_cidr=$3
 
 igw_id=$(aws ec2 create-internet-gateway | jq -r .InternetGateway.InternetGatewayId)
-aws ec2 create-tags --resources $igw_id --tags Key=Name,Value="$prefix-cdp-igw"
+aws ec2 create-tags --resources $igw_id --tags Key=Name,Value="$prefix-cdp-igw" $(flatten_tags $TAGS) > /dev/null 2>&1
 
 vpc_id=$(aws ec2 create-vpc --cidr 10.0.0.0/16 | jq -r .Vpc.VpcId)
-aws ec2 create-tags --resources $vpc_id --tags Key=Name,Value="$prefix-cdp-vpc"
+aws ec2 create-tags --resources $vpc_id --tags Key=Name,Value="$prefix-cdp-vpc" $(flatten_tags $TAGS) > /dev/null 2>&1
 
 
 aws ec2 attach-internet-gateway --internet-gateway-id $igw_id --vpc-id $vpc_id
-aws ec2 create-tags --resources $vpc_id --tags Key=Name,Value="$prefix-cdp-vpc"
+aws ec2 create-tags --resources $vpc_id --tags Key=Name,Value="$prefix-cdp-vpc" $(flatten_tags $TAGS) > /dev/null 2>&1
 aws ec2 modify-vpc-attribute --enable-dns-support "{\"Value\":true}" --vpc-id $vpc_id
 aws ec2 modify-vpc-attribute --enable-dns-hostnames "{\"Value\":true}" --vpc-id $vpc_id
 
@@ -63,9 +79,9 @@ aws ec2 create-route --route-table-id $route_id --destination-cidr-block 0.0.0.0
 subnet_id1a=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.0.0/19 --availability-zone "$region"a | jq -r .Subnet.SubnetId)
 subnet_id1b=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.160.0/19 --availability-zone "$region"b | jq -r .Subnet.SubnetId)
 subnet_id1c=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.64.0/19 --availability-zone "$region"c | jq -r .Subnet.SubnetId)
-aws ec2 create-tags --resources $subnet_id1a --tags Key=Name,Value="$prefix-pub-subnet-1"
-aws ec2 create-tags --resources $subnet_id1b --tags Key=Name,Value="$prefix-pub-subnet-2"
-aws ec2 create-tags --resources $subnet_id1c --tags Key=Name,Value="$prefix-pub-subnet-3"
+aws ec2 create-tags --resources $subnet_id1a --tags Key=Name,Value="$prefix-pub-subnet-1" $(flatten_tags $TAGS) > /dev/null 2>&1
+aws ec2 create-tags --resources $subnet_id1b --tags Key=Name,Value="$prefix-pub-subnet-2" $(flatten_tags $TAGS) > /dev/null 2>&1
+aws ec2 create-tags --resources $subnet_id1c --tags Key=Name,Value="$prefix-pub-subnet-3" $(flatten_tags $TAGS) > /dev/null 2>&1
 
 
 aws ec2 modify-subnet-attribute --subnet-id $subnet_id1a --map-public-ip-on-launch
@@ -77,6 +93,7 @@ aws ec2 associate-route-table  --subnet-id $subnet_id1b --route-table-id $route_
 aws ec2 associate-route-table  --subnet-id $subnet_id1c --route-table-id $route_id > /dev/null 2>&1
 
 knox_sg_id=$(aws ec2 create-security-group --description "AWS CDP Knox security group" --group-name "$prefix-knox-sg" --vpc-id $vpc_id | jq -r .GroupId)
+aws ec2 create-tags --resources $knox_sg_id --tags Key=Name,Value="$prefix-knox-sg" $(flatten_tags $TAGS) > /dev/null 2>&1
 
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 22 --cidr $sg_cidr  >> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 443 --cidr $sg_cidr >> /dev/null 2>&1
@@ -92,6 +109,7 @@ aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol udp -
 
 
 default_sg_id=$(aws ec2 create-security-group --description "AWS default security group" --group-name "$prefix-default-sg" --vpc-id $vpc_id | jq -r .GroupId)
+aws ec2 create-tags --resources $default_sg_id --tags Key=Name,Value="$prefix-default-sg" $(flatten_tags $TAGS) > /dev/null 2>&1
 
 aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 22 --cidr $sg_cidr>> /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $default_sg_id --protocol tcp --port 443 --cidr $sg_cidr >> /dev/null 2>&1

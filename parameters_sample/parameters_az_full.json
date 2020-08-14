@@ -31,9 +31,15 @@
         "create_network": "no",
         "use_ccm": "no",
         "existing_network_file": "",
-        "tags": {
-            "end_date":       "04102020",
-            "project":        "pvi_test"
-        }
+        "tags": [
+            {
+                "key": "my_tag",
+                "value": "my_value"
+            },
+            {
+                "key": "my_other_tag",
+                "value": "my_other_value"
+            }
+        ]
     }
 }

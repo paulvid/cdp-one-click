@@ -40,7 +40,20 @@ then
 fi 
 
 
-
+flatten_tags() {
+    tags=$1
+    flattened_tags=""
+    for item in $(echo ${tags} | jq -r '.[] | @base64'); do
+        _jq() {
+            echo ${item} | base64 --decode | jq -r ${1}
+        }
+        #echo ${item} | base64 --decode
+        key=$(_jq '.key')
+        value=$(_jq '.value')
+        flattened_tags=$flattened_tags" key=\"$key\",value=\"$value\""
+    done
+    echo $flattened_tags
+}
 
 # Parsing variables
 prefix=${1}
@@ -102,5 +115,5 @@ cdp datahub create-aws-cluster --cluster-name ${cluster_name} \
 --instance-groups ${instance_groups} \
 --subnet-id ${subnet_id} \
 --image ${image} \
---tags key="enddate",value="${END_DATE}" key="project",value="${PROJECT}" key="deploytool",value="one-click" key="owner",value="${owner}"
+--tags $(flatten_tags $TAGS)
 
