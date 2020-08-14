@@ -76,7 +76,7 @@ if [[ $hasMLAdmin == "false" ]]
 then
     cdp iam assign-group-resource-role \
         --group-name cdp_${prefix}-cdp-env \
-        --resource-role "crn:altus:iam:us-west-1:altus:resourceRole:MLAdmin" \
+        --resource-role-crn "crn:altus:iam:us-west-1:altus:resourceRole:MLAdmin" \
         --resource-crn $env_crn
 fi
 sleep $sleep_duration
@@ -85,7 +85,7 @@ if [[ $hasMLUser == "false" ]]
 then
     cdp iam assign-group-resource-role \
         --group-name cdp_${prefix}-cdp-env \
-        --resource-role "crn:altus:iam:us-west-1:altus:resourceRole:MLUser" \
+        --resource-role-crn "crn:altus:iam:us-west-1:altus:resourceRole:MLUser" \
         --resource-crn $env_crn
 fi
 sleep $sleep_duration

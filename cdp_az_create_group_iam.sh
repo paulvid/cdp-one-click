@@ -79,13 +79,13 @@ sleep $sleep_duration
 
 cdp iam assign-group-resource-role \
     --group-name cdp_$2-cdp-env \
-    --resource-role "crn:altus:iam:us-west-1:altus:resourceRole:EnvironmentAdmin" \
+    --resource-role-crn "crn:altus:iam:us-west-1:altus:resourceRole:EnvironmentAdmin" \
     --resource-crn $env_crn
 sleep $sleep_duration
 
 cdp iam assign-group-resource-role \
     --group-name cdp_$2-cdp-env \
-    --resource-role "crn:altus:iam:us-west-1:altus:resourceRole:EnvironmentUser" \
+    --resource-role-crn "crn:altus:iam:us-west-1:altus:resourceRole:EnvironmentUser" \
     --resource-crn $env_crn
 sleep $sleep_duration
 
