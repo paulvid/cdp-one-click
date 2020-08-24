@@ -227,9 +227,12 @@ if [[ "$generate_credential" == "yes" ]]
 then
 
     # Purging old accounts
-    result=$($base_dir/aws-pre-req/aws_purge_ca_roles_policies.sh $prefix $generate_minimal_cross_account 2>&1 > /dev/null)
-    handle_exception $? $prefix "cross account purge" "$result"
-    echo "${CHECK_MARK}  $prefix: cross account purged"
+    if [[ "$($base_dir/aws-pre-req/aws_check_if_resource_exists.sh $prefix ca)" == "no" ]]
+    then
+        result=$($base_dir/aws-pre-req/aws_purge_ca_roles_policies.sh $prefix $generate_minimal_cross_account 2>&1 > /dev/null)
+        handle_exception $? $prefix "cross account purge" "$result"
+        echo "${CHECK_MARK}  $prefix: cross account purged"
+    fi
 
     cred=$(cdp environments list-credentials | jq -r .credentials[].credentialName | grep ${credential})
     if [[ ${credential} == $cred ]]

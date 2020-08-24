@@ -11,7 +11,7 @@ Description:
 
 Arguments:
     prefix:   prefix for your assets
-    resource: type of resource to check (in: bucket, network, iam) 
+    resource: type of resource to check (in: bucket, network, iam, ca) 
     --help or -h:   displays this help"
 
 }
@@ -43,7 +43,7 @@ prefix=$1
 resource=$2
 response="no"
 
-if [[ "$resource" != "bucket" && "$resource" != "network" && "$resource" != "iam" ]]
+if [[ "$resource" != "bucket" && "$resource" != "network" && "$resource" != "ca" && "$resource" != "iam" ]]
 then
     echo "$resource is not a recognized resource type!"  >&2
     display_usage
@@ -70,6 +70,15 @@ then
 
 fi
 
+if [[ "$resource" == "ca" ]]
+then
+    role="${prefix}-cross-account-role"
+    if [ $(aws iam list-roles | jq -r '.Roles[] | select(.RoleName=="$role")' | wc -l) -gt 0 ] 
+    then
+        response="yes"
+    fi
+
+fi
 
 if [[ "$resource" == "iam" ]]
 then
