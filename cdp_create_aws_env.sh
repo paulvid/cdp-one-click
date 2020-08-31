@@ -94,6 +94,7 @@ then
         --subnet-ids "${subnet1}" "${subnet2}" "${subnet3}" \
         --vpc-id "${vpc}" \
         --s3-guard-table-name ${prefix}-cdp-table \
+        --enable-tunnel \
         --tags $(flatten_tags "$TAGS")
 
 
@@ -106,5 +107,6 @@ else
         --log-storage storageLocationBase="${prefix}-cdp-bucket",instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/${prefix}-log-role" \
         --network-cidr "10.0.0.0/16" \
         --s3-guard-table-name ${prefix}-cdp-table \
+        --enable-tunnel \
         --tags $(flatten_tags "$TAGS")
 fi

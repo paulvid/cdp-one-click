@@ -87,6 +87,7 @@ then
         --log-storage storageLocationBase="abfs://logs@${prefix//-/}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
         --new-network-params networkCidr="10.10.0.0/16" \
         --tags $(flatten_tags $TAGS)  \
+        --enable-tunnel \
         --use-public-ip
 else
     cdp environments create-azure-environment  --environment-name ${prefix}-cdp-env \
@@ -97,6 +98,7 @@ else
         --log-storage storageLocationBase="abfs://logs@${prefix//-/}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
         --existing-network-params networkId="$network_id",resourceGroupName="$prefix-cdp-rg",subnetIds="$subnet_1","$subnet_2","$subnet_3" \
         --tags $(flatten_tags $TAGS) \
+        --enable-tunnel \
         --use-public-ip
 fi
 
