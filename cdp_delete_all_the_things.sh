@@ -274,7 +274,7 @@ if [ $wc -ne 0 ]; then
 fi
 
 
-printf "\r${CHECK_MARK}  $prefix: environment status: NOT_FOUND                                                 "
+printf "\r${CHECK_MARK}  $prefix: environment status: NOT_FOUND                                                                             "
 
 echo ""
 echo ""

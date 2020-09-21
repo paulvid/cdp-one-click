@@ -115,7 +115,7 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
     
     definition=$(_jq '.definition')
     
-    for row in $(cat $base_dir/cml-workspace-definitions/$definition | jq -r '.instanceGroups[] | @base64'); do
+    for row in $(cat $base_dir/cml-workspace-definitions/${cloud_provider}/$definition | jq -r '.instanceGroups[] | @base64'); do
             _jq() {
             echo ${row} | base64 --decode | jq -r ${1}
             }

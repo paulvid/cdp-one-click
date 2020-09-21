@@ -159,6 +159,8 @@ parse_parameters()
     # Export defaults
     export CDP_PROFILE=$cdp_profile
     export TAGS=$tags
+    export PROJECT=$default_project
+    export END_DATE=$default_date
 
     if [ ${#existing_network_file} -gt 0 ]
     then
