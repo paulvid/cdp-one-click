@@ -40,7 +40,6 @@ fi
 parse_parameters ${1}
 
 # 1. Creating datahub cluster
-echo ""
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
 echo "Creating CDP op databases for $prefix:"
@@ -88,3 +87,5 @@ for item in $(echo ${op_db_list} | jq -r '.[] | @base64'); do
     fi
 
 done
+
+echo ""

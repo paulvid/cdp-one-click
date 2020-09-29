@@ -40,7 +40,6 @@ fi
 parse_parameters ${1}
 
 # 1. Creating datahub cluster
-echo ""
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
 echo "Creating CDP datahub clusters for $prefix:"

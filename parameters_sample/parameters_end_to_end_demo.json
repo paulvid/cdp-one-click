@@ -15,7 +15,13 @@
                 "definition": "small_workspace.json"
             }
         ],
-        "op_db_list": []
+        "op_db_list": [],
+        "dw_list": [
+            {
+                "name": "vw-name",
+                "type": "hive"
+            }
+        ]
     },
     "optional": {}
  }

@@ -59,6 +59,70 @@ run_pre_checks
 echo "${CHECK_MARK}  pre-checks done"
 echo ""
 
+# 0. Deleting CDW
+echo "⏱  $(date +%H%Mhrs)"
+echo ""
+echo      "Deleting CDW for $prefix:"
+underline="▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔"
+for ((i = 1; i <= $prefix_length; i++)); do
+    underline=${underline}"▔"
+done
+echo ${underline}
+echo ""
+
+env_name=${prefix}-cdp-env
+env_crn=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env  2>/dev/null | jq -r .environment.crn)
+cluster_id=$(cdp dw list-clusters | jq -r '.clusters[] | select(.environmentCrn=="'${env_crn}'") | .id')
+if [ ${#cluster_id} -lt 0 ]; then
+    printf "\r${ALREADY_DONE}  $prefix: CDW cluster already deleted     "
+    echo ""
+else
+    # 0.1. Deleting all vw
+    all_vws=$(cdp dw list-vws --cluster-id ${cluster_id} | jq -r '.vws[].id' 2>/dev/null)
+
+    for vw_id in $(echo ${all_vws}); do
+        cdp dw delete-vw --cluster-id ${cluster_id} --vw-id ${vw_id} >/dev/null 2>&1
+
+        wc=$(cdp dw describe-vw --cluster-id ${cluster_id} --vw-id ${vw_id} 2>/dev/null | jq -r .vw.status | wc -l)
+
+        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+        while [ $wc -ne 0 ]; do
+            vw_status=$(cdp dw describe-vw --cluster-id ${cluster_id} --vw-id ${vw_id} 2>/dev/null | jq -r .vw.status)
+            i=$(((i + 1) % 8))
+            printf "\r${spin:$i:1}  $prefix: $vw_id vw status: $vw_status                           "
+            sleep 2
+            wc=$(cdp dw describe-vw --cluster-id ${cluster_id} --vw-id ${vw_id} 2>/dev/null | jq -r .vw.status | wc -l)
+        done
+
+        printf "\r${CHECK_MARK}  $prefix: $vw_id vw status: NOT_FOUND                                 "
+        echo ""
+    done
+
+    echo "${CHECK_MARK}  $prefix: no vw remaining"
+
+    # 0.2. Deleting the CDW cluster
+    cdp dw delete-cluster --cluster-id ${cluster_id}
+    wc=$(cdp dw describe-cluster --cluster-id ${cluster_id} 2>/dev/null | jq -r .cluster.status | wc -l)
+
+        spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+        while [ $wc -ne 0 ]; do
+            cluster_status=$(cdp dw describe-cluster --cluster-id ${cluster_id} 2>/dev/null | jq -r .cluster.status)
+            i=$(((i + 1) % 8))
+            printf "\r${spin:$i:1}  $prefix: $cluster_id cluster status: $cluster_status                           "
+            sleep 2
+            wc=$(cdp dw describe-cluster --cluster-id ${cluster_id} 2>/dev/null | jq -r .cluster.status | wc -l)
+        done
+
+        printf "\r${CHECK_MARK}  $prefix: $cluster_id cluster status: NOT_FOUND                                 "
+        echo ""
+    echo ""
+fi
+
+echo "${CHECK_MARK}  $prefix: CDW assets remaining"
+echo ""
+
+
+
 # 1. Deleting op databases
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
@@ -94,9 +158,6 @@ for db in $(echo ${all_dbs}); do
 done
 
 echo "${CHECK_MARK}  $prefix: no op database remaining"
-
-echo ""
-echo "CDP op databases for $prefix deleted!"
 echo ""
 
 
@@ -133,9 +194,6 @@ for workspace in $(echo ${all_workspaces}); do
 done
 
 echo "${CHECK_MARK}  $prefix: no ML workspace remaining"
-
-echo ""
-echo "CDP ml workspaces for $prefix deleted!"
 echo ""
 
 # 3. Deleting datahub clusters
@@ -177,8 +235,6 @@ done
 
 echo "${CHECK_MARK}  $prefix: no datahub cluster remaining"
 echo ""
-echo "CDP datahub clusters for $prefix deleted!"
-echo ""
 
 # Generating network deletion
 $base_dir/aws-pre-req/aws_generate_delete_network.sh $prefix $base_dir >/dev/null 2>&1
@@ -209,9 +265,7 @@ while [ $wc -ne 0 ]; do
 done
 printf "\r${CHECK_MARK}  $prefix: datalake status: NOT_FOUND                                             "
 
-echo ""
-echo ""
-echo "CDP datalake for $prefix deleted!"
+echo "${CHECK_MARK}  $prefix: no datalake assets remaining"
 echo ""
 
 # 5. Deleting environment
@@ -275,10 +329,8 @@ fi
 
 
 printf "\r${CHECK_MARK}  $prefix: environment status: NOT_FOUND                                                                             "
-
 echo ""
-echo ""
-echo "CDP environment for $prefix deleted!"
+echo "${CHECK_MARK}  $prefix: no environment assets remaining"
 echo ""
 
 # 6. Deleting cloud assets
@@ -317,7 +369,7 @@ if [[ ${cloud_provider} == "aws" ]]; then
     echo "${CHECK_MARK}  $prefix: network deleted"
 
     echo ""
-    echo "AWS assets for $prefix deleted!"
+    echo "${CHECK_MARK}  $prefix: no AWS assets remaining"
     echo ""
     echo "⏱  $(date +%H%Mhrs)"
     echo ""
@@ -355,7 +407,7 @@ if [[ ${cloud_provider} == "az" ]]; then
     fi
 
     echo ""
-    echo "Azure assets for $prefix deleted!"
+    echo "${CHECK_MARK}  $prefix: no azure assets remaining"
     echo ""
     echo "⏱  $(date +%H%Mhrs)"
     echo ""

@@ -40,7 +40,6 @@ fi
 parse_parameters ${1}
 env_crn=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r .environment.crn)
 # 1. Creating datahub cluster
-echo ""
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
 echo "Creating CDP VWs for $prefix:"
@@ -52,46 +51,96 @@ echo ${underline}
 echo ""
 
 
-# 1. Checking if dw environment is setup
+# 1. Checking if dw cluster is setup
+env_crn=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.crn)
+cluster_id=$(cdp dw list-clusters | jq -r '.clusters[] | select(.environmentCrn=="'${env_crn}'") | .id')
 
+if [ ${#cluster_id} -gt 0 ]; then
+    printf "\r${ALREADY_DONE}  $prefix: CDW cluster already available     "
+    echo ""
+else
 
-# 1.1. Creating all clusters
+    if [[ ${cloud_provider} == "aws" ]]
+    then
+        options="publicSubnetIds="
+        for subnet_id in $(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.network.dwxSubnets[].subnetId)
+        do
+            options=${options}$subnet_id","
+        done
+        
+        aws_options=$(echo $options | sed 's/.$//')
+     
 
+        result=$(cdp dw create-cluster --environment-crn ${env_crn} --aws-options $aws_options 2>&1 >/dev/null)
+        handle_exception $? $prefix "CDW cluster creation" "$result"
 
+    fi
+    
+    if [[ ${cloud_provider} == "az" ]]
+    then
+        options="subnetId="
+        for subnet_id in $(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.network.dwxSubnets[].subnetId)
+        do
+            options=${options}$subnet_id","
+        done
+        
+        az_options=$options"enableAZ=true"
 
-for item in $(echo ${cdw_list} | jq -r '.[] | @base64'); do
+        result=$(cdp dw create-cluster --environment-crn ${env_crn} --azure-options $az_options 2>&1 >/dev/null)
+        handle_exception $? $prefix "CDW cluster creation" "$result"
+
+    fi
+
+    
+    
+    cluster_id=$(cdp dw list-clusters | jq -r '.clusters[] | select(.environmentCrn=="'${env_crn}'") | .id')
+
+    cluster_status=$(cdp dw describe-cluster --cluster-id ${cluster_id} | jq -r .cluster.status)
+
+    spin='🌑🌒🌓🌔🌕🌖🌗🌘'
+    while [ "$cluster_status" != "Running" ]; do
+        i=$(((i + 1) % 8))
+        printf "\r${spin:$i:1}  $prefix: CDW cluster status: $cluster_status                           "
+        sleep 2
+        cluster_status=$(cdp dw describe-cluster --cluster-id ${cluster_id} | jq -r .cluster.status)
+    done
+fi
+
+# 2. Creating all vw
+
+for item in $(echo ${dw_list} | jq -r '.[] | @base64'); do
     _jq() {
         echo ${item} | base64 --decode | jq -r ${1}
     }
     #echo ${item} | base64 --decode
-    database_name=$(_jq '.database_name')
-    env_name=${prefix}-cdp-env
-    db_status=$(cdp opdb describe-database --environment-name $env_name --database-name $database_name 2>/dev/null | jq -r .databaseDetails.status)
-    if [ ${#db_status} -eq 0 ]; then
-        db_status="NOT_FOUND"
-    fi
-
-    if [[ ("$db_status" == "AVAILABLE") ]]; then
-        printf "\r${ALREADY_DONE}  $prefix: $database_name already available     "
+    vw_name=$(_jq '.name')
+    vw_type=$(_jq '.type')
+    vw_id=$(cdp dw list-vws --cluster-id ${cluster_id} | jq -r '.vws[] | select(.name=="'${vw_name}'") | .id')
+    if [ ${#vw_id} -gt 0 ]; then
+        printf "\r${ALREADY_DONE}  $prefix: $vw_name already exists     "
         echo ""
+    
     else
-        if [[ ("$db_status" == "NOT_FOUND") ]]; then
-             result=$(cdp opdb create-database --environment-name $env_name --database-name $database_name 2>&1 >/dev/null)
-            handle_exception $? $prefix "op db creation" "$result"
-        fi
-        db_status=$(cdp opdb describe-database --environment-name $env_name --database-name $database_name 2>/dev/null | jq -r .databaseDetails.status)
+        dbc_id=$(cdp dw list-dbcs --cluster-id ${cluster_id} | jq -r .dbcs[0].id)
+        result=$(cdp dw create-vw --cluster-id ${cluster_id} --dbc-id ${dbc_id} --vw-type ${vw_type} --name ${vw_name} 2>&1 >/dev/null)
+        handle_exception $? $prefix "CDW VW creation" "$result"
+        
+        vw_id=$(cdp dw list-vws --cluster-id ${cluster_id} | jq -r '.vws[] | select(.name=="'${vw_name}'") | .id')
+        vw_status=$(cdp dw describe-vw --cluster-id ${cluster_id} --vw-id ${vw_id} | jq -r .vw.status)
 
         spin='🌑🌒🌓🌔🌕🌖🌗🌘'
-        while [ "$db_status" != "AVAILABLE" ]; do
+        while [ "$vw_status" != "Running" ]; do
             i=$(((i + 1) % 8))
-            printf "\r${spin:$i:1}  $prefix: $database_name database status: $db_status                           "
+            printf "\r${spin:$i:1}  $prefix: $vw_name vw status: $vw_status                           "
             sleep 2
-            db_status=$(cdp opdb describe-database --environment-name $env_name --database-name $database_name 2>/dev/null | jq -r .databaseDetails.status)
+            vw_status=$(cdp dw describe-vw --cluster-id ${cluster_id} --vw-id ${vw_id} | jq -r .vw.status)
         done
 
-        printf "\r${CHECK_MARK}  $prefix: $database_name database status: $db_status                                 "
+        printf "\r${CHECK_MARK}  $prefix: $vw_name vw status: $vw_status                                 "
         echo ""
 
     fi
 
 done
+
+echo ""

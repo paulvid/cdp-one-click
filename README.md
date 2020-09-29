@@ -94,10 +94,21 @@ _Note: Azure CML is not supported yet, so don't add it in your parameters file :
 
             <b><em>Element 1: </em></b>
             {
-                <b><em>Name of the database you want to creaate: </em></b>
+                <b><em>Name of the database you want to create: </em></b>
                 "database_name": "your_db_name"
             }
 
+        ],
+        <b><em>Array of CDW vw to setup (can be empty): </em></b>
+        "dw_list": [
+
+            <b><em>Element 1: </em></b>
+            {
+                <b><em>Name of the vw you want to create: </em></b>
+                "name": "vw-name",
+                <b><em>Type of vw you want to create: </em></b>
+                "type": "hive"
+            }
         ]
     },
 
@@ -204,7 +215,7 @@ cdp_az_sdx.sh <your_param_file>
 cdp_create_datahub_things.sh <your_param_file>
 ```
 
-### ML 
+### CML 
 ```
 cdp_create_ml_things.sh <your_param_file> 
 ```
@@ -213,6 +224,11 @@ cdp_create_ml_things.sh <your_param_file>
 ```
 cdp_create_opdb_things.sh <your_param_file> 
 ```
+### CDW 
+```
+cdp_create_dw_things.sh <your_param_file> 
+```
+
 
 ### Starting / Stopping (work in progress)
 ```

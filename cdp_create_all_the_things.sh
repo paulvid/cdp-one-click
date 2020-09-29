@@ -161,8 +161,17 @@ then
     handle_exception $? $prefix "creating op databases" "Error op databases"
 fi
 
+# 7. Creating CDW if we have at least definition
+list_size=$(echo ${dw_list} | jq -r .[] 2> /dev/null | wc -l)
+vw_name_size=$(echo ${dw_list} | jq -r .[0].name 2> /dev/null |  awk '{print length}')
 
-
+if ([ $list_size -gt 0 ] && [ $vw_name_size -gt 0 ])
+then
+    $base_dir/cdp_create_dw_things.sh $param_file
+    handle_exception $? $prefix "creating CDW" "Error in CDW creation"
+fi
+echo ""
+echo ""
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"

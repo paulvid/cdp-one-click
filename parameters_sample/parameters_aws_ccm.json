@@ -8,7 +8,8 @@
         "workload_pwd":   "superc00lpassw0rd",
         "datahub_list": [],
         "ml_workspace_list": [],
-        "op_db_list": []
+        "op_db_list": [],
+        "dw_list": []
     },
     "optional": {
         "use_ccm": "yes",

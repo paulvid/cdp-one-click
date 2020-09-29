@@ -252,6 +252,3 @@ if [[ "$SYNC_USERS" == 1 ]]; then
 fi
 
 echo ""
-echo ""
-echo "CDP datalake for $prefix created!"
-echo ""

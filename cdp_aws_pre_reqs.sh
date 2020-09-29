@@ -257,5 +257,3 @@ fi
 
 
 echo ""
-echo "AWS pre-requisites created for $prefix!"
-echo ""

@@ -19,7 +19,12 @@
             {
                 "database_name": "opdb-test"
             }
-
+        ],
+        "dw_list": [
+            {
+                "name": "vw-name",
+                "type": "hive"
+            }
         ]
     },
     "optional": {

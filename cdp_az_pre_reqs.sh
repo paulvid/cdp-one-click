@@ -139,5 +139,3 @@ if [[ "$generate_credential" == "yes" ]]; then
 fi
 
 echo ""
-echo "Azure pre-requisites created for $prefix!"
-echo ""
