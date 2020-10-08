@@ -5,8 +5,33 @@
   "environmentName": "pvi-az-cdp-env",
   "instanceGroups": [
     {
+      "nodeCount": 2,
+      "name": "master",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "StandardSSD_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
       "nodeCount": 1,
-      "name": "gateway",
+      "name": "manager",
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
@@ -22,7 +47,7 @@
           {
             "size": 100,
             "count": 1,
-            "type": "Standard_LRS"
+            "type": "StandardSSD_LRS"
           }
         ],
         "cloudPlatform": "AZURE"
@@ -31,7 +56,7 @@
     },
     {
       "nodeCount": 3,
-      "name": "nifi",
+      "name": "worker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -41,13 +66,13 @@
         },
         "instanceType": "Standard_D8_v3",
         "rootVolume": {
-          "size": 150
+          "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 500,
-            "count": 4,
-            "type": "Standard_LRS"
+            "size": 100,
+            "count": 1,
+            "type": "StandardSSD_LRS"
           }
         ],
         "cloudPlatform": "AZURE"
@@ -69,8 +94,28 @@
     "cloudStorage": {
       "locations": [
         {
-          "type": "DEFAULT_FS",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-test"
+          "type": "FLINK_HIGH_AVAILABILITY",
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/flink/pvi-test/ha"
+        },
+        {
+          "type": "FLINK_HISTORYSERVER_ARCHIVE",
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/flink/pvi-test/applicationHistory"
+        },
+        {
+          "type": "FLINK_JOBMANAGER_ARCHIVE",
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/flink/pvi-test/applicationHistory"
+        },
+        {
+          "type": "FLINK_CHECKPOINTS",
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/flink/pvi-test/checkpoints"
+        },
+        {
+          "type": "FLINK_SAVEPOINTS",
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/flink/pvi-test/savepoints"
+        },
+        {
+          "type": "YARN_LOG",
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/oplogs/yarn-app-logs"
         }
       ],
       "identities": [
@@ -88,7 +133,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry",
+    "blueprintName": "7.2.2 - Streaming Analytics Light Duty with Apache Flink",
     "validateBlueprint": false
   },
   "sdx": {

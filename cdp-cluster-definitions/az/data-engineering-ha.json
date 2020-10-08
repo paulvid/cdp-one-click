@@ -5,8 +5,8 @@
   "environmentName": "pvi-az-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 1,
-      "name": "coordinator",
+      "nodeCount": 0,
+      "name": "gateway",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -14,32 +14,7 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1000,
-            "count": 7,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master1",
-      "type": "GATEWAY",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
@@ -56,7 +31,7 @@
     },
     {
       "nodeCount": 3,
-      "name": "executor",
+      "name": "worker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -64,14 +39,14 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 1000,
-            "count": 7,
+            "size": 100,
+            "count": 1,
             "type": "StandardSSD_LRS"
           }
         ],
@@ -80,8 +55,8 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 1,
-      "name": "master2",
+      "nodeCount": 2,
+      "name": "master",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -89,7 +64,32 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "StandardSSD_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 0,
+      "name": "compute",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
@@ -106,15 +106,15 @@
     },
     {
       "nodeCount": 1,
-      "name": "master3",
-      "type": "CORE",
+      "name": "manager",
+      "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
         "azure": {
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
@@ -146,6 +146,10 @@
         {
           "type": "YARN_LOG",
           "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/oplogs/yarn-app-logs"
+        },
+        {
+          "type": "ZEPPELIN_NOTEBOOK",
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-test/zeppelin/notebook"
         }
       ],
       "identities": [
@@ -163,7 +167,7 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Real-time Data Mart: Apache Impala, Hue, Apache Kudu, Apache Spark",
+    "blueprintName": "7.2.2 - Data Engineering: HA: Apache Spark, Apache Hive, Apache Oozie",
     "validateBlueprint": false
   },
   "sdx": {

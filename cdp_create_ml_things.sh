@@ -82,6 +82,10 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
         env_name=${prefix}-cdp-env
 
         workspace_status=$($base_dir/cdp_describe_ml_workspace.sh $env_name $workspace_name | jq -r .workspace.instanceStatus)
+        if [ ${#workspace_status} -lt 2 ]
+        then
+            handle_exception 1 $prefix "ml workspace creation" "error in ml creation"
+        fi 
 
         spin='🌑🌒🌓🌔🌕🌖🌗🌘'
         while [ "$workspace_status" != "installation:finished" ]; do

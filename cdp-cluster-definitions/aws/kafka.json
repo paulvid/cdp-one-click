@@ -1,28 +1,6 @@
 {
-  "environmentName": "aal-cdp-env",
+  "environmentName": "pvi-aws-cdp-env",
   "instanceGroups": [
-    {
-      "nodeCount": 3,
-      "name": "broker",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "aws": {},
-        "instanceType": "m5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1000,
-            "count": 1,
-            "type": "st1"
-          }
-        ],
-        "cloudPlatform": "AWS"
-      },
-      "recipeNames": []
-    },
     {
       "nodeCount": 1,
       "name": "master",
@@ -44,15 +22,37 @@
         "cloudPlatform": "AWS"
       },
       "recipeNames": []
+    },
+    {
+      "nodeCount": 3,
+      "name": "broker",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "aws": {},
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 1000,
+            "count": 1,
+            "type": "st1"
+          }
+        ],
+        "cloudPlatform": "AWS"
+      },
+      "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6c3e9e69-8868-4f72-5d95-fe38d77ffccf"
+    "id": "37b125e3-aac8-40c9-5cb1-4886fb53d80e"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-0b30ef74296b8ca30"
+      "subnetId": "subnet-0811e3a93dc303b73"
     }
   },
   "cluster": {
@@ -60,19 +60,19 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "aal-cdp-table"
+          "dynamoTableName": "pvi-aws-cdp-table"
         }
       },
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "s3a://aal-cdp-bucket/pvi-test-de"
+          "value": "s3a://pvi-aws-cdp-bucket/pvi-test"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/aal-log-role"
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvi-aws-log-role"
           },
           "type": "LOG"
         }
@@ -81,11 +81,11 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.1 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
+    "blueprintName": "7.2.2 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "aal-cdp-dl"
+    "name": "pvi-aws-cdp-dl"
   },
   "externalDatabase": {
     "availabilityType": "NON_HA"
@@ -93,10 +93,10 @@
   "tags": {
     "application": null,
     "userDefined": {
+      "end_date": "10112020",
       "owner": "pvidal@cloudera.com",
       "deploytool": "one-click",
-      "enddate": "08062020",
-      "project": "aal_one_click_project"
+      "project": "pvi-aws_one_click_project"
     },
     "defaults": null
   },

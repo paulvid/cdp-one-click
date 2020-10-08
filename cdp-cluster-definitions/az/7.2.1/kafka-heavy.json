@@ -2,11 +2,11 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pvi-az-cdp-env",
+  "environmentName": "aaa-cdp-env",
   "instanceGroups": [
     {
       "nodeCount": 1,
-      "name": "coordinator",
+      "name": "registry",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -14,14 +14,39 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 1000,
-            "count": 7,
+            "size": 100,
+            "count": 1,
+            "type": "Standard_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "master",
+      "type": "GATEWAY",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
             "type": "StandardSSD_LRS"
           }
         ],
@@ -31,15 +56,15 @@
     },
     {
       "nodeCount": 1,
-      "name": "master1",
-      "type": "GATEWAY",
+      "name": "smm",
+      "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
         "azure": {
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
@@ -47,7 +72,7 @@
           {
             "size": 100,
             "count": 1,
-            "type": "StandardSSD_LRS"
+            "type": "Standard_LRS"
           }
         ],
         "cloudPlatform": "AZURE"
@@ -56,7 +81,7 @@
     },
     {
       "nodeCount": 3,
-      "name": "executor",
+      "name": "broker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -64,64 +89,14 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 1000,
-            "count": 7,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master2",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D16_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master3",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D16_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
+            "size": 500,
+            "count": 2,
             "type": "StandardSSD_LRS"
           }
         ],
@@ -132,7 +107,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6d950fc9-05d5-4c6d-739b-4c0449cd09c4"
+    "id": "648f59eb-321a-42b9-4124-41d15dccbafd"
   },
   "network": {
     "azure": {
@@ -144,8 +119,8 @@
     "cloudStorage": {
       "locations": [
         {
-          "type": "YARN_LOG",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/oplogs/yarn-app-logs"
+          "type": "DEFAULT_FS",
+          "value": "abfs://data@aaacdpsa.dfs.core.windows.net/pvi-az-nifi-heavy"
         }
       ],
       "identities": [
@@ -153,7 +128,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pvi-az-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/aaa-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -163,18 +138,23 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Real-time Data Mart: Apache Impala, Hue, Apache Kudu, Apache Spark",
+    "blueprintName": "7.2.1 - Streams Messaging Heavy Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-az-cdp-dl"
+    "name": "aaa-cdp-dl"
   },
   "externalDatabase": {
     "availabilityType": "HA"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "owner": "pvidal@cloudera.com",
+      "deploytool": "one-click",
+      "enddate": "08062020",
+      "project": "aaa_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {},

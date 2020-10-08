@@ -2,15 +2,15 @@
   "environmentName": "pvi-aws-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 1,
+      "nodeCount": 2,
       "name": "master",
-      "type": "GATEWAY",
+      "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
         "aws": {},
-        "instanceType": "r5.4xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
-          "size": 50
+          "size": 100
         },
         "attachedVolumes": [
           {
@@ -24,21 +24,21 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 2,
-      "name": "executor",
-      "type": "CORE",
+      "nodeCount": 1,
+      "name": "manager",
+      "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
         "aws": {},
-        "instanceType": "r5d.4xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
-          "size": 50
+          "size": 100
         },
         "attachedVolumes": [
           {
-            "size": 300,
-            "count": 2,
-            "type": "ephemeral"
+            "size": 100,
+            "count": 1,
+            "type": "standard"
           }
         ],
         "cloudPlatform": "AWS"
@@ -46,21 +46,21 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 1,
-      "name": "coordinator",
+      "nodeCount": 3,
+      "name": "worker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
         "aws": {},
-        "instanceType": "r5d.4xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
-          "size": 50
+          "size": 100
         },
         "attachedVolumes": [
           {
-            "size": 300,
-            "count": 2,
-            "type": "ephemeral"
+            "size": 1000,
+            "count": 1,
+            "type": "gp2"
           }
         ],
         "cloudPlatform": "AWS"
@@ -87,8 +87,28 @@
       },
       "locations": [
         {
-          "type": "DEFAULT_FS",
-          "value": "s3a://pvi-aws-cdp-bucket/pvi-test"
+          "type": "FLINK_HIGH_AVAILABILITY",
+          "value": "s3a://pvi-aws-cdp-bucket/flink/pvi-test/ha"
+        },
+        {
+          "type": "FLINK_HISTORYSERVER_ARCHIVE",
+          "value": "s3a://pvi-aws-cdp-bucket/flink/pvi-test/applicationHistory"
+        },
+        {
+          "type": "FLINK_JOBMANAGER_ARCHIVE",
+          "value": "s3a://pvi-aws-cdp-bucket/flink/pvi-test/applicationHistory"
+        },
+        {
+          "type": "FLINK_CHECKPOINTS",
+          "value": "s3a://pvi-aws-cdp-bucket/flink/pvi-test/checkpoints"
+        },
+        {
+          "type": "FLINK_SAVEPOINTS",
+          "value": "s3a://pvi-aws-cdp-bucket/flink/pvi-test/savepoints"
+        },
+        {
+          "type": "YARN_LOG",
+          "value": "s3a://pvi-aws-cdp-bucket/oplogs/yarn-app-logs"
         }
       ],
       "identities": [
@@ -103,11 +123,14 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Data Mart: Apache Impala, Hue",
+    "blueprintName": "7.2.2 - Streaming Analytics Heavy Duty with Apache Flink",
     "validateBlueprint": false
   },
   "sdx": {
     "name": "pvi-aws-cdp-dl"
+  },
+  "externalDatabase": {
+    "availabilityType": "HA"
   },
   "tags": {
     "application": null,

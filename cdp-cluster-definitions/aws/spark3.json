@@ -1,9 +1,9 @@
 {
-  "environmentName": "dfsi-aw-wc3aug-env",
+  "environmentName": "pvi-aws-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 0,
-      "name": "compute",
+      "nodeCount": 3,
+      "name": "worker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -24,8 +24,8 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 3,
-      "name": "worker",
+      "nodeCount": 0,
+      "name": "compute",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -70,11 +70,11 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6c3e9e69-8868-4f72-5d95-fe38d77ffccf"
+    "id": "37b125e3-aac8-40c9-5cb1-4886fb53d80e"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-013ff37b385c56fd3"
+      "subnetId": "subnet-0811e3a93dc303b73"
     }
   },
   "cluster": {
@@ -82,19 +82,19 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "dfsi-aw-wc3aug-table"
+          "dynamoTableName": "pvi-aws-cdp-table"
         }
       },
       "locations": [
         {
           "type": "YARN_LOG",
-          "value": "s3a://dfsiawwc3augeet1/oplogs/yarn-app-logs"
+          "value": "s3a://pvi-aws-cdp-bucket/oplogs/yarn-app-logs"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::650068598544:instance-profile/dfsi-aw-wc3aug-logs-role"
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvi-aws-log-role"
           },
           "type": "LOG"
         }
@@ -103,15 +103,20 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.1 - Data Engineering: Apache Spark3",
+    "blueprintName": "7.2.2 - Data Engineering: Apache Spark3",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "dfsi-aw-wc3aug-dl"
+    "name": "pvi-aws-cdp-dl"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "end_date": "10112020",
+      "owner": "pvidal@cloudera.com",
+      "deploytool": "one-click",
+      "project": "pvi-aws_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {}

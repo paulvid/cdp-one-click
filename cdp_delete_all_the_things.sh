@@ -72,13 +72,13 @@ echo ""
 
 env_name=${prefix}-cdp-env
 env_crn=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env  2>/dev/null | jq -r .environment.crn)
-cluster_id=$(cdp dw list-clusters | jq -r '.clusters[] | select(.environmentCrn=="'${env_crn}'") | .id')
-if [ ${#cluster_id} -lt 0 ]; then
+cluster_id=$(cdp dw list-clusters 2>/dev/null | jq -r '.clusters[] | select(.environmentCrn=="'${env_crn}'") | .id')
+if [ ${#cluster_id} -lt 2 ]; then
     printf "\r${ALREADY_DONE}  $prefix: CDW cluster already deleted     "
     echo ""
 else
     # 0.1. Deleting all vw
-    all_vws=$(cdp dw list-vws --cluster-id ${cluster_id} | jq -r '.vws[].id' 2>/dev/null)
+    all_vws=$(cdp dw list-vws --cluster-id ${cluster_id}  2>/dev/null | jq -r '.vws[].id' 2>/dev/null)
 
     for vw_id in $(echo ${all_vws}); do
         cdp dw delete-vw --cluster-id ${cluster_id} --vw-id ${vw_id} >/dev/null 2>&1
@@ -118,7 +118,7 @@ else
     echo ""
 fi
 
-echo "${CHECK_MARK}  $prefix: CDW assets remaining"
+echo "${CHECK_MARK}  $prefix: no CDW assets remaining"
 echo ""
 
 
@@ -264,7 +264,7 @@ while [ $wc -ne 0 ]; do
     wc=$($base_dir/cdp_describe_dl.sh $prefix 2>/dev/null | jq -r .datalake.status | wc -l)
 done
 printf "\r${CHECK_MARK}  $prefix: datalake status: NOT_FOUND                                             "
-
+echo ""
 echo "${CHECK_MARK}  $prefix: no datalake assets remaining"
 echo ""
 
@@ -368,7 +368,6 @@ if [[ ${cloud_provider} == "aws" ]]; then
     $base_dir/aws-pre-req/tmp_network/${prefix}_aws_delete_network.sh >/dev/null 2>&1
     echo "${CHECK_MARK}  $prefix: network deleted"
 
-    echo ""
     echo "${CHECK_MARK}  $prefix: no AWS assets remaining"
     echo ""
     echo "⏱  $(date +%H%Mhrs)"
@@ -406,7 +405,6 @@ if [[ ${cloud_provider} == "az" ]]; then
         fi
     fi
 
-    echo ""
     echo "${CHECK_MARK}  $prefix: no azure assets remaining"
     echo ""
     echo "⏱  $(date +%H%Mhrs)"

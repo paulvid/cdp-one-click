@@ -2,33 +2,8 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pvi-az-cdp-env",
+  "environmentName": "qzs-cdp-env",
   "instanceGroups": [
-    {
-      "nodeCount": 1,
-      "name": "gateway",
-      "type": "GATEWAY",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "Standard_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
     {
       "nodeCount": 3,
       "name": "nifi",
@@ -53,11 +28,36 @@
         "cloudPlatform": "AZURE"
       },
       "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "gateway",
+      "type": "GATEWAY",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "Standard_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6d950fc9-05d5-4c6d-739b-4c0449cd09c4"
+    "id": "648f59eb-321a-42b9-4124-41d15dccbafd"
   },
   "network": {
     "azure": {
@@ -70,7 +70,7 @@
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-test"
+          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/pvi-test"
         }
       ],
       "identities": [
@@ -78,7 +78,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pvi-az-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/3b4df54c-3c29-4484-a5bf-a4aee6d2eb0f/resourceGroups/qzs-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -88,18 +88,18 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry",
+    "blueprintName": "7.2.1 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-az-cdp-dl"
-  },
-  "externalDatabase": {
-    "availabilityType": "HA"
+    "name": "qzs-cdp-dl"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "enddate": "06152020",
+      "project": "qzs_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {},

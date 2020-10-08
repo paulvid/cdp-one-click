@@ -1,14 +1,14 @@
 {
-  "environmentName": "pvi-aws-cdp-env",
+  "environmentName": "dfsi-aw-wc3aug-env",
   "instanceGroups": [
     {
-      "nodeCount": 1,
-      "name": "master",
-      "type": "GATEWAY",
+      "nodeCount": 0,
+      "name": "compute",
+      "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
         "aws": {},
-        "instanceType": "r5.4xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -24,21 +24,21 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 2,
-      "name": "executor",
+      "nodeCount": 3,
+      "name": "worker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
         "aws": {},
-        "instanceType": "r5d.4xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 300,
-            "count": 2,
-            "type": "ephemeral"
+            "size": 100,
+            "count": 1,
+            "type": "standard"
           }
         ],
         "cloudPlatform": "AWS"
@@ -47,20 +47,20 @@
     },
     {
       "nodeCount": 1,
-      "name": "coordinator",
-      "type": "CORE",
+      "name": "master",
+      "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
         "aws": {},
-        "instanceType": "r5d.4xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 300,
-            "count": 2,
-            "type": "ephemeral"
+            "size": 100,
+            "count": 1,
+            "type": "standard"
           }
         ],
         "cloudPlatform": "AWS"
@@ -70,11 +70,11 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "37b125e3-aac8-40c9-5cb1-4886fb53d80e"
+    "id": "6c3e9e69-8868-4f72-5d95-fe38d77ffccf"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-0811e3a93dc303b73"
+      "subnetId": "subnet-013ff37b385c56fd3"
     }
   },
   "cluster": {
@@ -82,19 +82,19 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "pvi-aws-cdp-table"
+          "dynamoTableName": "dfsi-aw-wc3aug-table"
         }
       },
       "locations": [
         {
-          "type": "DEFAULT_FS",
-          "value": "s3a://pvi-aws-cdp-bucket/pvi-test"
+          "type": "YARN_LOG",
+          "value": "s3a://dfsiawwc3augeet1/oplogs/yarn-app-logs"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvi-aws-log-role"
+            "instanceProfile": "arn:aws:iam::650068598544:instance-profile/dfsi-aw-wc3aug-logs-role"
           },
           "type": "LOG"
         }
@@ -103,20 +103,15 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Data Mart: Apache Impala, Hue",
+    "blueprintName": "7.2.1 - Data Engineering: Apache Spark3",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-aws-cdp-dl"
+    "name": "dfsi-aw-wc3aug-dl"
   },
   "tags": {
     "application": null,
-    "userDefined": {
-      "end_date": "10112020",
-      "owner": "pvidal@cloudera.com",
-      "deploytool": "one-click",
-      "project": "pvi-aws_one_click_project"
-    },
+    "userDefined": {},
     "defaults": null
   },
   "inputs": {}

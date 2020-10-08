@@ -1,14 +1,13 @@
 {
-  "environmentName": "pvi-aws-cdp-env",
+  "environmentName": "qas-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 1,
-      "name": "master2",
+      "nodeCount": 2,
+      "name": "master",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "aws": {},
-        "instanceType": "r5.2xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -18,85 +17,17 @@
             "count": 1,
             "type": "standard"
           }
-        ],
-        "cloudPlatform": "AWS"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "coordinator",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "aws": {},
-        "instanceType": "i3.4xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1900,
-            "count": 2,
-            "type": "ephemeral"
-          }
-        ],
-        "cloudPlatform": "AWS"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master3",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "aws": {},
-        "instanceType": "r5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "standard"
-          }
-        ],
-        "cloudPlatform": "AWS"
+        ]
       },
       "recipeNames": []
     },
     {
       "nodeCount": 3,
-      "name": "executor",
+      "name": "worker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "aws": {},
-        "instanceType": "i3.4xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1900,
-            "count": 2,
-            "type": "ephemeral"
-          }
-        ],
-        "cloudPlatform": "AWS"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master1",
-      "type": "GATEWAY",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "aws": {},
-        "instanceType": "r5.2xlarge",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -106,19 +37,58 @@
             "count": 1,
             "type": "standard"
           }
-        ],
-        "cloudPlatform": "AWS"
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "gateway",
+      "type": "GATEWAY",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "leader",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ]
       },
       "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "37b125e3-aac8-40c9-5cb1-4886fb53d80e"
+    "id": "6c3e9e69-8868-4f72-5d95-fe38d77ffccf"
   },
   "network": {
     "aws": {
-      "subnetId": "subnet-0811e3a93dc303b73"
+      "subnetId": "subnet-096b86385720e30b6"
     }
   },
   "cluster": {
@@ -126,19 +96,23 @@
     "cloudStorage": {
       "aws": {
         "s3Guard": {
-          "dynamoTableName": "pvi-aws-cdp-table"
+          "dynamoTableName": "qas-cdp-table"
         }
       },
       "locations": [
         {
+          "type": "HBASE_ROOT",
+          "value": "s3a://qas-cdp-bucket/pvi-nifi/hbase"
+        },
+        {
           "type": "YARN_LOG",
-          "value": "s3a://pvi-aws-cdp-bucket/oplogs/yarn-app-logs"
+          "value": "s3a://qas-cdp-bucket/oplogs/yarn-app-logs"
         }
       ],
       "identities": [
         {
           "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvi-aws-log-role"
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/qas-log-role"
           },
           "type": "LOG"
         }
@@ -147,19 +121,17 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Real-time Data Mart: Apache Impala, Hue, Apache Kudu, Apache Spark",
+    "blueprintName": "7.2.1 - Operational Database: Apache HBase, Phoenix",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-aws-cdp-dl"
+    "name": "qas-cdp-dl"
   },
   "tags": {
     "application": null,
     "userDefined": {
-      "end_date": "10112020",
-      "owner": "pvidal@cloudera.com",
-      "deploytool": "one-click",
-      "project": "pvi-aws_one_click_project"
+      "enddate": "06152020",
+      "project": "qas_one_click_project"
     },
     "defaults": null
   },

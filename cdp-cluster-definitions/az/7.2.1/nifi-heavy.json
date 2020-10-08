@@ -2,8 +2,33 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pvi-az-cdp-env",
+  "environmentName": "aaa-cdp-env",
   "instanceGroups": [
+    {
+      "nodeCount": 3,
+      "name": "zookeeper",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 150
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "Standard_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
     {
       "nodeCount": 1,
       "name": "gateway",
@@ -39,15 +64,15 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D8_v3",
+        "instanceType": "Standard_F16s_v2",
         "rootVolume": {
           "size": 150
         },
         "attachedVolumes": [
           {
-            "size": 500,
+            "size": 1000,
             "count": 4,
-            "type": "Standard_LRS"
+            "type": "Premium_LRS"
           }
         ],
         "cloudPlatform": "AZURE"
@@ -57,7 +82,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6d950fc9-05d5-4c6d-739b-4c0449cd09c4"
+    "id": "648f59eb-321a-42b9-4124-41d15dccbafd"
   },
   "network": {
     "azure": {
@@ -70,7 +95,7 @@
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-test"
+          "value": "abfs://data@aaacdpsa.dfs.core.windows.net/pvi-az-nifi-heavy"
         }
       ],
       "identities": [
@@ -78,7 +103,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pvi-az-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/aaa-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -88,18 +113,20 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry",
+    "blueprintName": "7.2.1 - Flow Management Heavy Duty with Apache NiFi, Apache NiFi Registry",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-az-cdp-dl"
-  },
-  "externalDatabase": {
-    "availabilityType": "HA"
+    "name": "aaa-cdp-dl"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "owner": "pvidal@cloudera.com",
+      "deploytool": "one-click",
+      "enddate": "08062020",
+      "project": "aaa_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {},

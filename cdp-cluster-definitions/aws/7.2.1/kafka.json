@@ -1,8 +1,5 @@
 {
-  "azure": {
-    "encryptStorage": false
-  },
-  "environmentName": "pvi-az-cdp-env",
+  "environmentName": "aal-cdp-env",
   "instanceGroups": [
     {
       "nodeCount": 3,
@@ -10,11 +7,8 @@
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
+        "aws": {},
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -22,10 +16,10 @@
           {
             "size": 1000,
             "count": 1,
-            "type": "Standard_LRS"
+            "type": "st1"
           }
         ],
-        "cloudPlatform": "AZURE"
+        "cloudPlatform": "AWS"
       },
       "recipeNames": []
     },
@@ -35,51 +29,50 @@
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
+        "aws": {},
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
-          "size": 50
+          "size": 100
         },
         "attachedVolumes": [
           {
             "size": 100,
             "count": 1,
-            "type": "StandardSSD_LRS"
+            "type": "standard"
           }
         ],
-        "cloudPlatform": "AZURE"
+        "cloudPlatform": "AWS"
       },
       "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6d950fc9-05d5-4c6d-739b-4c0449cd09c4"
+    "id": "6c3e9e69-8868-4f72-5d95-fe38d77ffccf"
   },
   "network": {
-    "azure": {
-      "subnetId": "subnet1"
+    "aws": {
+      "subnetId": "subnet-0b30ef74296b8ca30"
     }
   },
   "cluster": {
     "databases": [],
     "cloudStorage": {
+      "aws": {
+        "s3Guard": {
+          "dynamoTableName": "aal-cdp-table"
+        }
+      },
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-test"
+          "value": "s3a://aal-cdp-bucket/pvi-test-de"
         }
       ],
       "identities": [
         {
-          "adlsGen2": {
-            "accountKey": null,
-            "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pvi-az-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
-            "secure": false
+          "s3": {
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/aal-log-role"
           },
           "type": "LOG"
         }
@@ -88,20 +81,24 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
+    "blueprintName": "7.2.1 - Streams Messaging Light Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-az-cdp-dl"
+    "name": "aal-cdp-dl"
   },
   "externalDatabase": {
     "availabilityType": "NON_HA"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "owner": "pvidal@cloudera.com",
+      "deploytool": "one-click",
+      "enddate": "08062020",
+      "project": "aal_one_click_project"
+    },
     "defaults": null
   },
-  "inputs": {},
-  "cloudPlatform": "AZURE"
+  "inputs": {}
 }

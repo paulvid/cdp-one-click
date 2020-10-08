@@ -2,11 +2,11 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pvi-az-cdp-env",
+  "environmentName": "qzs-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 1,
-      "name": "coordinator",
+      "nodeCount": 2,
+      "name": "master",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -14,14 +14,14 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
         "attachedVolumes": [
           {
-            "size": 1000,
-            "count": 7,
+            "size": 100,
+            "count": 1,
             "type": "StandardSSD_LRS"
           }
         ],
@@ -31,15 +31,15 @@
     },
     {
       "nodeCount": 1,
-      "name": "master1",
-      "type": "GATEWAY",
+      "name": "leader",
+      "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
         "azure": {
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
@@ -56,7 +56,7 @@
     },
     {
       "nodeCount": 3,
-      "name": "executor",
+      "name": "worker",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -64,32 +64,7 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1000,
-            "count": 7,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 1,
-      "name": "master2",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
@@ -106,15 +81,15 @@
     },
     {
       "nodeCount": 1,
-      "name": "master3",
-      "type": "CORE",
+      "name": "gateway",
+      "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
         "azure": {
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_D16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
@@ -132,7 +107,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6d950fc9-05d5-4c6d-739b-4c0449cd09c4"
+    "id": "cd1b36ec-7da6-4c3e-515b-999d05fd712c"
   },
   "network": {
     "azure": {
@@ -144,8 +119,12 @@
     "cloudStorage": {
       "locations": [
         {
+          "type": "HBASE_ROOT",
+          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/pvi-test/hbase"
+        },
+        {
           "type": "YARN_LOG",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/oplogs/yarn-app-logs"
+          "value": "abfs://data@qzscdpsa.dfs.core.windows.net/oplogs/yarn-app-logs"
         }
       ],
       "identities": [
@@ -153,7 +132,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pvi-az-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/3b4df54c-3c29-4484-a5bf-a4aee6d2eb0f/resourceGroups/qzs-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -163,18 +142,18 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Real-time Data Mart: Apache Impala, Hue, Apache Kudu, Apache Spark",
+    "blueprintName": "7.2.0 - Operational Database: Apache HBase, Phoenix",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-az-cdp-dl"
-  },
-  "externalDatabase": {
-    "availabilityType": "HA"
+    "name": "qzs-cdp-dl"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "enddate": "06152020",
+      "project": "qzs_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {},
