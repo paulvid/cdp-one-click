@@ -242,7 +242,6 @@ fi
 result=$($base_dir/cdp_set_workload_pwd.sh ${workload_pwd} 2>&1 >/dev/null)
 handle_exception $? $prefix "workload password setup" "$result"
 
-echo ""
 echo "${CHECK_MARK}  $prefix: workload password setup "
 sleep $sleep_duration
 
