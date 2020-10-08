@@ -78,14 +78,9 @@ else
     
     if [[ ${cloud_provider} == "az" ]]
     then
-        options="subnetId="
-        for subnet_id in $(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.network.dwxSubnets[].subnetId)
-        do
-            options=${options}$subnet_id","
-        done
+        subnet_id=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.network.dwxSubnets | jq 'keys' | jq -r .[0])
         
-        az_options=$options"enableAZ=true"
-
+        az_options="subnetId="$subnet_id",enableAZ=true"
         result=$(cdp dw create-cluster --environment-crn ${env_crn} --azure-options $az_options 2>&1 >/dev/null)
         handle_exception $? $prefix "CDW cluster creation" "$result"
 
@@ -104,6 +99,7 @@ else
         sleep 2
         cluster_status=$(cdp dw describe-cluster --cluster-id ${cluster_id} | jq -r .cluster.status)
     done
+    echo ""
 fi
 
 # 2. Creating all vw
