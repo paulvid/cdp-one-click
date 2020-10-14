@@ -36,18 +36,5 @@
             }
         }
     ],
-    "tags": [
-        {
-            "key": "owner",
-            "value": "<owner>"
-        },
-        {
-            "key": "enddate",
-            "value": "<enddate>"
-        },
-        {
-            "key": "project",
-            "value": "<project>"
-        }
-    ]
+    "tags": "<tags>"
 }

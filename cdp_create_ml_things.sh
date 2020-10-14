@@ -17,6 +17,7 @@ Arguments:
    "
 }
 
+
 # check whether user had supplied -h or --help . If yes display usage
 if [[ ($1 == "--help") || $1 == "-h" ]]; then
     display_usage
@@ -70,9 +71,9 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
         echo ""
     else
         workspace_name=${prefix}-$(echo $definition | awk -F "." '{print $1}' | sed s/\_/\-/g)
-
+       
         if [[ ("$workspace_status" == "NOT_FOUND") ]]; then
-            workspace_template=$(sed "s/<project>/${PROJECT}/g;s/<owner>/${owner}/g;s/<enddate>/${END_DATE}/g;s/<prefix>/${prefix}/g" $base_dir/cml-workspace-definitions/${cloud_provider}/$definition)
+            workspace_template=$(sed 's|"<tags>"|'"$(echo $tags)"'|g;s|<prefix>|'"$(echo $prefix)"'|g' $base_dir/cml-workspace-definitions/${cloud_provider}/$definition)
             echo $workspace_template >$base_dir/cml-workspace-definitions/${cloud_provider}/${prefix}_$definition
             result=$($base_dir/cdp_create_ml_workspace.sh $prefix $base_dir/cml-workspace-definitions/${cloud_provider}/${prefix}_$definition ${workspace_name} ${cloud_provider} ${enable_workspace} 2>&1 >/dev/null)
             handle_exception $? $prefix "ml workspace creation" "$result"
@@ -80,7 +81,7 @@ for item in $(echo ${ml_workspace_list} | jq -r '.[] | @base64'); do
             rm $base_dir/cml-workspace-definitions/${cloud_provider}/${prefix}_$definition 2>&1 >/dev/null
         fi
         env_name=${prefix}-cdp-env
-
+        
         workspace_status=$($base_dir/cdp_describe_ml_workspace.sh $env_name $workspace_name | jq -r .workspace.instanceStatus)
         if [ ${#workspace_status} -lt 2 ]
         then

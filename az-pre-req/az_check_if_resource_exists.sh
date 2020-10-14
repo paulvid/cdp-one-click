@@ -11,7 +11,7 @@ Description:
 
 Arguments:
     prefix:   prefix for your assets
-    resource: type of resource to check (in: rg, network, storage, iam) 
+    resource: type of resource to check (in: rg, network, storage, iam, netapp) 
     --help or -h:   displays this help"
 
 }
@@ -39,7 +39,7 @@ prefix=$1
 resource=$2
 response="no"
 
-if [[ "$resource" != "rg" && "$resource" != "network" && "$resource" != "storage" && "$resource" != "iam" ]]; then
+if [[ "$resource" != "rg" && "$resource" != "network" && "$resource" != "storage" && "$resource" != "iam" && "$resource" != "netapp" ]]; then
     echo "$resource is not a recognized resource type!" >&2
     display_usage
     exit 1
@@ -64,6 +64,16 @@ fi
 if [[ "$resource" == "network" ]]; then
     network_state=$(az network vnet show -g $prefix-cdp-rg -n $prefix-cdp-vnet 2>/dev/null | jq -r .provisioningState)
     if [[ "$network_state" == "Succeeded" ]]; then
+        response="yes"
+    fi
+
+fi
+
+
+if [[ "$resource" == "netapp" ]]; then
+    rg=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env | jq -r .environment.network.azure.resourceGroupName)
+    netapp_state=$(az netappfiles volume show --resource-group ${rg} --account-name ${prefix}-netapp-acct --pool-name ${prefix}-pool --volume-name ${prefix}-volume 2>/dev/null | jq -r .provisioningState)
+    if [[ "$netapp_state" == "Succeeded" ]]; then
         response="yes"
     fi
 

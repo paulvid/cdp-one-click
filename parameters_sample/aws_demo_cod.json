@@ -1,0 +1,16 @@
+{
+    "required": {
+        "prefix":         "pvi-cod",
+        "credential":     "pvidal-aws-se-credential",
+        "region":         "us-east-1",
+        "key":            "field",
+        "workload_pwd":   "Supersecret33!",
+        "datahub_list": [],
+        "ml_workspace_list": [],
+        "op_db_list": [
+            {
+                "database_name": "opdb-demo"
+            }]
+    },
+    "optional": {}
+}
