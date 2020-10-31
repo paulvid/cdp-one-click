@@ -99,6 +99,12 @@ parse_parameters()
     owner=$(cdp iam get-user | jq -r .user.email)
     workload_user=$(cdp iam get-user | jq -r .user.workloadUsername)
 
+    #Datalake Scale
+    datalake_scale=$(cat ${param_file} | jq -r .optional.datalake_scale)
+    datalake_scale=$(handle_null_param "$datalake_scale" "no" "LIGHT_DUTY")
+
+    workload_analytics=$(cat ${param_file} | jq -r .optional.workload_analytics)
+    workload_analytics=$(handle_null_param "$workload_analytics" "no" "--no-workload-analytics")
 
     # Tags
     tags=$(cat ${param_file} | jq -r .optional.tags)

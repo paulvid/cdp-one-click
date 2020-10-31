@@ -16,6 +16,7 @@ Arguments:
     region:         region for your env
     key:            name of the AWS key to re-use
     sg_cidr:        CIDR to open in your security group
+    workload_analytics  enable workload analytics?
     subnet1:        (optional) subnetId to be used for your environment (must be in different AZ than other subnets)
     subnet2:        (optional) subnetId to be used for your environment (must be in different AZ than other subnets)
     subnet3:        (optional) subnetId to be used for your environment (must be in different AZ than other subnets)
@@ -35,21 +36,21 @@ fi
 
 
 # Check the numbers of arguments
-if [  $# -lt 4 ] 
+if [  $# -lt 5 ] 
 then 
     echo "Not enough arguments!" >&2
     display_usage
     exit 1
 fi 
 
-if [  $# -gt 11 ] 
+if [  $# -gt 12 ] 
 then 
     echo "Too many arguments!" >&2
     display_usage
     exit 1
 fi 
 
-if [[ $# -gt 5 && $# -ne 11 ]] 
+if [[ $# -gt 6 && $# -ne 12 ]] 
 then 
     echo "Wrong number of arguments!" >&2
     display_usage
@@ -75,15 +76,16 @@ credential=$2
 region=$3
 key=$4
 sg_cidr=$5
+workload_analytics=$6
 owner=$(cdp iam get-user | jq -r .user.email)
-if [  $# -gt 5 ]
+if [  $# -gt 6 ]
 then
-    subnet1=$6
-    subnet2=$7
-    subnet3=$8
-    vpc=$9
-    knox_sg_id=${10}
-    default_sg_id=${11}
+    subnet1=$7
+    subnet2=$8
+    subnet3=$9
+    vpc=${10}
+    knox_sg_id=${11}
+    default_sg_id=${12}
 
     cdp environments create-aws-environment --environment-name ${prefix}-cdp-env \
         --credential-name ${credential} \
@@ -95,6 +97,7 @@ then
         --vpc-id "${vpc}" \
         --s3-guard-table-name ${prefix}-cdp-table \
         --enable-tunnel \
+        $workload_analytics \
         --tags $(flatten_tags "$TAGS")
 
 
@@ -108,5 +111,6 @@ else
         --network-cidr "10.0.0.0/16" \
         --s3-guard-table-name ${prefix}-cdp-table \
         --enable-tunnel \
+        $workload_analytics \
         --tags $(flatten_tags "$TAGS")
 fi

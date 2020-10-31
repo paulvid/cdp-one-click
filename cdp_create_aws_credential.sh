@@ -41,5 +41,4 @@ fi
 
 credential_name=$1
 role_arn=$2
-
 cdp environments create-aws-credential --credential-name ${credential_name} --role-arn ${role_arn}

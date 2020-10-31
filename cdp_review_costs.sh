@@ -67,16 +67,22 @@ then
 
 
 # 1. SDX Costs
-
-    SDX_NUM_ELEMENTS=$(jq '.config.sdx | length' cost/aws_sdx_instances.json)
+    if [[ "$datalake_scale" == "MEDIUM_DUTY_HA" ]]
+    then
+        SDX_FILE="cost/aws_sdx_instances_med.json"
+    else
+        SDX_FILE="cost/aws_sdx_instances.json"
+    fi
+    SDX_NUM_ELEMENTS=$(jq '.config.sdx | length' $SDX_FILE)
     SDX_NUM_ELEMENTS=$((SDX_NUM_ELEMENTS-1))
 
     for i in $(seq 0 ${SDX_NUM_ELEMENTS});
     do
-        INSTANCE_TYPE=$(jq -r ".config.sdx[${i}].instanceTypes[].size" cost/aws_sdx_instances.json)
+        INSTANCE_TYPE=$(jq -r ".config.sdx[${i}].instanceTypes[].size" $SDX_FILE)
+        node_count=$(jq -r ".config.sdx[${i}].instanceTypes[].quantity" $SDX_FILE)
         OUTPUT=$(curl -s 'https://ec2.shop?region='${region}'&format=json' | jq ".Prices[] | select(.InstanceType==\"${INSTANCE_TYPE}\")".Cost)
         if [ ${#OUTPUT} -eq 0 ]; then OUTPUT=0; fi
-        sdx_cost_hourly=$(ruby -e "total_cost=(${sdx_cost_hourly}+${OUTPUT});puts total_cost")
+        sdx_cost_hourly=$(ruby -e "total_cost=(${sdx_cost_hourly}+(${OUTPUT}*${node_count}));puts total_cost")
     done
 
     sdx_cost_daily=$(ruby -e "total_cost=(${sdx_cost_hourly}*24);puts total_cost")

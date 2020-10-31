@@ -190,7 +190,7 @@ else
                     knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
                     default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
 
-                    result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
+                    result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" "$workload_analytics" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
                     handle_exception $? $prefix "environment creation" "$result"
                 fi
                 if [[ "$use_ccm" == "yes" ]]; then
@@ -216,7 +216,7 @@ else
                     knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
                     default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
 
-                    result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $pub_sub_1 $pub_sub_2 $pub_sub_3 $priv_sub_1 $priv_sub_2 $priv_sub_3 $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
+                    result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" "$workload_analytics" $pub_sub_1 $pub_sub_2 $pub_sub_3 $priv_sub_1 $priv_sub_2 $priv_sub_3 $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
                     handle_exception $? $prefix "environment creation" "$result"
 
                 fi
@@ -234,7 +234,7 @@ else
                         knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
                         default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
 
-                        result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
+                        result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" "$workload_analytics" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
                         handle_exception $? $prefix "environment creation" "$result"
                     fi
                     if [[ "$use_ccm" == "yes" ]]; then
@@ -260,17 +260,17 @@ else
                         knox_sg_id=$(cat ${network_file} | jq -r .KnoxGroupId)
                         default_sg_id=$(cat ${network_file} | jq -r .DefaultGroupId)
 
-                        result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" $pub_sub_1 $pub_sub_2 $pub_sub_3 $priv_sub_1 $priv_sub_2 $priv_sub_3 $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
+                        result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" "$workload_analytics" $pub_sub_1 $pub_sub_2 $pub_sub_3 $priv_sub_1 $priv_sub_2 $priv_sub_3 $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
                         handle_exception $? $prefix "environment creation" "$result"
 
                     fi
                 else  
                     if [[ "$use_ccm" == "no" ]]; then
-                        result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" 2>&1 >/dev/null)
+                        result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" "$workload_analytics" 2>&1 >/dev/null)
                         handle_exception $? $prefix "environment creation" "$result"
                     fi
                     if [[ "$use_ccm" == "yes" ]]; then
-                        result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" 2>&1 >/dev/null)
+                        result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" "$workload_analytics" 2>&1 >/dev/null)
                         handle_exception $? $prefix "environment creation" "$result"
                     fi
                 fi
@@ -324,7 +324,7 @@ else
 
     else
         if [ "$dl_status" == "NOT_FOUND" ]; then
-            result=$($base_dir/cdp_create_aws_datalake.sh $base_dir $prefix $RDS_HA 2>&1 >/dev/null)
+            result=$($base_dir/cdp_create_aws_datalake.sh $base_dir $prefix $datalake_scale $RDS_HA 2>&1 >/dev/null)
             handle_exception $? $prefix "datalake creation" "$result"
         fi
         wait_for_deployment DL RUNNING UNKNOWN

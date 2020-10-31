@@ -4,13 +4,14 @@
  display_usage() { 
 	echo "
 Usage:
-    $(basename "$0") <prefix> (<rds_ha>) [--help or -h]
+    $(basename "$0") <prefix> <scale> (<rds_ha>) [--help or -h]
 
 Description:
     Creates a data lake post environment creation
 
 Arguments:
     prefix:         prefix for your assets
+    scale:          scale of the datalake
     rds_ha:         (optional) flag for rds ha (values 0 or 1)
     --help or -h:   displays this help"
 
@@ -25,23 +26,23 @@ fi
 
 
 # Check the numbers of arguments
-if [  $# -lt 1 ] 
+if [  $# -lt 2 ] 
 then 
     echo "Not enough arguments!"  >&2
     display_usage
     exit 1
 fi 
 
-if [  $# -gt 2 ] 
+if [  $# -gt 3 ] 
 then 
     echo "Too many arguments!"  >&2
     display_usage
     exit 1
 fi 
 
-if [ $# -eq 2 ] 
+if [ $# -eq 3 ] 
 then 
-    rds_ha=$2
+    rds_ha=$3
 else
     rds_ha=1
 fi 
@@ -72,11 +73,13 @@ then
     cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
         --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@${1//-/}cdpsa.dfs.core.windows.net" \
-        --tags $(flatten_tags $TAGS)
+        --scale $2 \
+        --tags $(flatten_tags $TAGS) 
 else
     cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
         --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@${1//-/}cdpsa.dfs.core.windows.net" \
-        --tags $(flatten_tags $TAGS)
+        --scale $2
+        --tags $(flatten_tags $TAGS) \
         --database-availability-type NONE
 fi

@@ -27,6 +27,7 @@ _Note: Azure CML is not supported yet, so don't add it in your parameters file :
 * CDP Credential ([Instructions](https://docs.cloudera.com/management-console/cloud/credentials-aws/topics/mc-create-credentialrole.html))
     * You must set your `Workload Password` in your `CDP Profile` ([Shortcut](https://console.cdp.cloudera.com/iam/index.html#/my-account))
     * You must generate a `CLI Access Key` in your `CDP Profile`, and configure it to your local `CDP CLI` ([Shortcut](https://console.cdp.cloudera.com/iam/index.html#/my-account))
+    * Your user should have minimally EnvironmentCreator and IamUser as roles
 
 
 # Parameters file format
@@ -141,6 +142,12 @@ _Note: Azure CML is not supported yet, so don't add it in your parameters file :
 
         <b><em>Use existing network for env deployment (path to the network file, see examples in parameters_sample) </em></b>
         "existing_network_file": "[path_to_network_file]",
+
+        <b><em>The Data Lake scale you'd like to have (default: LIGHT_DUTY, possible vaules: LIGHT_DUTY, MEDIUM_DUTY_HA) </em></b>
+        "scale": "[LIGHT_DUTY]",
+
+        <b><em>Enable workload analytics (i.e. WXM): (default: --no-enable-workload-analytics, possible values: --enable-workload-analytics, --no-enable-workload-analytics) </em></b>
+        "workload_analytic": "--enable-workload-analytics",
 
         <b><em>Array of custom tags to setup (if empty the scripts will generate project, owner, end_date and deploytool tags): </em></b>
         "tags": [

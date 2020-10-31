@@ -15,6 +15,7 @@ Arguments:
     region:             region for your env
     key:                name of the Azure key to re-use
     sg_cidr:            CIDR to open in your security group
+    workload_analytics: enable workload analytics
     network_created:    (optional) flag to see if network was created (possible values: yes or no)
     --help or -h:   displays this help"
 
@@ -29,14 +30,14 @@ fi
 
 
 # Check the numbers of arguments
-if [  $# -lt 5 ] 
+if [  $# -lt 6 ] 
 then 
     echo "Not enough arguments!" >&2
     display_usage
     exit 1
 fi 
 
-if [  $# -gt 6 ] 
+if [  $# -gt 7 ] 
 then 
     echo "Too many arguments!" >&2
     display_usage
@@ -62,11 +63,12 @@ credential=$2
 region=$3
 key=$4
 sg_cidr=$5
-network_created=$6
+workload_analytics=$6
+network_created=$7
 owner=$(cdp iam get-user | jq -r .user.email)
-if [  $# -gt 6 ] 
+if [  $# -gt 7 ] 
 then 
-    network_created=$6
+    network_created=$7
     network_id="$prefix-cdp-vnet"
     subnet_1="$prefix-pub-subnet-1"
     subnet_2="$prefix-pub-subnet-2"
@@ -88,6 +90,7 @@ then
         --new-network-params networkCidr="10.10.0.0/16" \
         --tags $(flatten_tags $TAGS)  \
         --enable-tunnel \
+        $workload_analytics \
         --use-public-ip
 else
     cdp environments create-azure-environment  --environment-name ${prefix}-cdp-env \
@@ -99,6 +102,7 @@ else
         --existing-network-params networkId="$network_id",resourceGroupName="$prefix-cdp-rg",subnetIds="$subnet_1","$subnet_2","$subnet_3" \
         --tags $(flatten_tags $TAGS) \
         --enable-tunnel \
+        $workload_analytics \
         --use-public-ip
 fi
 

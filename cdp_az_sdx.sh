@@ -177,10 +177,10 @@ else
     else
         if [[ "$env_status" == "NOT_FOUND" ]]; then
             if [[ "$use_ccm" == "no" ]]; then
-                result=$($base_dir/cdp_create_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" $create_network 2>&1 >/dev/null)
+                result=$($base_dir/cdp_create_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" "$workload_analytics" $create_network 2>&1 >/dev/null)
                 handle_exception $? $prefix "environment creation" "$result"
             else
-                result=$($base_dir/cdp_create_private_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" $create_network 2>&1 >/dev/null)
+                result=$($base_dir/cdp_create_private_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" "$workload_analytics" $create_network 2>&1 >/dev/null)
                 handle_exception $? $prefix "environment creation" "$result"
             fi
         fi
@@ -230,7 +230,7 @@ else
         wait_for_deployment DL RUNNING UNKNOWN
     else
         if [[ "$dl_status" == "NOT_FOUND" ]]; then
-            result=$($base_dir/cdp_create_az_datalake.sh $prefix $RDS_HA 2>&1 >/dev/null)
+            result=$($base_dir/cdp_create_az_datalake.sh $prefix $datalake_scale $RDS_HA 2>&1 >/dev/null)
             handle_exception $? $prefix "datalake creation" "$result"
         fi
         wait_for_deployment DL RUNNING UNKNOWN

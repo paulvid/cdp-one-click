@@ -248,9 +248,9 @@ then
     echo "${CHECK_MARK}  $prefix: cross account created"
 
     ca_role_arn=$(aws iam get-role  --role-name ${prefix}-cross-account-role | jq -r .Role.Arn)
+    sleep 60
 
-
-    result=$($base_dir/cdp_create_aws_credential.sh ${credential} ${ca_role_arn}  2>&1 > /dev/null)
+    result=$($base_dir/cdp_create_aws_credential.sh ${credential} ${ca_role_arn} 2>&1 > /dev/null)
     handle_exception $? $prefix "credential creation" "$result"
     echo "${CHECK_MARK}  $prefix: new credential created"
 fi

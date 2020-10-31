@@ -29,14 +29,14 @@ fi
 
 
 # Check the numbers of arguments
-if [  $# -lt 5 ] 
+if [  $# -lt 6 ] 
 then 
     echo "Not enough arguments!" >&2
     display_usage
     exit 1
 fi 
 
-if [  $# -gt 6 ] 
+if [  $# -gt 7 ] 
 then 
     echo "Too many arguments!" >&2
     display_usage
@@ -64,12 +64,13 @@ credential=$2
 region=$3
 key=$4
 sg_cidr=$5
+workload_analytics=$6
 
 
 network_created="no"
-if [  $# -eq 6 ] 
+if [  $# -eq 7 ] 
 then 
-    network_created=$6
+    network_created=$7
     network_id="$prefix-cdp-vnet"
     subnet_1="$prefix-priv-subnet-1"
     subnet_2="$prefix-priv-subnet-2"
@@ -91,7 +92,8 @@ then
         --new-network-params networkCidr="10.10.0.0/16" \
         --tags $(flatten_tags $TAGS)  \
         --no-use-public-ip \
-        --enable-tunnel
+        --enable-tunnel \
+        $workload_analytics
 else
     cdp environments create-azure-environment  --environment-name ${prefix}-cdp-env \
         --credential-name ${credential} \
@@ -102,7 +104,8 @@ else
         --existing-network-params networkId="$network_id",resourceGroupName="$prefix-cdp-rg",subnetIds="$subnet_1","$subnet_2","$subnet_3" \
         --tags $(flatten_tags $TAGS)  \
         --no-use-public-ip \
-        --enable-tunnel
+        --enable-tunnel \
+        $workload_analytics
 fi
 
 

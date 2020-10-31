@@ -1,0 +1,61 @@
+{
+  "vers": 1,
+  "config": {
+    "sdx": [
+      {
+        "instance": "freeipa",
+        "instanceTypes": [
+          {
+            "size": "m5.large",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "instance": "idbroker",
+        "instanceTypes": [
+          {
+            "size": "t3.medium",
+            "quantity": 2
+          }
+        ]
+      },
+      {
+        "instance": "main",
+        "instanceTypes": [
+          {
+            "size": "m5.2xlarge",
+            "quantity": 2
+          }
+        ]
+      },
+      {
+        "instance": "gateway",
+        "instanceTypes": [
+          {
+            "size": "m5.xlarge",
+            "quantity": 2
+          }
+        ]
+      },
+      {
+        "instance": "aux",
+        "instanceTypes": [
+          {
+            "size": "m5.xlarge",
+            "quantity": 1
+          }
+        ]
+      },
+      {
+        "instance": "rds",
+        "instanceTypes": [
+          {
+            "size": "db.m5.large",
+            "quantity": 1
+          }
+        ]
+      }
+    ]
+  }
+}
