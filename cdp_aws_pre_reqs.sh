@@ -95,7 +95,7 @@ if [[ "$create_network" == "yes" ]]
 then
     if [[ "$($base_dir/aws-pre-req/aws_check_if_resource_exists.sh $prefix network)" == "no" ]]
     then
-        if [[ "$use_ccm" == "no" ]]
+        if [[ "$use_priv_ips" == "no" ]]
         then
             result=$(
                 { stdout=$($base_dir/aws-pre-req/aws_create_network.sh $prefix $region $sg_cidr) ; } 2>&1
@@ -142,7 +142,7 @@ then
             echo "${CHECK_MARK}  $prefix: new network created"
         fi
 
-        if [[ "$use_ccm" == "yes" ]]
+        if [[ "$use_priv_ips" == "yes" && "$create_network" == "yes" ]]
         then
             result=$(
                 { stdout=$($base_dir/aws-pre-req/aws_create_private_network.sh $prefix $region $sg_cidr) ; } 2>&1
@@ -204,7 +204,7 @@ then
             aws ec2 delete-route-table  --route-table-id $priv_route_2
             aws ec2 delete-route-table  --route-table-id $priv_route_3
 
-            aws ec2 delete-vpc-endpoint --vpc-endpoint-ids $s3_endpoint $dyanmo_endpoint
+            aws ec2 delete-vpc-endpoints --vpc-endpoint-ids $s3_endpoint $dyanmo_endpoint
 
             aws ec2 delete-vpc  --vpc-id $vpc_id
             aws ec2 delete-internet-gateway  --internet-gateway-id $igw_id

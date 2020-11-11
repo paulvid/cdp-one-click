@@ -131,20 +131,23 @@ _Note: Azure CML is not supported yet, so don't add it in your parameters file :
         <b><em>NOT SUPPORTED YET Flag to generate minimal cross account role policy or not (default: no, possible values: yes, no) </em></b>
         "generate_minimal_cross_account": "no",
 
-        <b><em>Flag to create network in cloud provider or not (only supported in AWS) (default: no, possible values: yes, no) </em></b>
+        <b><em>Flag to create network in cloud provider or not (default: no, possible values: yes, no) </em></b>
         "create_network": "no",
 
         <b><em>CIDR to open in your security group of your network (port 443, 22 and 9443 will be open to this) </em></b>
         "sg_cidr": "0.0.0.0/0",
 
-         <b><em>Use CCM for env deployment (default: no, possible values: yes, no) </em></b>
-        "use_ccm": "no",
+         <b><em>Use private IPs for env deployment (default: no, possible values: yes, no). NB: For AWS If this is set to "yes" and "create_network" is set to "no", you must currently use the DEV CDP CLI. NB2: For Azure, this currently is unavailable. The functionality is currently (as of 2020/11/10) in MOW-DEV.</em></b>
+        "use_priv_ips": "no",
 
         <b><em>Use existing network for env deployment (path to the network file, see examples in parameters_sample) </em></b>
         "existing_network_file": "[path_to_network_file]",
 
         <b><em>The Data Lake scale you'd like to have (default: LIGHT_DUTY, possible vaules: LIGHT_DUTY, MEDIUM_DUTY_HA) </em></b>
         "scale": "[LIGHT_DUTY]",
+
+        <b><em>If creating an environment with private IPs, create a bastion in one of the public subnets that you can proxy to to access all the UIs. (default: no, possible vaules: no, yes). NB: This is AWS only, at the moment. </em></b>
+        "create_bastion": "yes",
 
         <b><em>Enable workload analytics (i.e. WXM): (default: --no-enable-workload-analytics, possible values: --enable-workload-analytics, --no-enable-workload-analytics) </em></b>
         "workload_analytic": "--enable-workload-analytics",

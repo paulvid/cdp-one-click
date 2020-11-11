@@ -66,7 +66,7 @@ sg_cidr=$5
 workload_analytics=$6
 network_created=$7
 owner=$(cdp iam get-user | jq -r .user.email)
-if [  $# -gt 7 ] 
+if [  $# -gt 6 ] 
 then 
     network_created=$7
     network_id="$prefix-cdp-vnet"
@@ -88,7 +88,7 @@ then
         --security-access cidr="$sg_cidr" \
         --log-storage storageLocationBase="abfs://logs@${prefix//-/}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
         --new-network-params networkCidr="10.10.0.0/16" \
-        --tags $(flatten_tags $TAGS)  \
+        --tags $(flatten_tags "$TAGS")  \
         --enable-tunnel \
         $workload_analytics \
         --use-public-ip
@@ -100,7 +100,7 @@ else
         --security-access securityGroupIdForKnox="$knox_nsg",defaultSecurityGroupId="$default_nsg" \
         --log-storage storageLocationBase="abfs://logs@${prefix//-/}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
         --existing-network-params networkId="$network_id",resourceGroupName="$prefix-cdp-rg",subnetIds="$subnet_1","$subnet_2","$subnet_3" \
-        --tags $(flatten_tags $TAGS) \
+        --tags $(flatten_tags "$TAGS") \
         --enable-tunnel \
         $workload_analytics \
         --use-public-ip

@@ -86,7 +86,7 @@ fi
 
 if [[ "$($base_dir/az-pre-req/az_check_if_resource_exists.sh $prefix network)" == "no" ]]; then
     if [[ "$create_network" == "yes" ]]; then
-        if [[ "$use_ccm" == "yes" ]]; then
+        if [[ "$use_priv_ips" == "yes" ]]; then
             result=$($base_dir/az-pre-req/az_create_private_network.sh $prefix $sg_cidr 2>&1 >/dev/null)
             handle_exception $? $prefix "network creation" "$result"
             echo "${CHECK_MARK}  $prefix: network created"

@@ -83,7 +83,7 @@ sg_cidr=$5
 workload_analytics=$6
 owner=$(cdp iam get-user | jq -r .user.email)
 
-if [  $# -gt 5 ]
+if [  $# -gt 6 ]
 then
     pub_sub_1=$7
     pub_sub_2=$8
@@ -106,7 +106,7 @@ then
         --s3-guard-table-name ${prefix}-cdp-table \
         --enable-tunnel \
         $workload_analytics \
-        --tags $(flatten_tags $TAGS) 
+        --tags $(flatten_tags "$TAGS") 
 
 
 else 
@@ -117,9 +117,9 @@ else
         --authentication publicKeyId="${key}" \
         --log-storage storageLocationBase="${prefix}-cdp-bucket",instanceProfile="arn:aws:iam::$AWS_ACCOUNT_ID:instance-profile/${prefix}-log-role" \
         --network-cidr "10.0.0.0/16" \
-        --s3-guard-table-name ${prefix}-cdp-table \ 
+        --s3-guard-table-name ${prefix}-cdp-table \
         --enable-tunnel \
         $workload_analytics \
-        --tags $(flatten_tags $TAGS)  \
-        --create-private-network
+        --tags $(flatten_tags "$TAGS")  \
+        --create-private-subnets
 fi

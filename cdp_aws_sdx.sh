@@ -126,6 +126,29 @@ wait_for_deployment() {
 
 }
 
+#########################
+# Arguments:            #
+#   $1 _> server name   #
+#########################
+wait_for_instance_name() {
+    instance_name=$1
+
+    instance_id=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$instance_name" 2>/dev/null | jq -r '.Reservations[].Instances[] | select(.State.Name!="terminated")' | jq -r .InstanceId)
+    instance_status=$(aws ec2 describe-instances --instance-ids $instance_id 2>/dev/null | jq -r .Reservations[].Instances[0].State.Name)
+    while [ "$instance_status" != "running" ]; do
+        i=$(((i + 1) % 8))
+        printf "\r${SPIN:$i:1}  $prefix: $instance_name instance status: $instance_status                           "
+        sleep 2
+        instance_status=$(aws ec2 describe-instances --instance-ids $instance_id 2>/dev/null | jq -r .Reservations[].Instances[0].State.Name)
+        if [[ "$instance_status" == "error" ]]; then handle_exception 2 $prefix "$instance_name instance creation" "$instance_name server creation failed; Check UI for details"; fi
+    done
+
+    printf "\r${CHECK_MARK}  $prefix: $instance_name instance status: $instance_status                           "
+    echo ""
+}
+
+
+
 # check whether user had supplied -h or --help . If yes display usage
 if [[ ($1 == "--help") || $1 == "-h" ]]; then
     display_usage
@@ -179,7 +202,7 @@ else
     else
         if [ "$env_status" == "NOT_FOUND" ]; then
             if [[ "$create_network" == "yes" ]]; then
-                if [[ "$use_ccm" == "no" ]]; then
+                if [[ "$use_priv_ips" == "no" ]]; then
                     network_file=${2}
                     igw_id=$(cat ${network_file} | jq -r .InternetGatewayId)
                     vpc_id=$(cat ${network_file} | jq -r .VpcId)
@@ -193,7 +216,7 @@ else
                     result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" "$workload_analytics" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
                     handle_exception $? $prefix "environment creation" "$result"
                 fi
-                if [[ "$use_ccm" == "yes" ]]; then
+                if [[ "$use_priv_ips" == "yes" ]]; then
                     network_file=${2}
 
                     igw_id=$(cat ${network_file} | jq -r .InternetGatewayId)
@@ -223,7 +246,7 @@ else
 
             else
                 if [[ $USE_EXISTING_NETWORK == "yes" ]]; then
-                    if [[ "$use_ccm" == "no" ]]; then
+                    if [[ "$use_priv_ips" == "no" ]]; then
                         network_file=$EXISTING_NETWORK_FILE
                         igw_id=$(cat ${network_file} | jq -r .InternetGatewayId)
                         vpc_id=$(cat ${network_file} | jq -r .VpcId)
@@ -237,7 +260,7 @@ else
                         result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" "$workload_analytics" $subnet_id1a $subnet_id1b $subnet_id1c $vpc_id $knox_sg_id $default_sg_id 2>&1 >/dev/null)
                         handle_exception $? $prefix "environment creation" "$result"
                     fi
-                    if [[ "$use_ccm" == "yes" ]]; then
+                    if [[ "$use_priv_ips" == "yes" ]]; then
                         network_file=$EXISTING_NETWORK_FILE
 
                         igw_id=$(cat ${network_file} | jq -r .InternetGatewayId)
@@ -265,11 +288,11 @@ else
 
                     fi
                 else  
-                    if [[ "$use_ccm" == "no" ]]; then
+                    if [[ "$use_priv_ips" == "no" ]]; then
                         result=$($base_dir/cdp_create_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" "$workload_analytics" 2>&1 >/dev/null)
                         handle_exception $? $prefix "environment creation" "$result"
                     fi
-                    if [[ "$use_ccm" == "yes" ]]; then
+                    if [[ "$use_priv_ips" == "yes" ]]; then
                         result=$($base_dir/cdp_create_private_aws_env.sh $prefix $credential $region "$key" "$sg_cidr" "$workload_analytics" 2>&1 >/dev/null)
                         handle_exception $? $prefix "environment creation" "$result"
                     fi
@@ -339,6 +362,37 @@ echo "${CHECK_MARK}  $prefix: workload password setup "
 # 5. Syncing users
 if [[ "$SYNC_USERS" == 1 ]]; then
     $base_dir/cdp_sync_users.sh $prefix
+fi
+
+# 6. Create Bastion
+if [[ "$create_bastion" == "yes" ]]; then
+    bastion=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$prefix-bastion" 2>/dev/null | jq -r '.Reservations[].Instances[] | select(.State.Name!="terminated")' | jq -r .InstanceId)
+    if [[ "$bastion" == "" ]]; then
+        env_vpc=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r '.environment.network.aws.vpcId')
+        pub_subnet=$(aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=$env_vpc | jq -r '.NatGateways[0].SubnetId')
+        sg_id=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r '.environment.securityAccess.defaultSecurityGroupId')
+        if [[ "$sg_id" == "" || "$sg_id" == "null" ]]; then
+            sg_id=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$prefix-cdp-env-freeipa*" | jq -r '.Reservations[0].Instances[0].SecurityGroups[0].GroupId')
+        fi
+        image_id=$(aws ec2 describe-images \
+        --owners 'aws-marketplace' \
+        --filters 'Name=product-code,Values=aw0evgkw8e5c1q413zgy5pjce' \
+        --query 'sort_by(Images, &CreationDate)[-1].[ImageId]' \
+        --output 'text')
+
+        result=$(aws ec2 run-instances --image-id $image_id --count 1 --instance-type t2.medium --key-name $key --security-group-ids $sg_id --subnet-id $pub_subnet --block-device-mapping DeviceName=/dev/sda1,Ebs={VolumeSize=8} --associate-public-ip-address --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value="'$prefix'-bastion"}]' 'ResourceType=volume,Tags=[{Key=Name,Value="'$prefix'-bastion"}]')
+        handle_exception $? $prefix "bastion creation" "$result"
+
+        wait_for_instance_name "${prefix}-bastion"
+        echo "${CHECK_MARK}  $prefix: bastion setup "
+    else
+        #already running
+        printf "\r${ALREADY_DONE}  $prefix: $prefix-bastion already running                             "
+    fi
+    bastion_ip=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${prefix}-bastion" 2>/dev/null | jq -r '.Reservations[].Instances[] | select(.State.Name!="terminated")' | jq -r .PublicIpAddress)
+    echo "Connect to your Bastion as follows:                        "
+    echo "1.) ssh -i <path to $key key> -CND 8157 centos@$bastion_ip"
+    echo '2.) "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --user-data-dir="$HOME/chrome-with-proxy" --proxy-server="socks5://localhost:8157"'
 fi
 
 echo ""

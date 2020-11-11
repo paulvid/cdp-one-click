@@ -4,6 +4,31 @@ source $(
     pwd -L
 )/common.sh
 
+
+#########################
+# Arguments:            #
+#   $1 _> server name   #
+#########################
+wait_for_instance_id() {
+    instance_id=$1
+    instance_name=$(aws ec2 describe-instances --instance-ids $instance_id | jq -r '.Reservations[].Instances[].Tags[] | select (.Key=="Name")' | jq -r .Value)
+    instance_status=$(aws ec2 describe-instances --instance-ids $instance_id 2>/dev/null | jq -r .Reservations[].Instances[0].State.Name)
+
+    while [[ "$instance_status" != terminated ]]; do
+        
+        i=$(((i + 1) % 8))
+        printf "\r${SPIN:$i:1}  $prefix: $instance_name instance status: $instance_status                           "
+        if [[ "$instance_status" == "error" ]]; then handle_exception 2 $prefix "instance $instance_name deletion" "instance $instance_name deletion failed; Check UI for details"; fi
+
+        sleep 2
+        instance_status=$(aws ec2 describe-instances --instance-ids $instance_id 2>/dev/null | jq -r .Reservations[].Instances[0].State.Name)
+    done
+
+    printf "\r${CHECK_MARK}  $prefix: instance ${instance_name} terminated                              "
+    echo ""
+}
+
+
 display_usage() {
     echo "
 Usage:
@@ -236,8 +261,6 @@ done
 echo "${CHECK_MARK}  $prefix: no datahub cluster remaining"
 echo ""
 
-# Generating network deletion
-$base_dir/aws-pre-req/aws_generate_delete_network.sh $prefix $base_dir >/dev/null 2>&1
 
 # 4. Deleting datalake
 echo ""
@@ -286,6 +309,15 @@ if [ $wc -ne 0 ]; then
     fi
 
     if [[ ${cloud_provider} == "aws" ]]; then
+        if [[ "$create_bastion" == "yes" ]]; then
+            bastion_id=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$prefix-bastion" 2>/dev/null | jq -r '.Reservations[].Instances[] | select(.State.Name!="terminated")' | jq -r .InstanceId)
+            if [[ "$bastion_id" != "" ]]; then
+                result=$(aws ec2 terminate-instances --instance-ids $bastion_id 2>&1 > /dev/null)
+                handle_exception $? $prefix "$bastion_id instance deletion" "$result"
+                wait_for_instance_id $bastion_id
+                echo "${CHECK_MARK}  $prefix: bastion instance has been terminated"
+            fi
+        fi
         env_vpc_id=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r .environment.network.aws.vpcId)
     fi
 
@@ -365,8 +397,16 @@ if [[ ${cloud_provider} == "aws" ]]; then
     aws s3 rb s3://${prefix}-cdp-bucket --force >/dev/null 2>&1
     echo "${CHECK_MARK}  $prefix: bucket purged"
 
-    $base_dir/aws-pre-req/tmp_network/${prefix}_aws_delete_network.sh >/dev/null 2>&1
-    echo "${CHECK_MARK}  $prefix: network deleted"
+    
+    if [[ $create_network = "yes" ]]; then
+        # Generating network deletion
+        #$base_dir/aws-pre-req/aws_generate_delete_network.sh $prefix $base_dir >/dev/null 2>&1
+
+        $base_dir/aws-pre-req/tmp_network/${prefix}_aws_delete_network.sh >/dev/null 2>&1
+        #Delete Network Files
+        rm $base_dir/aws-pre-req/tmp_network/${prefix}_aws_delete_network.sh && rm $base_dir/aws-pre-req/tmp_network/${prefix}_aws_network.json
+        echo "${CHECK_MARK}  $prefix: network deleted"
+    fi
 
     echo "${CHECK_MARK}  $prefix: no AWS assets remaining"
     echo ""

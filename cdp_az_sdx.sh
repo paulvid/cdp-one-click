@@ -176,10 +176,13 @@ else
 
     else
         if [[ "$env_status" == "NOT_FOUND" ]]; then
-            if [[ "$use_ccm" == "no" ]]; then
+            echo "use priv IPs?"
+            echo $use_priv_ips
+            if [[ "$use_priv_ips" == "no" ]]; then
                 result=$($base_dir/cdp_create_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" "$workload_analytics" $create_network 2>&1 >/dev/null)
                 handle_exception $? $prefix "environment creation" "$result"
             else
+                echo "doing the private thing"
                 result=$($base_dir/cdp_create_private_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" "$workload_analytics" $create_network 2>&1 >/dev/null)
                 handle_exception $? $prefix "environment creation" "$result"
             fi

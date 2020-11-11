@@ -90,7 +90,7 @@ then
         --security-access cidr="$sg_cidr" \
         --log-storage storageLocationBase="abfs://logs@${prefix//-/}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
         --new-network-params networkCidr="10.10.0.0/16" \
-        --tags $(flatten_tags $TAGS)  \
+        --tags $(flatten_tags "$TAGS")  \
         --no-use-public-ip \
         --enable-tunnel \
         $workload_analytics
@@ -102,7 +102,7 @@ else
         --security-access securityGroupIdForKnox="$knox_nsg",defaultSecurityGroupId="$default_nsg" \
         --log-storage storageLocationBase="abfs://logs@${prefix//-/}cdpsa.dfs.core.windows.net",managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${prefix}-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity" \
         --existing-network-params networkId="$network_id",resourceGroupName="$prefix-cdp-rg",subnetIds="$subnet_1","$subnet_2","$subnet_3" \
-        --tags $(flatten_tags $TAGS)  \
+        --tags $(flatten_tags "$TAGS")  \
         --no-use-public-ip \
         --enable-tunnel \
         $workload_analytics

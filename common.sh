@@ -106,6 +106,9 @@ parse_parameters()
     workload_analytics=$(cat ${param_file} | jq -r .optional.workload_analytics)
     workload_analytics=$(handle_null_param "$workload_analytics" "no" "--no-workload-analytics")
 
+    create_bastion=$(cat ${param_file} | jq -r .optional.create_bastion)
+    create_bastion=$(handle_null_param "$create_bastion" "no" "no")
+
     # Tags
     tags=$(cat ${param_file} | jq -r .optional.tags)
     tags_length=$(echo $tags | 	jq '. | length')
@@ -151,8 +154,8 @@ parse_parameters()
     sg_cidr=$(cat ${param_file} | jq -r .optional.sg_cidr)
     sg_cidr=$(handle_null_param "$sg_cidr" "no" "0.0.0.0/0")
 
-    use_ccm=$(cat ${param_file} | jq -r .optional.use_ccm)
-    use_ccm=$(handle_null_param "$use_ccm" "no" "no")
+    use_priv_ips=$(cat ${param_file} | jq -r .optional.use_priv_ips)
+    use_priv_ips=$(handle_null_param "$use_priv_ips" "no" "no")
 
 
     existing_network_file=$(cat ${param_file} | jq -r .optional.existing_network_file)
@@ -218,9 +221,12 @@ parse_parameters()
         handle_exception 1 ${prefix} "parsing parameters" "Wrong parameters: you can't refer an existing network and create a network"
     fi
 
-    if [[ ${use_ccm} == "yes" && ${create_network} == "no" && ${cloud_provider} == "aws" && ${USE_EXISTING_NETWORK} != "yes" ]]
-    then
-        handle_exception 1 ${prefix} "parsing parameters" "Operation not supported: you can't enable CCM without creating network (see https://jira.cloudera.com/browse/CB-7187)"
+    if [[ $create_bastion == "yes" && $use_priv_ips == "no" ]]; then
+        handle_exception 1 $prefix "parsing parameters" "No need to create a bastion host if not using private IPs"
+    fi
+
+    if [[ $use_priv_ips == "yes" && $cloud_provider == "az" ]]; then
+        handle_exception 1 $prefix "parsing parameters" "Cloudbreak doesn't yet support using Private IPs in Azure via the CDP CLI. Please create the environment via the UI if that is required."
     fi
 
     CHECK_MARK="✅"

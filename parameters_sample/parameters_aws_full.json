@@ -34,7 +34,8 @@
         "generate_credential": "no",
         "generate_minimal_cross_account": "no",
         "create_network": "no",
-        "use_ccm": "no",
+        "use_priv_ips": "no",
+        "create_bastion": "no",
         "existing_network_file": "",
         "tags": [
             {
