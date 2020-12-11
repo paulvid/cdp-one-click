@@ -1,0 +1,96 @@
+{
+  "environmentName": "vv01-cdp-env",
+  "instanceGroups": [
+    {
+      "nodeCount": 1,
+      "name": "gateway",
+      "type": "GATEWAY",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "aws": {},
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ],
+        "cloudPlatform": "AWS"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "nifi",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "aws": {},
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ],
+        "cloudPlatform": "AWS"
+      },
+      "recipeNames": ["cdp-mod-wkp"]
+    }
+  ],
+  "image": {
+    "catalog": "cdp-default",
+    "id": "37b125e3-aac8-40c9-5cb1-4886fb53d80e"
+  },
+  "network": {
+    "aws": {
+      "subnetId": "subnet-085849c1d23204c9f"
+    }
+  },
+  "cluster": {
+    "databases": [],
+    "cloudStorage": {
+      "aws": {
+        "s3Guard": {
+          "dynamoTableName": "vv01-cdp-table"
+        }
+      },
+      "locations": [
+        {
+          "type": "DEFAULT_FS",
+          "value": "s3a://vv01-cdp-bucket/erewqew"
+        }
+      ],
+      "identities": [
+        {
+          "s3": {
+            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/vv01-log-role"
+          },
+          "type": "LOG"
+        }
+      ]
+    },
+    "exposedServices": [
+      "ALL"
+    ],
+    "blueprintName": "cdp-mod-wkp",
+    "validateBlueprint": false
+  },
+  "sdx": {
+    "name": "vv01-cdp-dl"
+  },
+  "tags": {
+    "application": null,
+    "userDefined": {},
+    "defaults": null
+  },
+  "inputs": {}
+}

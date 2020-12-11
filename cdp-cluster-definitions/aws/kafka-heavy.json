@@ -1,36 +1,20 @@
 {
-  "environmentName": "pvi-aws-cdp-env",
+  "azure": {
+    "encryptStorage": false
+  },
+  "environmentName": "pviaz-cdp-env",
   "instanceGroups": [
-    {
-      "nodeCount": 1,
-      "name": "smm",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "aws": {},
-        "instanceType": "m5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "standard"
-          }
-        ],
-        "cloudPlatform": "AWS"
-      },
-      "recipeNames": []
-    },
     {
       "nodeCount": 1,
       "name": "registry",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "aws": {},
-        "instanceType": "m5.2xlarge",
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
@@ -38,32 +22,10 @@
           {
             "size": 100,
             "count": 1,
-            "type": "standard"
+            "type": "Standard_LRS"
           }
         ],
-        "cloudPlatform": "AWS"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 3,
-      "name": "broker",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "aws": {},
-        "instanceType": "m5.2xlarge",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1000,
-            "count": 1,
-            "type": "gp2"
-          }
-        ],
-        "cloudPlatform": "AWS"
+        "cloudPlatform": "AZURE"
       },
       "recipeNames": []
     },
@@ -73,50 +35,126 @@
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
-        "aws": {},
-        "instanceType": "m5.2xlarge",
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
-          "size": 100
+          "size": 50
         },
         "attachedVolumes": [
           {
             "size": 100,
             "count": 1,
-            "type": "standard"
+            "type": "StandardSSD_LRS"
           }
         ],
-        "cloudPlatform": "AWS"
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 1,
+      "name": "smm",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "Standard_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 3,
+      "name": "broker",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8s_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 1000,
+            "count": 1,
+            "type": "Premium_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 0,
+      "name": "srm",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "Standard_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
       },
       "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "37b125e3-aac8-40c9-5cb1-4886fb53d80e"
+    "id": "1d742190-8f71-4cb1-ad94-b2d6bc485db2"
   },
   "network": {
-    "aws": {
-      "subnetId": "subnet-0811e3a93dc303b73"
+    "azure": {
+      "subnetId": "subnet1"
     }
   },
   "cluster": {
     "databases": [],
     "cloudStorage": {
-      "aws": {
-        "s3Guard": {
-          "dynamoTableName": "pvi-aws-cdp-table"
-        }
-      },
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "s3a://pvi-aws-cdp-bucket/pvi-test"
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-726-az-de-kafka-heavy"
         }
       ],
       "identities": [
         {
-          "s3": {
-            "instanceProfile": "arn:aws:iam::981304421142:instance-profile/pvi-aws-log-role"
+          "adlsGen2": {
+            "accountKey": null,
+            "accountName": null,
+            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pviaz-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "secure": false
           },
           "type": "LOG"
         }
@@ -125,11 +163,11 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Streams Messaging Heavy Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
+    "blueprintName": "7.2.6 - Streams Messaging Heavy Duty: Apache Kafka, Schema Registry, Streams Messaging Manager, Streams Replication Manager",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-aws-cdp-dl"
+    "name": "pviaz-cdp-dl"
   },
   "externalDatabase": {
     "availabilityType": "HA"
@@ -137,12 +175,13 @@
   "tags": {
     "application": null,
     "userDefined": {
-      "end_date": "10112020",
+      "end_date": "12142020",
       "owner": "pvidal@cloudera.com",
       "deploytool": "one-click",
-      "project": "pvi-aws_one_click_project"
+      "project": "pviaz_one_click_project"
     },
     "defaults": null
   },
-  "inputs": {}
+  "inputs": {},
+  "cloudPlatform": "AZURE"
 }

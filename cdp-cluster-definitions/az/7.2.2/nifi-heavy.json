@@ -2,11 +2,11 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pviaz-cdp-env",
+  "environmentName": "pvi-az-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 1,
-      "name": "coordinator",
+      "nodeCount": 3,
+      "name": "nifi",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -14,15 +14,15 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_E16_v3",
+        "instanceType": "Standard_F16s_v2",
         "rootVolume": {
-          "size": 50
+          "size": 150
         },
         "attachedVolumes": [
           {
-            "size": 300,
-            "count": 1,
-            "type": "StandardSSD_LRS"
+            "size": 1000,
+            "count": 4,
+            "type": "Premium_LRS"
           }
         ],
         "cloudPlatform": "AZURE"
@@ -30,8 +30,8 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 2,
-      "name": "executor",
+      "nodeCount": 3,
+      "name": "zk",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -39,15 +39,15 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_E16_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
-          "size": 50
+          "size": 150
         },
         "attachedVolumes": [
           {
-            "size": 300,
+            "size": 100,
             "count": 1,
-            "type": "StandardSSD_LRS"
+            "type": "Standard_LRS"
           }
         ],
         "cloudPlatform": "AZURE"
@@ -56,7 +56,7 @@
     },
     {
       "nodeCount": 1,
-      "name": "master",
+      "name": "gateway",
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
@@ -64,7 +64,7 @@
           "encrypted": false,
           "managedDisk": true
         },
-        "instanceType": "Standard_E8_v3",
+        "instanceType": "Standard_D8_v3",
         "rootVolume": {
           "size": 50
         },
@@ -72,7 +72,7 @@
           {
             "size": 100,
             "count": 1,
-            "type": "StandardSSD_LRS"
+            "type": "Standard_LRS"
           }
         ],
         "cloudPlatform": "AZURE"
@@ -82,7 +82,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "1d742190-8f71-4cb1-ad94-b2d6bc485db2"
+    "id": "6d950fc9-05d5-4c6d-739b-4c0449cd09c4"
   },
   "network": {
     "azure": {
@@ -95,7 +95,7 @@
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-726-az-de-dm"
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-test"
         }
       ],
       "identities": [
@@ -103,7 +103,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pviaz-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pvi-az-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -113,23 +113,18 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.6 - Data Mart: Apache Impala, Hue",
+    "blueprintName": "7.2.2 - Flow Management Heavy Duty with Apache NiFi, Apache NiFi Registry",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pviaz-cdp-dl"
+    "name": "pvi-az-cdp-dl"
   },
   "externalDatabase": {
     "availabilityType": "HA"
   },
   "tags": {
     "application": null,
-    "userDefined": {
-      "end_date": "12142020",
-      "owner": "pvidal@cloudera.com",
-      "deploytool": "one-click",
-      "project": "pviaz_one_click_project"
-    },
+    "userDefined": {},
     "defaults": null
   },
   "inputs": {},
