@@ -158,7 +158,7 @@ aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp -
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol udp --port 0-65535 --cidr 10.10.0.0/16 > /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 0-65535 --cidr 10.10.224.0/19  > /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol udp --port 0-65535 --cidr 10.10.224.0/19 > /dev/null 2>&1
-aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 443 --cidr 0.0.0.0/0 > /dev/null 2>&1
+aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol tcp --port 443 --cidr $sg_cidr > /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol icmp --port -1 --cidr 10.10.0.0/16 > /dev/null 2>&1
 aws ec2 authorize-security-group-ingress --group-id $knox_sg_id --protocol icmp --port -1 --cidr 10.10.224.0/19 > /dev/null 2>&1
 

@@ -306,6 +306,13 @@ wc=$($base_dir/cdp_describe_env.sh $prefix 2>/dev/null | jq -r .environment.stat
 if [ $wc -ne 0 ]; then
     if [[ ${cloud_provider} == "az" ]]; then
         env_rg_name=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r .environment.network.azure.resourceGroupName)
+        env_vnet_name=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r .environment.network.azure.networkId)
+        if [[ "$create_bastion" == "yes" ]]; then
+            printf "\r$prefix: Deleting Bastion Resource Group                       "
+            az group delete --name "$prefix-bastion-rg" --yes >/dev/null 2>&1
+            printf "\r${CHECK_MARK}  $prefix: bastion deleted                        "
+            echo ""
+        fi
     fi
 
     if [[ ${cloud_provider} == "aws" ]]; then
@@ -335,13 +342,13 @@ if [ $wc -ne 0 ]; then
 
     if [[ "$create_network" == "no" ]]; then
         if [[ ${cloud_provider} == "az" ]]; then
-            wc=$(az group show --name $env_rg_name 2>/dev/null | jq -r .properties.provisioningState | wc -l)
+            wc=$(az network vnet show --name $env_vnet_name --resource-group $env_rg_name 2>/dev/null | jq -r .properties.provisioningState | wc -l)
             while [ $wc -ne 0 ]; do
-                rg_status=$(az group show --name $env_rg_name 2>/dev/null | jq -r .properties.provisioningState)
+                rg_status=$(az network vnet show --name $env_vnet_name --resource-group $env_rg_name 2>/dev/null | jq -r .properties.provisioningState)
                 i=$(((i + 1) % 8))
-                printf "\r${spin:$i:1}  $prefix: environment status: NO_CDP_API_RESPONSE ($env_rg_name rg status: $rg_status)       "
+                printf "\r${spin:$i:1}  $prefix: environment status: NO_CDP_API_RESPONSE ($env_vnet_name rg status: $rg_status)       "
                 sleep 2                    
-                wc=$(az group show --name $env_rg_name 2>/dev/null | jq -r .properties.provisioningState | wc -l)
+                wc=$(az network vnet show --name $env_vnet_name --resource-group $env_rg_name 2>/dev/null | jq -r .properties.provisioningState | wc -l)
             done
         fi
 
@@ -425,8 +432,9 @@ if [[ ${cloud_provider} == "az" ]]; then
     done
     echo ${underline}
     echo ""
+    printf "\r$prefix: Deleting Resource Group                       "
     ${base_dir}/az-pre-req/az_delete_resource_group.sh $prefix >/dev/null 2>&1
-    echo "${CHECK_MARK}  $prefix: resource group content deleted"
+    printf "\r${CHECK_MARK}  $prefix: resource group content deleted"
 
     if [[ "$generate_credential" == "yes" ]]; then
         result=$($base_dir/az-pre-req/az_delete_cred_role.sh $prefix 2>&1 >/dev/null)
@@ -444,7 +452,7 @@ if [[ ${cloud_provider} == "az" ]]; then
             echo "${CHECK_MARK}  $prefix: credential purged"
         fi
     fi
-
+    echo ""
     echo "${CHECK_MARK}  $prefix: no azure assets remaining"
     echo ""
     echo "⏱  $(date +%H%Mhrs)"

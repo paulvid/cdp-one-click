@@ -1,0 +1,19 @@
+{
+    "required": {
+
+        "prefix":         "pvi",
+        "credential":     "pvidal-aws-se-credential",
+        "region":         "us-east-1",
+        "key":            "field",
+        "workload_pwd":   "superc00lpassw0rd",
+        "datahub_list": [],
+        "ml_workspace_list": [],
+        "op_db_list": [],
+        "dw_list": []
+    },
+    "optional": {
+        "use_priv_ips": "yes",
+        "create_network": "yes",
+        "create_bastion": "yes"
+    }
+}

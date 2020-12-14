@@ -225,9 +225,6 @@ parse_parameters()
         handle_exception 1 $prefix "parsing parameters" "No need to create a bastion host if not using private IPs"
     fi
 
-    if [[ $use_priv_ips == "yes" && $cloud_provider == "az" ]]; then
-        handle_exception 1 $prefix "parsing parameters" "Cloudbreak doesn't yet support using Private IPs in Azure via the CDP CLI. Please create the environment via the UI if that is required."
-    fi
 
     CHECK_MARK="✅"
     ALREADY_DONE="❎"

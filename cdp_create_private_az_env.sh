@@ -93,7 +93,8 @@ then
         --tags $(flatten_tags "$TAGS")  \
         --no-use-public-ip \
         --enable-tunnel \
-        $workload_analytics
+        $workload_analytics \
+        --resource-group-name $prefix-cdp-rg
 else
     cdp environments create-azure-environment  --environment-name ${prefix}-cdp-env \
         --credential-name ${credential} \
@@ -105,7 +106,8 @@ else
         --tags $(flatten_tags "$TAGS")  \
         --no-use-public-ip \
         --enable-tunnel \
-        $workload_analytics
+        $workload_analytics \
+        --resource-group-name $prefix-cdp-rg
 fi
 
 

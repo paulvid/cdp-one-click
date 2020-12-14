@@ -176,13 +176,10 @@ else
 
     else
         if [[ "$env_status" == "NOT_FOUND" ]]; then
-            # echo "use priv IPs?"
-            # echo $use_priv_ips
             if [[ "$use_priv_ips" == "no" ]]; then
                 result=$($base_dir/cdp_create_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" "$workload_analytics" $create_network 2>&1 >/dev/null)
                 handle_exception $? $prefix "environment creation" "$result"
             else
-                echo "doing the private thing"
                 result=$($base_dir/cdp_create_private_az_env.sh $prefix $credential "$region" "$key" "$sg_cidr" "$workload_analytics" $create_network 2>&1 >/dev/null)
                 handle_exception $? $prefix "environment creation" "$result"
             fi
@@ -251,6 +248,40 @@ sleep $sleep_duration
 # 5. Syncing users
 if [[ "$SYNC_USERS" == 1 ]]; then
     $base_dir/cdp_sync_users.sh $prefix
+fi
+
+# 6. Create Bastion
+if [[ "$create_bastion" == "yes" ]]; then
+    #Check for VM if already created
+    bastion=$(az vm list -g $prefix-bastion-rg 2>/dev/null | jq -r '.[].id')
+    if [[ "$bastion" == "" ]]; then
+        env_vnet=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r '.environment.network.azure.networkId')
+        env_vnet_rg=$(cdp environments describe-environment --environment-name $prefix-cdp-env | jq -r '.environment.network.azure.resourceGroupName')
+        
+        #Grab subnet ID from Vnet
+        pub_subnet=$(az network vnet subnet list --resource-group "$env_vnet_rg" --vnet-name "$env_vnet" | jq -r '.[0].id')
+
+        #Create RG
+        az_group=$(az group create --name $prefix-bastion-rg --location "$region")
+        
+        #Create NSG
+        az_nsg=$(az network nsg create -g $prefix-bastion-rg -n $prefix-bastion-nsg)
+        az_nsg=$(az network nsg rule create -g $prefix-bastion-rg --nsg-name $prefix-bastion-nsg -n ssh_cidr --priority 102 --source-address-prefixes "$sg_cidr" --destination-address-prefixes '*'  --destination-port-ranges 22 --direction Inbound --access Allow --protocol Tcp --description "Allow SSH to boxes from CIDR.")
+
+
+        result=$(az vm create --name $prefix-bastion --resource-group $prefix-bastion-rg --image OpenLogic:CentOS:7.5:latest --location "$region" --admin-username centos --public-ip-address $prefix-bastion-ip --subnet "$pub_subnet" --ssh-key-values "$key" --nsg $prefix-bastion-nsg)
+        handle_exception $? $prefix "bastion creation" "$result"
+
+        
+        echo "${CHECK_MARK}  $prefix: bastion setup "
+    else
+        #already running
+        printf "\r${ALREADY_DONE}  $prefix: $prefix-bastion already running                             "
+    fi
+    bastion_ip=$(az vm list -g $prefix-bastion-rg -d | jq -r '.[0].publicIps')
+    echo "Connect to your Bastion as follows:                        "
+    echo "1.) ssh -i <path to $key key> -CND 8157 centos@$bastion_ip"
+    echo '2.) "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --user-data-dir="$HOME/chrome-with-proxy" --proxy-server="socks5://localhost:8157"'
 fi
 
 echo ""
