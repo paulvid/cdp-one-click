@@ -2,8 +2,33 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pvi-az-cdp-env",
+  "environmentName": "pviaz-cdp-env",
   "instanceGroups": [
+    {
+      "nodeCount": 1,
+      "name": "master3",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D16_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "StandardSSD_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
     {
       "nodeCount": 1,
       "name": "coordinator",
@@ -55,31 +80,6 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 3,
-      "name": "executor",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D16_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 1000,
-            "count": 7,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
       "nodeCount": 1,
       "name": "master2",
       "type": "CORE",
@@ -105,8 +105,8 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 1,
-      "name": "master3",
+      "nodeCount": 3,
+      "name": "executor",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -120,8 +120,8 @@
         },
         "attachedVolumes": [
           {
-            "size": 100,
-            "count": 1,
+            "size": 1000,
+            "count": 7,
             "type": "StandardSSD_LRS"
           }
         ],
@@ -132,7 +132,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6d950fc9-05d5-4c6d-739b-4c0449cd09c4"
+    "id": "1d742190-8f71-4cb1-ad94-b2d6bc485db2"
   },
   "network": {
     "azure": {
@@ -153,7 +153,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pvi-az-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pviaz-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -163,18 +163,23 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Real-time Data Mart: Apache Impala, Hue, Apache Kudu, Apache Spark",
+    "blueprintName": "7.2.6 - Real-time Data Mart: Apache Impala, Hue, Apache Kudu, Apache Spark",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-az-cdp-dl"
+    "name": "pviaz-cdp-dl"
   },
   "externalDatabase": {
     "availabilityType": "HA"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "end_date": "12142020",
+      "owner": "pvidal@cloudera.com",
+      "deploytool": "one-click",
+      "project": "pviaz_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {},

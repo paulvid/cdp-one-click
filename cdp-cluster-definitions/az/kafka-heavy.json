@@ -2,8 +2,33 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pvi-az-cdp-env",
+  "environmentName": "pviaz-cdp-env",
   "instanceGroups": [
+    {
+      "nodeCount": 1,
+      "name": "registry",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "azure": {
+          "encrypted": false,
+          "managedDisk": true
+        },
+        "instanceType": "Standard_D8_v3",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "Standard_LRS"
+          }
+        ],
+        "cloudPlatform": "AZURE"
+      },
+      "recipeNames": []
+    },
     {
       "nodeCount": 1,
       "name": "master",
@@ -80,8 +105,8 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 1,
-      "name": "registry",
+      "nodeCount": 0,
+      "name": "srm",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -107,7 +132,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6d950fc9-05d5-4c6d-739b-4c0449cd09c4"
+    "id": "1d742190-8f71-4cb1-ad94-b2d6bc485db2"
   },
   "network": {
     "azure": {
@@ -120,7 +145,7 @@
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-test"
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-726-az-de-kafka-heavy"
         }
       ],
       "identities": [
@@ -128,7 +153,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pvi-az-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pviaz-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -138,18 +163,23 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Streams Messaging Heavy Duty: Apache Kafka, Schema Registry, Streams Messaging Manager",
+    "blueprintName": "7.2.6 - Streams Messaging Heavy Duty: Apache Kafka, Schema Registry, Streams Messaging Manager, Streams Replication Manager",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-az-cdp-dl"
+    "name": "pviaz-cdp-dl"
   },
   "externalDatabase": {
     "availabilityType": "HA"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "end_date": "12142020",
+      "owner": "pvidal@cloudera.com",
+      "deploytool": "one-click",
+      "project": "pviaz_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {},

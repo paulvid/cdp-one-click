@@ -1,8 +1,5 @@
 {
-  "azure": {
-    "encryptStorage": false
-  },
-  "environmentName": "pviaz-cdp-env",
+  "environmentName": "perro-cdp-env",
   "instanceGroups": [
     {
       "nodeCount": 1,
@@ -10,11 +7,16 @@
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
+        "aws": {
+          "encryption": {
+            "type": "NONE",
+            "key": null
+          },
+          "placementGroup": {
+            "strategy": "NONE"
+          }
         },
-        "instanceType": "Standard_D8_v3",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -22,35 +24,10 @@
           {
             "size": 100,
             "count": 1,
-            "type": "StandardSSD_LRS"
+            "type": "standard"
           }
         ],
-        "cloudPlatform": "AZURE"
-      },
-      "recipeNames": []
-    },
-    {
-      "nodeCount": 3,
-      "name": "worker",
-      "type": "CORE",
-      "recoveryMode": "MANUAL",
-      "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
-        },
-        "instanceType": "Standard_D8_v3",
-        "rootVolume": {
-          "size": 50
-        },
-        "attachedVolumes": [
-          {
-            "size": 100,
-            "count": 1,
-            "type": "StandardSSD_LRS"
-          }
-        ],
-        "cloudPlatform": "AZURE"
+        "cloudPlatform": "AWS"
       },
       "recipeNames": []
     },
@@ -60,11 +37,16 @@
       "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
-        "azure": {
-          "encrypted": false,
-          "managedDisk": true
+        "aws": {
+          "encryption": {
+            "type": "NONE",
+            "key": null
+          },
+          "placementGroup": {
+            "strategy": "NONE"
+          }
         },
-        "instanceType": "Standard_D8_v3",
+        "instanceType": "m5.2xlarge",
         "rootVolume": {
           "size": 50
         },
@@ -72,39 +54,71 @@
           {
             "size": 100,
             "count": 1,
-            "type": "StandardSSD_LRS"
+            "type": "standard"
           }
         ],
-        "cloudPlatform": "AZURE"
+        "cloudPlatform": "AWS"
+      },
+      "recipeNames": []
+    },
+    {
+      "nodeCount": 3,
+      "name": "worker",
+      "type": "CORE",
+      "recoveryMode": "MANUAL",
+      "template": {
+        "aws": {
+          "encryption": {
+            "type": "NONE",
+            "key": null
+          },
+          "placementGroup": {
+            "strategy": "NONE"
+          }
+        },
+        "instanceType": "m5.2xlarge",
+        "rootVolume": {
+          "size": 50
+        },
+        "attachedVolumes": [
+          {
+            "size": 100,
+            "count": 1,
+            "type": "standard"
+          }
+        ],
+        "cloudPlatform": "AWS"
       },
       "recipeNames": []
     }
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "1d742190-8f71-4cb1-ad94-b2d6bc485db2"
+    "id": "b5e268b9-bd4d-4675-849e-9afb4e333899"
   },
   "network": {
-    "azure": {
-      "subnetId": "subnet1"
+    "aws": {
+      "subnetId": "subnet-09b6c1bbf379517b1"
     }
   },
   "cluster": {
     "databases": [],
     "cloudStorage": {
+      "aws": {
+        "s3Guard": {
+          "dynamoTableName": "perro-cdp-table"
+        }
+      },
       "locations": [
         {
           "type": "YARN_LOG",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/oplogs/yarn-app-logs"
+          "value": "s3a://perro-cdp-bucket/oplogs/yarn-app-logs"
         }
       ],
       "identities": [
         {
-          "adlsGen2": {
-            "accountKey": null,
-            "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pviaz-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
-            "secure": false
+          "s3": {
+            "instanceProfile": "arn:aws:iam::665634629064:instance-profile/perro-log-role"
           },
           "type": "LOG"
         }
@@ -117,7 +131,7 @@
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pviaz-cdp-dl"
+    "name": "perro-cdp-dl"
   },
   "externalDatabase": {
     "availabilityType": "HA"
@@ -126,12 +140,11 @@
     "application": null,
     "userDefined": {
       "end_date": "12142020",
-      "owner": "pvidal@cloudera.com",
+      "owner": "cperro@cloudera.com",
       "deploytool": "one-click",
-      "project": "pviaz_one_click_project"
+      "project": "perro_one_click_project"
     },
     "defaults": null
   },
-  "inputs": {},
-  "cloudPlatform": "AZURE"
+  "inputs": {}
 }

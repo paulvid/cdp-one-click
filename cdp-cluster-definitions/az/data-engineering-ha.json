@@ -2,11 +2,11 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pvi-az-cdp-env",
+  "environmentName": "pviaz-cdp-env",
   "instanceGroups": [
     {
-      "nodeCount": 0,
-      "name": "gateway",
+      "nodeCount": 1,
+      "name": "compute",
       "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
@@ -80,9 +80,9 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 0,
-      "name": "compute",
-      "type": "CORE",
+      "nodeCount": 1,
+      "name": "manager",
+      "type": "GATEWAY",
       "recoveryMode": "MANUAL",
       "template": {
         "azure": {
@@ -105,9 +105,9 @@
       "recipeNames": []
     },
     {
-      "nodeCount": 1,
-      "name": "manager",
-      "type": "GATEWAY",
+      "nodeCount": 0,
+      "name": "gateway",
+      "type": "CORE",
       "recoveryMode": "MANUAL",
       "template": {
         "azure": {
@@ -132,7 +132,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6d950fc9-05d5-4c6d-739b-4c0449cd09c4"
+    "id": "1d742190-8f71-4cb1-ad94-b2d6bc485db2"
   },
   "network": {
     "azure": {
@@ -149,7 +149,7 @@
         },
         {
           "type": "ZEPPELIN_NOTEBOOK",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-test/zeppelin/notebook"
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-726-az-de-ha/zeppelin/notebook"
         }
       ],
       "identities": [
@@ -157,7 +157,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pvi-az-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pviaz-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -167,18 +167,23 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Data Engineering: HA: Apache Spark, Apache Hive, Apache Oozie",
+    "blueprintName": "7.2.6 - Data Engineering: HA: Apache Spark, Apache Hive, Apache Oozie",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-az-cdp-dl"
+    "name": "pviaz-cdp-dl"
   },
   "externalDatabase": {
     "availabilityType": "HA"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "end_date": "12142020",
+      "owner": "pvidal@cloudera.com",
+      "deploytool": "one-click",
+      "project": "pviaz_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {},

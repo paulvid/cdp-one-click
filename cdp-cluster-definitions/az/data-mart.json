@@ -2,7 +2,7 @@
   "azure": {
     "encryptStorage": false
   },
-  "environmentName": "pvi-az-cdp-env",
+  "environmentName": "pviaz-cdp-env",
   "instanceGroups": [
     {
       "nodeCount": 1,
@@ -82,7 +82,7 @@
   ],
   "image": {
     "catalog": "cdp-default",
-    "id": "6d950fc9-05d5-4c6d-739b-4c0449cd09c4"
+    "id": "1d742190-8f71-4cb1-ad94-b2d6bc485db2"
   },
   "network": {
     "azure": {
@@ -95,7 +95,7 @@
       "locations": [
         {
           "type": "DEFAULT_FS",
-          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-test"
+          "value": "abfs://data@pviazcdpsa.dfs.core.windows.net/pvi-726-az-de-dm"
         }
       ],
       "identities": [
@@ -103,7 +103,7 @@
           "adlsGen2": {
             "accountKey": null,
             "accountName": null,
-            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pvi-az-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
+            "managedIdentity": "/subscriptions/abce3e07-b32d-4b41-8c78-2bcaffe4ea27/resourceGroups/pviaz-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/loggerIdentity",
             "secure": false
           },
           "type": "LOG"
@@ -113,18 +113,23 @@
     "exposedServices": [
       "ALL"
     ],
-    "blueprintName": "7.2.2 - Data Mart: Apache Impala, Hue",
+    "blueprintName": "7.2.6 - Data Mart: Apache Impala, Hue",
     "validateBlueprint": false
   },
   "sdx": {
-    "name": "pvi-az-cdp-dl"
+    "name": "pviaz-cdp-dl"
   },
   "externalDatabase": {
     "availabilityType": "HA"
   },
   "tags": {
     "application": null,
-    "userDefined": {},
+    "userDefined": {
+      "end_date": "12142020",
+      "owner": "pvidal@cloudera.com",
+      "deploytool": "one-click",
+      "project": "pviaz_one_click_project"
+    },
     "defaults": null
   },
   "inputs": {},
