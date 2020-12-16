@@ -95,7 +95,17 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
         }
         definition=$(_jq '.definition')
         custom_script=$(_jq '.custom_script')
-        for row in $(cat $base_dir/cdp-cluster-definitions/${cloud_provider}/$definition | jq -r '.instanceGroups[] | @base64'); do
+        def_file="$base_dir/cdp-cluster-definitions/${cloud_provider}/$definition"
+        if [[ $(cat ${def_file} | jq -r .definition_type) == "standard" ]]
+        then
+            dl_version=$(curl -s https://cloudbreak-imagecatalog.s3.amazonaws.com/v3-prod-cb-image-catalog.json   | jq -r '.images | ."cdh-images" | sort_by(.created) | reverse[] | .version ' | head -1)
+            definition_name=$(cat ${def_file} | jq -r .official_name | sed s/VERSION/${dl_version}/g)
+            def_template=$(cdp datahub describe-cluster-definition --cluster-definition-name "${definition_name}" | jq -r .clusterDefinition.workloadTemplate)
+        else
+            def_template=$(cat ${def_file})
+        fi
+
+        for row in $(echo ${def_template} | jq -r '.instanceGroups[] | @base64'); do
             _jq() {
             echo ${row} | base64 --decode | jq -r ${1}
             }

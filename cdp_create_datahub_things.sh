@@ -43,7 +43,7 @@ parse_parameters ${1}
 echo "⏱  $(date +%H%Mhrs)"
 echo ""
 echo "Creating CDP datahub clusters for $prefix:"
-underline="▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔"
+underline="▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔"
 for ((i = 1; i <= $prefix_length; i++)); do
     underline=${underline}"▔"
 done
