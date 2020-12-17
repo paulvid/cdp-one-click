@@ -1,4 +1,9 @@
 #!/bin/bash 
+ if ! [ -z ${DEV_CLI+x} ]
+then
+    shopt -s expand_aliases
+    alias cdp="cdp 2>/dev/null"
+fi 
 
 
  display_usage() { 
@@ -75,6 +80,8 @@ else
     catalog_name=$(cat ${def_file} | jq -r .image.catalog)
     
 fi
+image="id=\"${id}\",catalogName=\"${catalog_name}\""
+cluster_template=$(echo ${def_template} | jq -r .cluster.blueprintName)
 
 instance_groups='';
 for row in $(echo ${def_template} | jq -r '.instanceGroups[] | @base64'); do

@@ -56,8 +56,6 @@ handle_null_param()
 #########################
 parse_parameters() 
 {
-    # Parsing arguments
-
     # File to parse
     param_file=${1}
 
@@ -122,6 +120,11 @@ parse_parameters()
         else 
             default_date="05202020"
         fi
+
+        if [[ ${cloud_provider} == "gcp" ]]
+        then
+            default_date="some_date"
+        fi
         default_project=$prefix"_one_click_project"
 
         tags=$(echo "[
@@ -133,7 +136,7 @@ parse_parameters()
                     \"value\": \"$default_project\"
                 },{
                     \"key\": \"deploytool\",
-                    \"value\": \"one-click\"
+                    \"value\": \"one_click\"
                 },{
                     \"key\": \"owner\",
                     \"value\": \"$owner\"
@@ -193,10 +196,22 @@ parse_parameters()
         export AWS_ACCOUNT_ID=$(aws sts get-caller-identity | jq .Account -r)
     fi
 
+    if [[ ${cloud_provider} == "gcp"  && ${cloud_profile} != "default" ]]
+    then
+        result=$(gcloud config set project "${cloud_profile}" 2>&1 > /dev/null)
+        handle_exception $? $prefix "gcp project setup" "$result"
+    fi
+
+    if [[ ${cloud_provider} == "gcp"  && ${create_network} == "no" ]]
+    then
+        echo "⛔  $prefix: CDP does not support creation of networks for GCP yet! Use the flag create_network in your paramters file" >&2
+        exit 1
+    fi
+
     if [[ ${cloud_provider} == "az"  && ${cloud_profile} != "default" ]]
     then
         result=$(az account set --subscription "${cloud_profile}" 2>&1 > /dev/null)
-        handle_exception $? $prefix "az subscription verification" "$result"
+        handle_exception $? $prefix "az subscription setup" "$result"
     fi
     
     
@@ -228,6 +243,10 @@ parse_parameters()
 
     CHECK_MARK="✅"
     ALREADY_DONE="❎"
+
+    # Taking care of error messages for internal release
+    
+
 }
 
 run_pre_checks() 
@@ -250,6 +269,12 @@ run_pre_checks()
     then
         result=$(az --version 2>&1 > /dev/null)
         handle_exception $? $prefix "az cli verification" "$result"
+    fi
+
+    if [[ ${cloud_provider} == "gcp" ]]
+    then
+        result=$(gcloud --version 2>&1 > /dev/null)
+        handle_exception $? $prefix "gcp cli verification" "$result"
     fi
 }
 

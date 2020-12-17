@@ -1,4 +1,9 @@
-#!/bin/bash
+#!/bin/bash 
+ if ! [ -z ${DEV_CLI+x} ]
+then
+    shopt -s expand_aliases
+    alias cdp="cdp 2>/dev/null"
+fi
 source $(
     cd $(dirname $0)
     pwd -L
@@ -99,6 +104,15 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
 
                 if [[ ${cloud_provider} == "az" ]]; then
                     result=$($base_dir/cdp_create_az_dh_cluster.sh $prefix $base_dir/cdp-cluster-definitions/${cloud_provider}/$definition 2>&1 >/dev/null)
+                    handle_exception $? $prefix "datahub creation" "$result"
+                fi
+
+                if [[ ${cloud_provider} == "gcp" ]]; then
+
+                    echo ''$base_dir'/cdp_create_gcp_dh_cluster.sh '$prefix' '$base_dir'/cdp-cluster-definitions/'${cloud_provider}'/'$definition''
+                    exit 1
+
+                    result=$($base_dir/cdp_create_gcp_dh_cluster.sh $prefix $base_dir/cdp-cluster-definitions/${cloud_provider}/$definition 2>&1 >/dev/null)
                     handle_exception $? $prefix "datahub creation" "$result"
                 fi
             fi

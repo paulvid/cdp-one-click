@@ -1,4 +1,9 @@
 #!/bin/bash 
+ if ! [ -z ${DEV_CLI+x} ]
+then
+    shopt -s expand_aliases
+    alias cdp="cdp 2>/dev/null"
+fi 
 source $(cd $(dirname $0); pwd -L)/common.sh
 set -o nounset
 

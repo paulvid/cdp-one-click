@@ -73,6 +73,17 @@ done
 export RDS_HA=$RDS_HA
 export SYNC_USERS=$SYNC_USERS
 
+
+# Removing warnings
+cdp iam get-user 2>/tmp/cli-test 1>/dev/null
+warning_message=$(cat /tmp/cli-test)
+if [ ${#warning_message} -gt 1 ]
+then
+    shopt -s expand_aliases
+    alias cdp="cdp 2>/dev/null"
+    export DEV_CLI="true"
+fi
+
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┃ Starting to create all the things ┃"
 echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
@@ -105,7 +116,6 @@ then
  
 fi
 echo ""
-
 if [[ ${cloud_provider} == "aws" ]]
 then
     # 1. AWS pre-reqs
@@ -129,6 +139,21 @@ then
     handle_exception $? $prefix "creating Azure SDX" "Error creating Azure SDX"
    
 fi
+
+
+if [[ ${cloud_provider} == "gcp" ]]
+then
+    # 1. GCP pre-reqs
+    ${base_dir}/cdp_gcp_pre_reqs.sh ${param_file}
+    handle_exception $? $prefix "creating GCP pre-requisites" "Error creating GCP pre-requisites"
+
+
+    # 2. GCP SDX
+    ${base_dir}/cdp_gcp_sdx.sh ${param_file}
+    handle_exception $? $prefix "creating GCP SDX" "Error creating GCP SDX"
+   
+fi
+
 
 # 4. Creating datahub cluster if we have at least one definition
 list_size=$(echo ${datahub_list} | jq -r .[] 2> /dev/null | wc -l)

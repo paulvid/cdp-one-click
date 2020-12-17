@@ -1,4 +1,9 @@
 #!/bin/bash 
+ if ! [ -z ${DEV_CLI+x} ]
+then
+    shopt -s expand_aliases
+    alias cdp="cdp 2>/dev/null"
+fi 
 source $(cd $(dirname $0); pwd -L)/common.sh
  display_usage() { 
 	echo "
@@ -222,5 +227,14 @@ if [[ ${cloud_provider} == "az" ]]
 then
 
 printf "💰 Estimated costs for Azure coming soon! 💰"
+
+fi
+
+
+#Azure
+if [[ ${cloud_provider} == "gcp" ]]
+then
+
+printf "💰 Estimated costs for GCP coming soon! 💰"
 
 fi

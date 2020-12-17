@@ -1,4 +1,9 @@
-#!/bin/bash
+#!/bin/bash 
+if ! [ -z ${DEV_CLI+x} ]
+then
+    shopt -s expand_aliases
+    alias cdp="cdp 2>/dev/null"
+fi
 source $(
     cd $(dirname $0)
     pwd -L
@@ -64,6 +69,16 @@ if [ $# -gt 1 ]; then
     display_usage
     exit 1
 fi
+# Removing warnings
+# Removing warnings
+cdp iam get-user 2>/tmp/cli-test 1>/dev/null
+warning_message=$(cat /tmp/cli-test)
+if [ ${#warning_message} -gt 1 ]
+then
+    shopt -s expand_aliases
+    alias cdp="cdp 2>/dev/null"
+    export DEV_CLI="true"
+fi
 
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┃ Starting to delete all the things ┃"
@@ -98,10 +113,8 @@ echo ""
 env_name=${prefix}-cdp-env
 env_crn=$(cdp environments describe-environment --environment-name ${prefix}-cdp-env  2>/dev/null | jq -r .environment.crn)
 cluster_id=$(cdp dw list-clusters 2>/dev/null | jq -r '.clusters[] | select(.environmentCrn=="'${env_crn}'") | .id')
-if [ ${#cluster_id} -lt 2 ]; then
-    printf "\r${ALREADY_DONE}  $prefix: CDW cluster already deleted     "
-    echo ""
-else
+if [ ${#cluster_id} -gt 2 ]; then
+
     # 0.1. Deleting all vw
     all_vws=$(cdp dw list-vws --cluster-id ${cluster_id}  2>/dev/null | jq -r '.vws[].id' 2>/dev/null)
 
@@ -454,6 +467,54 @@ if [[ ${cloud_provider} == "az" ]]; then
     fi
     echo ""
     echo "${CHECK_MARK}  $prefix: no azure assets remaining"
+    echo ""
+    echo "⏱  $(date +%H%Mhrs)"
+    echo ""
+fi
+
+
+# 6. Deleting GCP assets
+if [[ ${cloud_provider} == "gcp" ]]; then
+    echo "⏱  $(date +%H%Mhrs)"
+    echo ""
+    echo "Deleting GCP assets for $prefix:"
+    underline="▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔"
+    for ((i = 1; i <= $prefix_length; i++)); do
+        underline=${underline}"▔"
+    done
+    echo ${underline}
+    echo ""
+
+    result=$($base_dir/gcp-pre-req/gcp_delete_network.sh $prefix 2>&1 >/dev/null)
+    echo "${CHECK_MARK}  $prefix: network deleted"
+
+    result=$($base_dir/gcp-pre-req/gcp_delete_iam.sh $prefix 2>&1 >/dev/null)
+    echo "${CHECK_MARK}  $prefix: iam deleted"
+
+
+    result=$($base_dir/gcp-pre-req/gcp_delete_buckets.sh $prefix 2>&1 >/dev/null)
+    echo "${CHECK_MARK}  $prefix: buckets deleted"
+
+
+    if [[ "$generate_credential" == "yes" ]]; then
+
+
+
+        # Purging existing assets
+        result=$($base_dir/gcp-pre-req/gcp_delete_service_account.sh $prefix 2>&1 >/dev/null)
+        handle_exception $? $prefix "credential service account purge" "$result"
+        echo "${CHECK_MARK}  $prefix: credential service account purged"
+
+
+        cred=$(cdp environments list-credentials | jq -r .credentials[].credentialName | grep ${credential})
+        if [[ ${credential} == $cred ]]; then
+            result=$(cdp environments delete-credential --credential-name ${credential} 2>&1 >/dev/null)
+            handle_exception $? $prefix "credential purge" "$result"
+            echo "${CHECK_MARK}  $prefix: credential purged"
+        fi
+    fi
+
+    echo "${CHECK_MARK}  $prefix: no GCP assets remaining"
     echo ""
     echo "⏱  $(date +%H%Mhrs)"
     echo ""
