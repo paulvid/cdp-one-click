@@ -108,10 +108,6 @@ for item in $(echo ${datahub_list} | jq -r '.[] | @base64'); do
                 fi
 
                 if [[ ${cloud_provider} == "gcp" ]]; then
-
-                    echo ''$base_dir'/cdp_create_gcp_dh_cluster.sh '$prefix' '$base_dir'/cdp-cluster-definitions/'${cloud_provider}'/'$definition''
-                    exit 1
-
                     result=$($base_dir/cdp_create_gcp_dh_cluster.sh $prefix $base_dir/cdp-cluster-definitions/${cloud_provider}/$definition 2>&1 >/dev/null)
                     handle_exception $? $prefix "datahub creation" "$result"
                 fi
