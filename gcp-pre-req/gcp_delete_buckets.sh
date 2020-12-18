@@ -41,5 +41,8 @@ fi
 
 prefix=$1
 
+gsutil rm -r gs://$prefix-cdp-logs
+gsutil rm -r gs://$prefix-cdp-data
+
 gsutil rb -f gs://$prefix-cdp-logs
 gsutil rb -f gs://$prefix-cdp-data

@@ -55,6 +55,9 @@ else
 fi
 gcloud iam service-accounts create ${prefix}-log-sa --description="${prefix}-log-sa" --display-name="${prefix}-log-sa"
 gcloud projects add-iam-policy-binding ${project} --member="serviceAccount:${prefix}-log-sa@${project}.iam.gserviceaccount.com" --role="projects/${project}/roles/${prefix}_log_role" --condition='expression=resource.name == "'${prefix}'-cdp-logs",title='${prefix}'-cdp-logs'
+gsutil iam ch serviceAccount:${prefix}-log-sa@${project}.iam.gserviceaccount.com:admin gs://${prefix}-cdp-logs
+
+
 
 # DL Admin
 
