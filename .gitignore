@@ -8,3 +8,11 @@ cdp-cluster-definitions/aws/cdp-main-workshop.json
 cdp-cluster-definitions/aws/cdp-emr-workshop.json
 cdp-cluster-definitions/aws/cdf-workshop.json
 cdp-cluster-templates/*
+./.DS_Store
+aws-pre-req/.DS_Store
+.DS_Store
+parameters
+parameters/*
+tmp_network
+tmp_network/*
+gcp-pre-req/credential_jsons/*
