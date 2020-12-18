@@ -29,26 +29,33 @@ Arguments:
 ##########################################
 get_env_status() {
         wait_status=$1
-        result=$(
-                { stdout=$($base_dir/cdp_describe_env.sh $prefix) ; } 2>&1
-                printf "this is the separator"
-                printf "%s\n" "$stdout"
-            )
-        var_out=${result#*this is the separator}
-        var_err=${result%this is the separator*}
-        if [[ ${#var_out} -eq 0 ]]
+        ### COMMENTED UNTIL WE CAN REMOVE ERROR MESSAGES
+        # result=$(
+        #         { stdout=$($base_dir/cdp_describe_env.sh $prefix) ; } 2>&1
+        #         printf "this is the separator"
+        #         printf "%s\n" "$stdout"
+        #     )
+        # var_out=${result#*this is the separator}
+        # var_err=${result%this is the separator*}
+        # if [[ ${#var_out} -eq 0 ]]
+        # then
+        #     env_describe_err=$(echo $var_err | grep $wait_status)
+        #     if [[ ${#env_describe_err} > 1 ]]
+        #     then 
+        #         env_status="WAITING_FOR_API"
+        #     else
+        #         handle_exception 2 $prefix "environment creation" $var_err
+        #     fi
+        # else
+        #     env_status=$(echo ${var_out} | jq -r .environment.status)
+        # fi
+        status=$($base_dir/cdp_describe_env.sh $prefix | jq -r .environment.status)
+        if [ ${#status} -lt 4 ]
         then
-            env_describe_err=$(echo $var_err | grep $wait_status)
-            if [[ ${#env_describe_err} > 1 ]]
-            then 
-                env_status="WAITING_FOR_API"
-            else
-                handle_exception 2 $prefix "environment creation" $var_err
-            fi
+            env_status="WAITING_FOR_API"
         else
-            env_status=$(echo ${var_out} | jq -r .environment.status)
+            env_status=$status
         fi
-
         echo $env_status
 }
 
