@@ -44,7 +44,9 @@ fi
 param_file=${1}
 RDS_HA=1
 COST_CHECK=1
-SYNC_USERS=1
+#SYNC_USERS=1
+### MODIFIED BECAUSE OF CDP ERROR MESSAGES
+SYNC_USERS=0
 while (( "$#" )); do
   case "$1" in
     --no-db-ha)
