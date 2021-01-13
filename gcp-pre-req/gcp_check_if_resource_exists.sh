@@ -75,9 +75,9 @@ fi
 if [[ "$resource" == "iam" ]]; then
 
   log_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-log-sa'") | .email')
-  datalake_admin_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-datalake-admin-sa'") | .email')
-  ranger_audit_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-ranger-audit-sa'") | .email')
-  idbroker_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-idbroker-sa'") | .email')
+  datalake_admin_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-dladm-sa'") | .email')
+  ranger_audit_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-rgraud-sa'") | .email')
+  idbroker_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-idb-sa'") | .email')
 
   if [ ${#log_sa} -gt 1 ] && [ ${#datalake_admin_sa} -gt 1 ] && [ ${#ranger_audit_sa} -gt 1 ] && [ ${#idbroker_sa} -gt 1 ]
   then

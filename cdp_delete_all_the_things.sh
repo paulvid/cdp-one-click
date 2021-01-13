@@ -485,7 +485,7 @@ if [[ ${cloud_provider} == "gcp" ]]; then
     echo ${underline}
     echo ""
 
-    result=$($base_dir/gcp-pre-req/gcp_delete_network.sh $prefix 2>&1 >/dev/null)
+    result=$($base_dir/gcp-pre-req/gcp_delete_network.sh $prefix $region 2>&1 >/dev/null)
     echo "${CHECK_MARK}  $prefix: network deleted"
 
     result=$($base_dir/gcp-pre-req/gcp_delete_iam.sh $prefix 2>&1 >/dev/null)

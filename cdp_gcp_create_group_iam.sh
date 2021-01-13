@@ -95,6 +95,6 @@ fi
 
 cdp environments set-id-broker-mappings \
                --environment-name "$2-cdp-env" \
-               --baseline-role "${prefix}-ranger-audit-sa@${project}.iam.gserviceaccount.com" \
-               --data-access-role "${prefix}-datalake-admin-sa@${project}.iam.gserviceaccount.com" \
-               --mappings accessorCrn="$user_crn",role="${prefix}-datalake-admin-sa@${project}.iam.gserviceaccount.com"
+               --baseline-role "${prefix}-rgraud-sa@${project}.iam.gserviceaccount.com" \
+               --data-access-role "${prefix}-dladm-sa@${project}.iam.gserviceaccount.com" \
+               --mappings accessorCrn="$user_crn",role="${prefix}-dladm-sa@${project}.iam.gserviceaccount.com"

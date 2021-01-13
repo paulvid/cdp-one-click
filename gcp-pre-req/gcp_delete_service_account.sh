@@ -15,7 +15,7 @@ Description:
     Deletes Azure resource group
 
 Arguments:
-    prefix:         prefix for your service account (name <prefix>-cdp-cred-sa)
+    prefix:         prefix for your service account (name <prefix>-cdpcrd-sa)
     --help or -h:   displays this help"
 
 }
@@ -49,7 +49,7 @@ prefix=$1
 # Listing all resources
 
 
-email=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-cdp-cred-sa'") | .email')
+email=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-cdpcrd-sa'") | .email')
 
 if [[ ${#email} -gt 0 ]]
 then

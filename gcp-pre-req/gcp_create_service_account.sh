@@ -15,7 +15,7 @@ Description:
     Deletes Azure resource group
 
 Arguments:
-    prefix:         prefix for your service account (name <prefix>-cdp-cred-sa)
+    prefix:         prefix for your service account (name <prefix>-cdpcrd-sa)
     --help or -h:   displays this help"
 
 }
@@ -45,14 +45,14 @@ fi
 
 prefix=$1
 
-SERVICE_ACCOUNT_NAME=${prefix}-cdp-cred-sa
+SERVICE_ACCOUNT_NAME=${prefix}-cdpcrd-sa
 PROJECT_ID=$(gcloud config get-value project)
 
 # Listing all resources
 
 gcloud services enable compute.googleapis.com runtimeconfig.googleapis.com  --quiet
 
-gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME --display-name "${prefix}-cdp-cred-sa" --quiet
+gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME --display-name "${prefix}-cdpcrd-sa" --quiet
 
 
 gcloud projects add-iam-policy-binding $PROJECT_ID --member serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com --role roles/compute.instanceAdmin.v1 --quiet --no-user-output-enabled --condition=None

@@ -282,3 +282,5 @@ Note: some flags require dev cli, not for public consumption, use at your own ri
 **Mike Riggs** - [LinkedIn](https://www.linkedin.com/in/mriggs/)
 
 **Ryan Cicak** - [LinkedIn](https://www.linkedin.com/in/ryan-cicak-66221a47/)
+
+**Alex Moundalexis** - [LinkedIn](https://www.linkedin.com/in/moundalexis/)

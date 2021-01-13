@@ -78,14 +78,14 @@ if [ ${rds_ha} -eq 1 ]
 then 
     cdp datalake create-gcp-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
-        --cloud-provider-configuration "serviceAccountEmail=${prefix}-idbroker-sa@${project}.iam.gserviceaccount.com,storageLocation=gs://$prefix-cdp-data" \
+        --cloud-provider-configuration "serviceAccountEmail=${prefix}-idb-sa@${project}.iam.gserviceaccount.com,storageLocation=gs://$prefix-cdp-data" \
         --scale $2 
         
         # --tags $(flatten_tags "$TAGS") \ commenting out for now
 else
     cdp datalake create-gcp-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
-        --cloud-provider-configuration "serviceAccountEmail=${prefix}-idbroker-sa@${project}.iam.gserviceaccount.com,storageLocation=gs://$prefix-cdp-data" \
+        --cloud-provider-configuration "serviceAccountEmail=${prefix}-idb-sa@${project}.iam.gserviceaccount.com,storageLocation=gs://$prefix-cdp-data" \
         --scale $2 \
         --database-availability-type NONE
 fi

@@ -43,9 +43,9 @@ prefix=$1
 project=$(gcloud config get-value project)
 
 log_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-log-sa'") | .email')
-datalake_admin_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-datalake-admin-sa'") | .email')
-ranger_audit_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-ranger-audit-sa'") | .email')
-idbroker_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-idbroker-sa'") | .email')
+datalake_admin_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-dladm-sa'") | .email')
+ranger_audit_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-rgraud-sa'") | .email')
+idbroker_sa=$(gcloud iam service-accounts list --format json | jq -r '.[] | select(.displayName=="'${prefix}-idb-sa'") | .email')
 log_role=$(gcloud iam roles list --format json --project ${project} | jq -r '.[] | select(.title=="'${prefix}'-log-role") | .name')
 if [[ ${#log_sa} -gt 0 ]]
 then

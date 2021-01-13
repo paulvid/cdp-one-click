@@ -43,5 +43,5 @@ fi
 prefix=$1
 region=$2
 
-gsutil mb -c NEARLINE -l ${region} -b on gs://$prefix-cdp-logs
-gsutil mb -c NEARLINE -l ${region} -b on gs://$prefix-cdp-data
+gsutil mb -c STANDARD -l ${region} -b on gs://$prefix-cdp-logs
+gsutil mb -c STANDARD -l ${region} -b on gs://$prefix-cdp-data
