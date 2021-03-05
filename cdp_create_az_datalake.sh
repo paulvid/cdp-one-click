@@ -84,7 +84,7 @@ else
     cdp datalake create-azure-datalake --datalake-name $1-cdp-dl \
         --environment-name $1-cdp-env \
         --cloud-provider-configuration managedIdentity="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/$1-cdp-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/assumerIdentity",storageLocation="abfs://data@${1//-/}cdpsa.dfs.core.windows.net" \
-        --scale $2
+        --scale $2 \
         --tags $(flatten_tags $TAGS) \
         --database-availability-type NONE
 fi
